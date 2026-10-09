@@ -1,0 +1,142 @@
+import { describe, expect, it } from "vitest";
+import { appendOnlyIssues, fieldAt, fromPublicLedger, stable, withField } from "@openpromises/core";
+import { BASE, card } from "./helpers";
+
+/** The same value with every object's keys in reverse order. */
+function reversed(v: unknown): unknown {
+  if (Array.isArray(v)) return v.map(reversed);
+  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).reverse().map(([k, x]) => [k, reversed(x)]));
+  return v;
+}
+
+const messages = (before: unknown, after: unknown) => appendOnlyIssues(before, after).map((i) => `${i.path.join(".")}: ${i.message}`);
+
+describe("stable", () => {
+  it("ignores key order and undefined fields", () => {
+    expect(stable({ b: 1, a: [{ y: 2, x: 1 }], c: undefined })).toBe(stable({ a: [{ x: 1, y: 2 }], b: 1 }));
+    expect(stable({ a: [1, 2] })).not.toBe(stable({ a: [2, 1] }));
+  });
+});
+
+describe("fieldAt and withField", () => {
+  it("read and write a field by its path, absent reading as null", () => {
+    const e = { parameters: { cost: { range: [1, 2, 3] } } };
+    expect(fieldAt(e, ".parameters.cost.range")).toEqual([1, 2, 3]);
+    expect(fieldAt(e, ".parameters.who")).toBeNull();
+    expect(withField(e, ".parameters.cost.range", null)).toEqual({ parameters: { cost: {} } });
+    expect(withField(e, ".parameters.who.en", "x")).toEqual({ parameters: { cost: { range: [1, 2, 3] }, who: { en: "x" } } });
+    expect(e.parameters.cost.range).toEqual([1, 2, 3]);
+  });
+
+  it("refuse paths that would write to Object.prototype", () => {
+    expect(() => withField({}, ".__proto__.polluted", 1)).toThrow("unsafe correction path");
+    expect(() => withField({}, ".constructor", 1)).toThrow("unsafe correction path");
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+  });
+});
+
+describe("append-only", () => {
+  it("passes an unchanged card, whatever its key order", () => {
+    const reordered = reversed(BASE);
+    expect(Object.keys(reordered as object)[0]).toBe("reviews");
+    expect(messages(BASE, reordered)).toEqual([]);
+  });
+
+  it("passes new entries at the end, and edits to what describes the present", () => {
+    const after = card((c) => {
+      c.events.push({ date: "2026-08-01", type: "funded", text: { en: "Funded" }, evidence_url: "https://example.org/f" });
+      c.status = "funded";
+      c.status_note = { en: "Now funded." };
+      c.headline = { en: "Cap city bus fares at £2" };
+      c.reviews!.push({ by: "AI Journalist", kind: "automated", on: "2026-08-02" });
+    });
+    expect(messages(BASE, after)).toEqual([]);
+  });
+
+  it("fails an edited, removed or reordered entry", () => {
+    expect(messages(BASE, card((c) => (c.events[1]!.text = { en: "Rewritten" })))).toEqual([
+      "events.1: was changed; history is append-only (add a new entry, or record our own mistake as a correction)",
+    ]);
+    expect(messages(BASE, card((c) => c.events.pop()))).toEqual(["events.1: was removed; history is append-only (record what happened as a new entry instead)"]);
+    expect(messages(BASE, card((c) => c.events.reverse()))).toHaveLength(2);
+  });
+
+  it("passes a change that a new correction records exactly", () => {
+    const after = card((c) => {
+      c.versions[0]!.parameters!.cost!.range = [1.1, 1.3, 1.6];
+      c.corrections = [{ date: "2026-10-01", path: "versions[0].parameters.cost.range", was: [1, 1.2, 1.5], now: [1.1, 1.3, 1.6], reason: { en: "Misread the budget table." } }];
+    });
+    expect(messages(BASE, after)).toEqual([]);
+  });
+
+  it("undoes several corrections of one entry, newest first", () => {
+    const after = card((c) => {
+      c.events[1]!.date = "2026-06-03";
+      c.events[1]!.text = { en: "Named in the transport plan" };
+      c.corrections = [
+        { date: "2026-10-01", path: "events[1].date", was: "2026-06-01", now: "2026-06-02", reason: { en: "Wrong day." } },
+        { date: "2026-10-02", path: "events[1].text", was: { en: "In the city's transport plan" }, now: { en: "Named in the transport plan" }, reason: { en: "Clearer." } },
+        { date: "2026-10-03", path: "events[1].date", was: "2026-06-02", now: "2026-06-03", reason: { en: "Still wrong." } },
+      ];
+    });
+    expect(messages(BASE, after)).toEqual([]);
+  });
+
+  it("fails a change its correction does not record", () => {
+    const after = card((c) => {
+      c.versions[0]!.parameters!.cost!.range = [1.1, 1.3, 1.6];
+      c.versions[0]!.text = "Something else entirely.";
+      c.corrections = [{ date: "2026-10-01", path: "versions[0].parameters.cost.range", was: [1, 1.2, 1.5], now: [1.1, 1.3, 1.6], reason: { en: "Misread." } }];
+    });
+    expect(messages(BASE, after)).toEqual(["versions.0: changed in ways its corrections do not record: undoing them does not give back the published entry"]);
+  });
+
+  it("fails a correction whose was is not the published value", () => {
+    const after = card((c) => {
+      c.versions[0]!.parameters!.cost!.range = [1.1, 1.3, 1.6];
+      c.corrections = [{ date: "2026-10-01", path: "versions[0].parameters.cost.range", was: [9, 9, 9], now: [1.1, 1.3, 1.6], reason: { en: "Misread." } }];
+    });
+    expect(messages(BASE, after)).toHaveLength(1);
+  });
+
+  it("fails a changed or removed correction or review", () => {
+    const corrected = card((c) => (c.corrections = [{ date: "2026-10-01", path: "events[0].date", was: "2026-05-01", now: "2026-05-01", reason: { en: "Checked." } }]));
+    expect(messages(corrected, card())).toEqual(["corrections.0: was changed or removed; corrections are history too (add a new correction instead)"]);
+    expect(messages(BASE, card((c) => (c.reviews![0]!.on = "2026-05-09")))).toEqual(["reviews.0: was changed or removed; reviews are history (add a new review instead)"]);
+  });
+
+  it("fails a changed id", () => {
+    expect(messages(BASE, card((c) => (c.id = "other")))).toEqual(['id: the id changed from "test-bus-fares" to "other"; a published card keeps its id']);
+  });
+
+  it("refuses an unsafe correction path instead of following it", () => {
+    const after = card((c) => {
+      c.events[1]!.text = { en: "x" };
+      c.corrections = [{ date: "2026-10-01", path: "events[1].__proto__", was: null, now: null, reason: { en: "x" } }];
+    });
+    expect(messages(BASE, after)[0]).toContain("unsafe correction path");
+  });
+
+  it("treats a format migration as no edit: a legacy card read in v1 equals the same card migrated", () => {
+    const legacy = {
+      id: "uk-test-2026",
+      headline: "Cap bus fares at £2",
+      actor_id: "ada-lovelace",
+      made_on: "2026-05-01",
+      policy_area: "transport",
+      status: "promised",
+      deadline: "2027-01-01",
+      sources: [],
+      versions: [{ version: 1, text: "We will cap fares.", recorded_on: "2026-05-01", source_url: "https://example.org/s", parameters: { who: "Passengers", how_much_bn_per_year: [1, 1.2, 1.4], cost_note: "From the budget." } }],
+      events: [{ date: "2026-05-01", type: "promised", text: "Promised" }],
+      corrections: [{ date: "2026-10-01", path: "versions[0].parameters.cost_note", was: "Old note.", now: "From the budget.", reason: "Fixed note." }],
+    };
+    // The migration change: base in the old format, now in v1, written back with keys in another order.
+    const migrated = fromPublicLedger(legacy);
+    const written = reversed(migrated) as { versions: { parameters: { cost: { range: number[] } } }[] };
+    expect(messages(fromPublicLedger(legacy), written)).toEqual([]);
+    // And a real edit made in the same change is still caught.
+    written.versions[0]!.parameters.cost.range[0] = 0.5;
+    expect(messages(fromPublicLedger(legacy), written)).toHaveLength(1);
+  });
+});
