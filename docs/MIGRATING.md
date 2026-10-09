@@ -14,6 +14,8 @@ openpromises validate --no-base
 
 The problems listed are the ones COMPARISON.md describes. Nothing has changed yet.
 
+Then see what readers and machines would notice. A dry run ([tools/dry-run](../tools/dry-run/README.md)) builds everything the engine would publish for the site and compares it, area by area, with what the live site serves: cards, checks, history, feeds, Markdown, structured data and pages. It changes nothing. The move goes ahead when it finds nothing worse.
+
 ## 2. The editors list
 
 Approvals are recorded in the card and checked against a list of editors and their declared parties (decision 4). Choose where the list lives:

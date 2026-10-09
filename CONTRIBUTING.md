@@ -33,6 +33,7 @@ The JSON Schema files in `packages/core/schema/` are generated from the Zod sche
 3. Add or change tests with the code. A new rule needs at least one card that passes it and one that fails it.
 4. Update `docs/FORMAT.md` when the card format or a rule changes. The format is a public standard: a change that would make a valid card invalid needs a new format version and a migration (`openpromises migrate`).
 5. Two maintainers review every pull request, as two editors approve every card.
+6. Before a release, run each site's dry run (`pnpm dry-run`, [tools/dry-run](tools/dry-run/README.md)): what the engine publishes for a live site must be as good as what the site serves, or better.
 
 ## Licence
 

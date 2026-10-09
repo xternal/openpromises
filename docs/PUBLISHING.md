@@ -114,13 +114,13 @@ Every component takes `config` and `locale` (the site's default when left out). 
 
 ## Compared with the sites today
 
-What changes when a site renders its promise pages and feeds with these packages:
+What changes when a site renders its promise pages and feeds with these packages. A dry run ([tools/dry-run](../tools/dry-run/README.md)) checks this against the live site, item by item:
 
 | | Public Ledger | Borough Book |
 |---|---|---|
 | Feed addresses and entry ids | The same (`/feeds/…xml`, `tag:ledgergov.uk,2026:promise/<id>/event/<n>`) | The same (`<page>/feed.xml`, `tag:borough-ledger,2026:…`) |
-| Feed entry words | The same, from the same code | Titles now name the event first ("In plan: …"), as Public Ledger's do; the one-off "new pledge card" item is no longer made (the "Promised" entry covers it) |
+| Feed entry words | The same for timeline events, rewordings and replies. Not made yet: cost changes and the site's contract and figures entries (the dry run lists them) | Titles now name the event first ("In plan: …"), as Public Ledger's do; the one-off "new pledge card" item is no longer made (the "Promised" entry covers it) |
 | Card structured data | `Article` with the `Quotation`, as RFC-0001 §6 asks (today `WebPage`); breadcrumbs unchanged | `Article` with the `Quotation`, as today; the FAQ block stays the site's own |
-| Markdown, `llms-full.txt` | The same layout and facts | New |
+| Markdown, `llms-full.txt` | The same layout and facts, with the site's own words set in `messages` (as in `tools/dry-run/ledgergov.config.ts`) | New |
 | Open data | New in this form (the site's `/api/v1` stays its own) | New |
 | Kept in the site | Deadline-window feeds and email and Telegram follows (`follow`, decision 8), contract entries, the sandbox link, the reviewer's display name | Payments and ward pages, council decision feeds |

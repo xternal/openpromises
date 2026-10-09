@@ -13,7 +13,8 @@
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json",
     "schema": "pnpm --filter @openpromises/core schema",
-    "openpromises": "node packages/cli/dist/bin.js"
+    "openpromises": "node packages/cli/dist/bin.js",
+    "dry-run": "vitest run --config tools/dry-run/vitest.config.ts"
   },
   "devDependencies": {
     "@openpromises/cli": "workspace:*",
