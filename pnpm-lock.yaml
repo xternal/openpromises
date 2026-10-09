@@ -232,6 +232,9 @@ importers:
       '@openpromises/files':
         specifier: workspace:*
         version: link:../files
+      '@openpromises/publish':
+        specifier: workspace:*
+        version: link:../publish
       '@openpromises/quotes':
         specifier: workspace:*
         version: link:../quotes

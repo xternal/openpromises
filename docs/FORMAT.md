@@ -42,14 +42,14 @@ export default defineConfig({
 
 | Key | Meaning | Default |
 |---|---|---|
-| `site` | `{ name, url? }` | required |
+| `site` | `{ name, url?, description?, paths?, localePaths? }`. `url` is needed to publish (feeds, structured data and sitemaps use full addresses). `description`: what the site is, per language. `paths`: where the site serves its pages, with `{id}` and `{area}` filled in, and its feeds: a folder (`"/feeds"`) or a feed beside each page (`"{page}/feed.xml"`). `localePaths`: the path each language's pages start with, such as `{ ru: "", en: "/en" }`. | `name` required; paths `/promises`, `/promise/{id}`, `/actor/{id}`, `/promises/area/{area}`, `/feeds`; other languages under `/<code>` |
 | `content` | The content folder, relative to the configuration file | `"content"` |
 | `timezone` | The time zone "today" is taken in, for deadlines and reviews (an IANA name such as `"Europe/London"`) | `"UTC"` |
 | `locales` | `{ default, all }`: the languages every text we write must have. `default` is one of `all`. | `{ default: "en", all: ["en"] }` |
 | `money` | `{ currency, unit, period, qualities }`. Costs are written in `unit` of `currency` (for example `"bn"` of `"GBP"`), per `period` (`"year"`). `qualities` is the list of quality labels a cost may carry. | `qualities: ["sourced", "approx", "modelled"]`, `period: "year"` |
-| `actors` | `{ kinds, standing, levels?, ids? }`. `kinds`: the kinds of actor allowed (`party` is the kind the party check uses). `standing`: `"manual"` (each actor states it), `"fromSeats"` (worked out from the seats each party holds) or `"none"`. `levels`: allowed values of an actor's `level`, such as `["federal", "regional"]`. `ids`: the outside identifiers an actor may carry, such as a parliament's member id. | `kinds: ["person", "party", "government"]`, `standing: "none"` |
+| `actors` | `{ kinds, standing, levels?, ids? }`. (An `ids` entry may be a URL template with `{id}`, such as `"https://members.parliament.uk/member/{id}"`; structured data then names that page as the actor's official page.) `kinds`: the kinds of actor allowed (`party` is the kind the party check uses). `standing`: `"manual"` (each actor states it), `"fromSeats"` (worked out from the seats each party holds) or `"none"`. `levels`: allowed values of an actor's `level`, such as `["federal", "regional"]`. `ids`: the outside identifiers an actor may carry, such as a parliament's member id. | `kinds: ["person", "party", "government"]`, `standing: "none"` |
 | `venues` | Where promises are made. A card's `venue` must be one of them. | any venue allowed |
-| `areas` | What a card's `area` may be: `{ kind: "enum", values: [...] }`, `{ kind: "codes", pattern: "^(0[1-9]\|1[0-4])$" }` or `{ kind: "text" }` (any short text). | `{ kind: "text" }` |
+| `areas` | What a card's `area` may be: `{ kind: "enum", values: [...] }`, `{ kind: "codes", pattern: "^(0[1-9]\|1[0-4])$" }` or `{ kind: "text" }` (any short text). An enum or codes may add `labels` (`{ taxes: { en: "Taxes" } }`) and URL `slugs` (`{ economic_affairs: "transport-and-economy" }`); without a slug, the area is made into one. A slug is a URL: never change one once published. | `{ kind: "text" }` |
 | `ladder` | The status ladder: `"national"`, `"local"`, or `{ custom: [{ id, category }, ...] }` (§6). | `"national"` |
 | `labels` | Status labels per language: `{ en: { failed: "Not met" } }`. Neutral defaults exist in English and Russian (§6). | defaults |
 | `headline` | Headline limits per language: `{ en: { minWords: 3, maxWords: 8, maxChars: 70 } }`. | §11 |
@@ -59,6 +59,8 @@ export default defineConfig({
 | `legacy` | The older format that cards without a `format:` line are in: `"public-ledger"`, `"borough-book"` or `"russia-ledger"`. They are converted on read (§14). | none |
 | `deadlines` | `{ text: { en: "…" } }`: the words of the automatic `deadline_missed` event, per language. English and Russian are built in. | built in |
 | `lint` | `{ words: { en: [...] }, allow: { en: [...] } }`: extra judgement words, and phrases to allow, per language. | built in |
+| `messages` | Words on pages, feeds and Markdown, per language, replacing the built-in ones: `{ en: { "card.timeline": "Timeline" } }`. The keys are in `@openpromises/publish` (`MESSAGES`); English and Russian are built in. | built in |
+| `publish` | `{ tag, feeds, licence }`. `tag`: the fixed start of every feed entry id, such as `"example.org,2026"`; set it once and never change it, or every reader sees every entry again. `feeds`: `"atom"`, `"rss"` or `"both"`. `licence`: `{ name, url }` of the site's own writing, for Markdown and open data. | `feeds: "atom"` |
 | `x` | Zod schemas for the site's own fields: `{ card, actor }` (TypeScript configuration only). | none |
 
 A YAML or JSON configuration has the same keys, except `x`.

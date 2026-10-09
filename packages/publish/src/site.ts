@@ -1,10 +1,10 @@
 import type { Config } from "@openpromises/core";
 import { openDataCsv, openDataJson } from "./data";
-import { buildFeed, type EntryContext } from "./feeds";
+import { buildFeed, tagUri, type EntryContext } from "./feeds";
 import { cardMarkdownFile, llmsFull, llmsTxt, MARKDOWN_TYPE } from "./markdown";
 import { words } from "./messages";
 import { sitemapEntries, sitemapXml } from "./sitemap";
-import { paths, type FeedFormat, type FeedKind } from "./urls";
+import { absolute, paths, type FeedFormat, type FeedKind } from "./urls";
 import { actorName, type CardView } from "./view";
 
 /**
@@ -32,6 +32,9 @@ export interface PublishInput {
 const XML = "application/xml; charset=utf-8";
 
 export function publishFiles({ config, views, today }: PublishInput): PublishedFile[] {
+  // Everything is built on these two; say so before anything else.
+  absolute(config, "/");
+  tagUri(config, "feed/all");
   const files: PublishedFile[] = [];
   const p = paths(config);
   const published = views.filter((v) => v.where === "promises");

@@ -6,7 +6,7 @@ A promise is a card: the speaker's exact words, what it would cost (a range, wit
 
 It is a library and a command-line tool, not a hosted service. It makes no network calls, collects nothing and needs no account.
 
-> **Status:** in development (milestone E1). Not yet published to npm. The design is [RFC-0001](docs/RFC-0001.md); the card format is [docs/FORMAT.md](docs/FORMAT.md).
+> **Status:** in development (milestones E1 and E2). Not yet published to npm. The design is [RFC-0001](docs/RFC-0001.md); the card format is [docs/FORMAT.md](docs/FORMAT.md); publishing and pages are in [docs/PUBLISHING.md](docs/PUBLISHING.md).
 
 ## What the engine enforces
 
@@ -129,6 +129,7 @@ From then on its history only grows: a status change is a new event with an `evi
 | `openpromises deadlines` | Appends an automatic `deadline_missed` event to every open card whose deadline has passed. |
 | `openpromises lint` | Finds judgement words in our own text, per language; quotes are skipped. |
 | `openpromises migrate` | Converts cards in an older format to format v1. |
+| `openpromises publish --out <folder>` | Writes feeds, Markdown, `llms.txt`, a sitemap and open data for a static site (published cards only). |
 | `openpromises stats` | Counts cards by status, actor and area. |
 
 Run `openpromises help <command>` for the options, and `openpromises help rules` for every rule.
@@ -140,6 +141,8 @@ Run `openpromises help <command>` for the options, and `openpromises help rules`
 | [`@openpromises/core`](packages/core) | Card format v1 (Zod schemas, with JSON Schema in `packages/core/schema/` for other languages), configuration, and the rules as pure functions. |
 | [`@openpromises/files`](packages/files) | Reads and writes a content folder, compares it with a git base, migrates older formats on read. |
 | [`@openpromises/quotes`](packages/quotes) | Exact-quote matching: normalisation per language, exact / close / none tiers, spans in stored source text. |
+| [`@openpromises/publish`](packages/publish) | Atom and RSS feeds, JSON-LD, Markdown, `llms.txt`, sitemap, open data and IndexNow change lists, built from cards. |
+| [`@openpromises/react`](packages/react) | Server components for promise pages that read without JavaScript, with an optional stylesheet (navy-slate dark mode). |
 | [`@openpromises/cli`](packages/cli) | The `openpromises` command. |
 
 ## Who uses it

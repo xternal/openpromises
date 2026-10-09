@@ -30,7 +30,8 @@
   "dependencies": {
     "@openpromises/core": "workspace:*",
     "@openpromises/files": "workspace:*",
-    "@openpromises/quotes": "workspace:*"
+    "@openpromises/quotes": "workspace:*",
+    "@openpromises/publish": "workspace:*"
   },
   "bin": {
     "openpromises": "./dist/bin.js"

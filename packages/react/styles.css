@@ -1,0 +1,601 @@
+/*
+ * @openpromises/react: optional styles for the promise components.
+ *
+ * Every colour is a token on :root, so a site can restyle the components by
+ * setting the tokens (or ignore this file and style the op- classes itself).
+ * Dark mode is the navy slate palette, never black. Every text colour passes
+ * WCAG AA (4.5:1) on the page background and the first raised surface; faint
+ * text is never used on the second raised surface (--op-sunk), where it would
+ * not. test/contrast.test.ts checks this.
+ */
+
+:root {
+  --op-bg: #ffffff;
+  --op-surface: #f7f7f4;
+  --op-sunk: #f0f0ec;
+  --op-line: #e3e3de;
+  --op-line-strong: #c9cac3;
+  --op-ink: #16181d;
+  --op-muted: #555b66;
+  --op-faint: #666c77;
+  --op-accent: #2a55c9;
+  --op-good: #1a6e3f;
+  --op-warn: #8a5200;
+  --op-bad: #b3261e;
+  --op-radius: 10px;
+  --op-radius-small: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --op-bg: #101820;
+    --op-surface: #131d27;
+    --op-sunk: #1a2531;
+    --op-line: #26323f;
+    --op-line-strong: #364657;
+    --op-ink: #e7edf3;
+    --op-muted: #a3b0bd;
+    --op-faint: #7d8b99;
+    --op-accent: #7b9dff;
+    --op-good: #6fd39b;
+    --op-warn: #f0b45a;
+    --op-bad: #ff8f87;
+  }
+}
+
+:root[data-theme="dark"] {
+  --op-bg: #101820;
+  --op-surface: #131d27;
+  --op-sunk: #1a2531;
+  --op-line: #26323f;
+  --op-line-strong: #364657;
+  --op-ink: #e7edf3;
+  --op-muted: #a3b0bd;
+  --op-faint: #7d8b99;
+  --op-accent: #7b9dff;
+  --op-good: #6fd39b;
+  --op-warn: #f0b45a;
+  --op-bad: #ff8f87;
+}
+
+.op-card,
+.op-list,
+.op-coming,
+.op-crumbs,
+.op-index,
+.op-filter {
+  color: var(--op-ink);
+  overflow-wrap: anywhere;
+}
+
+.op-card a,
+.op-list a,
+.op-coming a,
+.op-crumbs a,
+.op-index a {
+  color: var(--op-accent);
+  text-underline-offset: 2px;
+}
+
+.op-card :focus-visible,
+.op-list :focus-visible,
+.op-coming :focus-visible,
+.op-crumbs :focus-visible,
+.op-index :focus-visible,
+.op-filter :focus-visible {
+  outline: 2px solid var(--op-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.op-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.op-muted {
+  color: var(--op-muted);
+}
+
+/* Breadcrumbs: the reader always knows where they are. */
+.op-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+  color: var(--op-muted);
+}
+.op-crumbs li + li::before {
+  content: "›";
+  margin-right: 8px;
+  color: var(--op-muted);
+}
+.op-crumbs [aria-current="page"] {
+  color: var(--op-ink);
+  font-weight: 600;
+}
+
+/* Status pill: the words carry the meaning; colour only repeats it. */
+.op-pill {
+  display: inline-block;
+  padding: 1px 8px;
+  border: 1px solid var(--op-line-strong);
+  border-radius: 999px;
+  background: var(--op-sunk);
+  color: var(--op-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.op-pill[data-category="progress"] {
+  color: var(--op-warn);
+}
+.op-pill[data-category="finished"] {
+  color: var(--op-bad);
+}
+.op-pill[data-status-top="true"] {
+  color: var(--op-good);
+}
+
+/* The card page. */
+.op-card {
+  display: grid;
+  gap: 32px;
+}
+.op-card__head {
+  display: grid;
+  gap: 14px;
+}
+.op-card__who,
+.op-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--op-muted);
+}
+.op-card__draft {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--op-line-strong);
+  border-radius: var(--op-radius-small);
+  background: var(--op-surface);
+  font-weight: 600;
+}
+.op-card__headline {
+  margin: 0;
+  font-weight: 600;
+}
+.op-card__quote {
+  margin: 0;
+  max-width: 34ch;
+  font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+.op-card__original {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--op-muted);
+}
+.op-card__body {
+  display: grid;
+  gap: 40px 48px;
+  align-items: start;
+}
+@media (min-width: 960px) {
+  .op-card__body {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+  .op-card__aside {
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: 80px;
+  }
+  .op-card__main {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+.op-card__main {
+  display: grid;
+  gap: 40px;
+  min-width: 0;
+}
+.op-card__aside {
+  display: grid;
+  gap: 14px;
+}
+.op-glance {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--op-line);
+  border-radius: var(--op-radius);
+  background: var(--op-surface);
+}
+.op-glance h2 {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--op-muted);
+}
+.op-glance dl {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+.op-fact dt {
+  font-size: 0.8125rem;
+  color: var(--op-muted);
+}
+.op-fact dd {
+  margin: 2px 0 0;
+}
+.op-fact__figure {
+  font-size: 1.625rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+.op-card__small {
+  margin: 0;
+  padding: 0 4px;
+  font-size: 0.8125rem;
+  color: var(--op-muted);
+}
+
+.op-section {
+  display: grid;
+  gap: 12px;
+}
+.op-section h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+.op-section p {
+  margin: 0;
+  max-width: 65ch;
+  line-height: 1.6;
+}
+.op-links {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+
+/* The status ladder. */
+.op-ladder ol {
+  display: grid;
+  grid-template-columns: repeat(var(--op-steps, 6), minmax(0, 1fr));
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.op-ladder li {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.op-ladder__bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--op-line);
+}
+.op-ladder li[data-passed="true"] .op-ladder__bar {
+  background: var(--op-line-strong);
+}
+.op-ladder li[aria-current="step"] .op-ladder__bar {
+  background: var(--op-ink);
+}
+.op-ladder__label {
+  overflow: hidden;
+  font-size: 0.75rem;
+  color: var(--op-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.op-ladder li[aria-current="step"] .op-ladder__label {
+  color: var(--op-ink);
+  font-weight: 600;
+}
+/* On a narrow screen only the current step is labelled; the others stay for screen readers. */
+@media (max-width: 560px) {
+  .op-ladder li:not([aria-current]) .op-ladder__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .op-ladder li[aria-current="step"] .op-ladder__label {
+    overflow: visible;
+  }
+}
+.op-ladder__end {
+  margin: 8px 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--op-bad);
+}
+.op-ladder__note {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--op-radius-small);
+  background: var(--op-sunk);
+  font-size: 0.875rem;
+}
+
+/* The timeline. */
+.op-timeline {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.op-timeline li {
+  display: grid;
+  grid-template-columns: 7.5rem 14px minmax(0, 1fr);
+  gap: 12px;
+  padding-bottom: 20px;
+  font-size: 0.9375rem;
+}
+.op-timeline li:last-child {
+  padding-bottom: 0;
+}
+.op-timeline__date {
+  font-size: 0.8125rem;
+  color: var(--op-muted);
+}
+.op-timeline__dot {
+  justify-self: center;
+  width: 9px;
+  height: 9px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--op-ink);
+}
+.op-timeline li[data-future="true"] .op-timeline__dot {
+  background: var(--op-bg);
+  box-shadow: inset 0 0 0 2px var(--op-ink);
+}
+.op-timeline li[data-today="true"] {
+  font-weight: 600;
+}
+.op-timeline li[data-today="true"] .op-timeline__dot {
+  border-radius: 2px;
+  background: var(--op-accent);
+}
+.op-timeline__label {
+  font-weight: 600;
+}
+
+/* Folded detail: open with no script. */
+.op-fold {
+  border-bottom: 1px solid var(--op-line);
+  padding: 12px 0;
+}
+.op-fold summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+.op-fold > div {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 0.9375rem;
+}
+.op-fold ol {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.op-fold ol > li {
+  display: grid;
+  gap: 4px;
+  padding-left: 12px;
+  border-left: 2px solid var(--op-line-strong);
+}
+.op-diff del {
+  color: var(--op-bad);
+}
+.op-diff ins {
+  color: var(--op-good);
+  text-decoration: underline;
+}
+
+.op-reply {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: var(--op-radius-small);
+  background: var(--op-sunk);
+  font-size: 0.9375rem;
+}
+
+/* Lists of cards. */
+.op-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--op-line);
+  list-style: none;
+}
+.op-list > li {
+  border-bottom: 1px solid var(--op-line);
+}
+.op-list > li[hidden] {
+  display: none;
+}
+.op-row {
+  display: grid;
+  gap: 8px 32px;
+  padding: 18px 12px;
+  color: var(--op-ink);
+  text-decoration: none;
+}
+.op-list a.op-row {
+  color: var(--op-ink);
+  text-decoration: none;
+}
+.op-row:hover {
+  background: var(--op-surface);
+}
+@media (min-width: 720px) {
+  .op-row {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+}
+.op-row__who {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+}
+.op-row__owner {
+  font-weight: 600;
+}
+.op-row__body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.op-row__headline {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--op-muted);
+}
+.op-row__quote {
+  font-size: 1rem;
+  font-weight: 550;
+  line-height: 1.35;
+}
+.op-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  font-size: 0.8125rem;
+  color: var(--op-muted);
+}
+.op-row__late {
+  font-weight: 600;
+  color: var(--op-bad);
+}
+.op-empty {
+  margin: 0;
+  padding: 24px 0;
+  border-block: 1px solid var(--op-line);
+  color: var(--op-muted);
+}
+
+/* Coming up. */
+.op-coming {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--op-line);
+  border-radius: var(--op-radius);
+}
+.op-coming h2 {
+  margin: 0;
+  font-size: 1.125rem;
+}
+.op-coming p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--op-muted);
+}
+.op-coming ol {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--op-line);
+  list-style: none;
+}
+.op-coming li {
+  border-bottom: 1px solid var(--op-line);
+}
+.op-coming a.op-due {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  color: var(--op-ink);
+  text-decoration: none;
+}
+.op-due__date {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.op-due__date[data-late="true"] {
+  color: var(--op-bad);
+}
+
+/* Lists of actors or areas. */
+.op-index ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.op-index [aria-current="page"] {
+  color: var(--op-ink);
+  font-weight: 600;
+}
+
+/* The filter, once the script runs. */
+.op-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+.op-filter label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.8125rem;
+  color: var(--op-muted);
+}
+.op-filter select {
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 1px solid var(--op-line-strong);
+  border-radius: var(--op-radius-small);
+  background: var(--op-bg);
+  color: var(--op-ink);
+  font: inherit;
+}
+.op-filter output {
+  font-size: 0.875rem;
+  color: var(--op-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .op-card *,
+  .op-list * {
+    transition: none !important;
+  }
+}

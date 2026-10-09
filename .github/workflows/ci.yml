@@ -27,6 +27,8 @@ jobs:
       # Every rule's passing and failing tests, the fixtures from each site, and the one-standard conformance suite.
       - run: pnpm test
       - run: pnpm build
+      - name: The client component keeps its "use client" line
+        run: head -c 13 packages/react/dist/client.js | grep -qx '"use client";'
       - name: JSON Schema matches the built package
         run: pnpm schema && git diff --exit-code -- packages/core/schema
       # The built command, as a user runs it: Node reads the TypeScript configuration itself.

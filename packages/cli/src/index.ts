@@ -39,6 +39,7 @@ import {
   withQuoteCheck,
 } from "@openpromises/files";
 import { findSpan, matchQuote, textFromHtml } from "@openpromises/quotes";
+import { cardViews, publishFiles } from "@openpromises/publish";
 import { onlyFlags, parseArgs, text, UsageError, type Args } from "./args";
 
 /**
@@ -418,6 +419,40 @@ async function migrate(args: Args, io: Io): Promise<number> {
   return 0;
 }
 
+// ---------------------------------------------------------------- publish
+
+async function publish(args: Args, io: Io): Promise<number> {
+  onlyFlags(args, ["config", "content", "out", "today", "dry-run"], "publish");
+  const out = text(args, "out");
+  if (!out) throw new UsageError("usage: openpromises publish --out <folder> [--today YYYY-MM-DD] [--dry-run]");
+  const site = await loadSite(args, io);
+  const read = readContent(folderSource(site.contentDir), site.config);
+  const r = validateContent(read.input);
+  const errors = [...read.issues, ...r.issues].filter((i) => i.severity === "error" && i.file.startsWith("promises/"));
+  if (errors.length) {
+    io.err(`refused: ${plural(errors.length, "published card has", "published cards have")} errors; run openpromises validate and fix them first`);
+    return 1;
+  }
+  const day = today(io, site.config, args);
+  const files = publishFiles({ config: site.config, views: cardViews(r.cards, r.actors), today: day });
+  const dir = resolve(io.cwd, out);
+  const shown = `${relative(io.cwd, dir) || "."}/`;
+  if (args.flags["dry-run"]) {
+    for (const f of files) io.out(`would write ${shown}${f.path.replace(/^\//, "")}`);
+    io.out(`Dry run: ${plural(files.length, "file")} would be written; nothing was written.`);
+    return 0;
+  }
+  for (const f of files) {
+    const path = join(dir, f.path);
+    if (!path.startsWith(dir)) throw new Error(`refused to write outside ${shown}: ${f.path}`);
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, f.body);
+  }
+  const published = r.cards.filter((c) => c.where === "promises").length;
+  io.out(`Published ${plural(published, "card")} as ${plural(files.length, "file")} in ${shown} (feeds, Markdown, llms.txt, sitemap and open data), for ${day}. Drafts are never published.`);
+  return 0;
+}
+
 // ---------------------------------------------------------------- stats
 
 async function stats(args: Args, io: Io): Promise<number> {
@@ -474,6 +509,10 @@ const HELP: Record<string, string> = {
   Rewrites cards and actors in the site's older format (legacy in the configuration, or --from:
   ${LEGACY_FORMATS.join(", ")}) in format v1, in place. With --in and --out, converts a whole folder
   into a new one.`,
+  publish: `openpromises publish --out <folder> [--today YYYY-MM-DD] [--dry-run]
+  Writes what a static site serves about its promises: feeds (Atom or RSS) for every change, card,
+  actor and area, Markdown for every card, llms.txt and llms-full.txt in every language, a sitemap and
+  open data (JSON and CSV). Published cards only; refuses while a published card has errors.`,
   stats: `openpromises stats [--editors <file>] [--json]
   Counts published cards by category, status, actor and area, and drafts by approval.`,
 };
@@ -509,6 +548,7 @@ const COMMANDS: Record<string, { booleans: string[]; run: (args: Args, io: Io) =
   deadlines: { booleans: ["dry-run"], run: deadlines },
   lint: { booleans: [], run: lint },
   migrate: { booleans: ["dry-run"], run: migrate },
+  publish: { booleans: ["dry-run"], run: publish },
   stats: { booleans: ["json"], run: stats },
   help: { booleans: [], run: help },
 };

@@ -267,6 +267,28 @@ describe("check-quote", () => {
   });
 });
 
+describe("publish", () => {
+  it("writes feeds, Markdown, llms.txt, a sitemap and open data for published cards only", async () => {
+    const d = site();
+    expect((await op(d, "publish --out public")).out).toContain("site.url is needed to publish");
+    write(join(d, "openpromises.config.yaml"), `${CONFIG}site: { name: Test Tracker, url: "https://example.org" }\npublish: { tag: "example.org,2026" }\n`.replace("site: { name: Test Tracker }\n", ""));
+    await op(d, "review bus-fares --by Sam");
+    await op(d, "review bus-fares --by Alex");
+    write(join(d, "content", "drafts", "secret-draft.yaml"), CARD.replace("id: bus-fares", "id: secret-draft"));
+    const r = await op(d, "publish --out public");
+    expect(r.code, r.out).toBe(0);
+    expect(r.out).toContain("Published 1 card as");
+    const out = (path: string) => readFileSync(join(d, "public", path), "utf8");
+    expect(out("feeds/all.xml")).toContain("<id>tag:example.org,2026:promise/bus-fares/event/0</id>");
+    expect(out("promise/bus-fares.md").startsWith("# Cap bus fares at £2\n")).toBe(true);
+    expect(out("llms.txt")).toContain("https://example.org/promise/bus-fares");
+    expect(out("sitemap-promises.xml")).toContain("<loc>https://example.org/promise/bus-fares</loc>");
+    expect(out("data/promises.csv").split("\r\n").filter(Boolean)).toHaveLength(2);
+    for (const f of ["feeds/all.xml", "llms.txt", "llms-full.txt", "data/promises.json", "sitemap-promises.xml"]) expect(out(f)).not.toContain("secret-draft");
+    expect(existsSync(join(d, "public", "promise", "secret-draft.md"))).toBe(false);
+  });
+});
+
 describe("migrate and stats", () => {
   it("rewrites an older-format card in format v1, in place, and counts the content", async () => {
     const d = site();
