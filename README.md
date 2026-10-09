@@ -1,12 +1,14 @@
 # OpenPromises
 
+[![CI](https://github.com/xternal/openpromises/actions/workflows/ci.yml/badge.svg)](https://github.com/xternal/openpromises/actions/workflows/ci.yml) [![Licence: Apache-2.0](https://img.shields.io/badge/licence-Apache--2.0-blue.svg)](LICENSE)
+
 **An open engine for tracking what people in power promise.**
 
 A promise is a card: the speaker's exact words, what it would cost (a range, with its source), and a timeline that moves only on evidence and is never rewritten. OpenPromises holds the rules that make such a card trustworthy, and the tools that check them, so a newsroom, a council watchdog or a project in another country can run a promise tracker from a configuration file and a folder of plain YAML files in git.
 
 It is a library and a command-line tool, not a hosted service. It makes no network calls, collects nothing and needs no account.
 
-> **Status:** in development (milestones E1 and E2). Not yet published to npm. The design is [RFC-0001](docs/RFC-0001.md); the card format is [docs/FORMAT.md](docs/FORMAT.md); publishing and pages are in [docs/PUBLISHING.md](docs/PUBLISHING.md).
+> **Version 0.1.** The card format is [docs/FORMAT.md](docs/FORMAT.md); publishing and pages are in [docs/PUBLISHING.md](docs/PUBLISHING.md); moving an existing tracker is [docs/MIGRATING.md](docs/MIGRATING.md); the design is [RFC-0001](docs/RFC-0001.md). Changes are in the [changelog](CHANGELOG.md).
 
 ## What the engine enforces
 
@@ -21,20 +23,15 @@ It is a library and a command-line tool, not a hosted service. It makes no netwo
 
 ## Two-minute example
 
-You need Node 22.18 or later. Until the first release, build the command from a checkout:
-
-```bash
-git clone https://github.com/xternal/openpromises && cd openpromises
-pnpm install && pnpm build
-alias openpromises="node $PWD/packages/cli/dist/bin.js"
-```
-
-Make a tracker in a new folder:
+You need Node 22.18 or later. Make a tracker in a new folder and install the command:
 
 ```bash
 mkdir my-tracker && cd my-tracker && git init
+npm install --save-dev @openpromises/cli
 mkdir -p content/actors
 ```
+
+Run it as `npx openpromises`, or add `alias openpromises="npx openpromises"` to type less.
 
 `openpromises.config.yaml` says what your tracker covers:
 
@@ -147,7 +144,7 @@ Run `openpromises help <command>` for the options, and `openpromises help rules`
 
 ## Who uses it
 
-OpenPromises is extracted from three promise trackers that wrote the same rules separately: [Public Ledger](https://ledgergov.uk) (UK government and parties), [Borough Book](https://boroughbook.uk) (a London council) and a bilingual tracker in development. [docs/COMPARISON.md](docs/COMPARISON.md) shows how each one's cards map to format v1, and [docs/MIGRATING.md](docs/MIGRATING.md) how a site moves.
+OpenPromises is extracted from three promise trackers that wrote the same rules separately: [Public Ledger](https://ledgergov.uk) (UK government and parties), [Borough Book](https://boroughbook.uk) (a London council) and [Russia Ledger](https://russialedger.com) (the Russian state, in Russian and English). [docs/COMPARISON.md](docs/COMPARISON.md) shows how each one's cards map to format v1, and [docs/MIGRATING.md](docs/MIGRATING.md) how a site moves.
 
 ## Licence
 

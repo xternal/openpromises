@@ -1,0 +1,9 @@
+OpenPromises
+Copyright 2026 Pavel Guzhikov and contributors
+
+This product includes software developed as part of the OpenPromises project
+(https://github.com/xternal/openpromises), licensed under the Apache License 2.0.
+
+The test fixtures in fixtures/public-ledger and fixtures/borough-book are
+copied from Public Ledger (https://ledgergov.uk) and Borough Book
+(https://boroughbook.uk) under CC BY 4.0; see fixtures/README.md.

@@ -1,14 +1,26 @@
 {
   "name": "@openpromises/core",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "OpenPromises card format v1, configuration and rules: pure functions, no I/O",
+  "keywords": [
+    "promises",
+    "accountability",
+    "fact-checking",
+    "journalism",
+    "open-data",
+    "politics",
+    "yaml"
+  ],
   "license": "Apache-2.0",
   "type": "module",
+  "homepage": "https://github.com/xternal/openpromises#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xternal/openpromises.git",
     "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/xternal/openpromises/issues"
   },
   "engines": {
     "node": ">=22.18.0"
@@ -24,7 +36,9 @@
   "files": [
     "dist",
     "schema",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "scripts": {
     "build": "tsup",
@@ -34,14 +48,7 @@
     "@openpromises/quotes": "workspace:*",
     "zod": "4.6.5"
   },
-  "homepage": "https://github.com/xternal/openpromises#readme",
-  "keywords": [
-    "promises",
-    "accountability",
-    "fact-checking",
-    "journalism",
-    "open-data",
-    "politics",
-    "yaml"
-  ]
+  "publishConfig": {
+    "access": "public"
+  }
 }

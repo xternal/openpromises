@@ -1,19 +1,34 @@
 {
   "name": "@openpromises/cli",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "The openpromises command: validate, new, review, check-quote, deadlines, lint, migrate, stats",
+  "keywords": [
+    "promises",
+    "accountability",
+    "fact-checking",
+    "journalism",
+    "open-data",
+    "politics",
+    "yaml"
+  ],
   "license": "Apache-2.0",
   "type": "module",
+  "homepage": "https://github.com/xternal/openpromises#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xternal/openpromises.git",
     "directory": "packages/cli"
   },
+  "bugs": {
+    "url": "https://github.com/xternal/openpromises/issues"
+  },
   "engines": {
     "node": ">=22.18.0"
   },
   "sideEffects": false,
+  "bin": {
+    "openpromises": "./dist/bin.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -22,7 +37,9 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "scripts": {
     "build": "tsup"
@@ -33,17 +50,7 @@
     "@openpromises/quotes": "workspace:*",
     "@openpromises/publish": "workspace:*"
   },
-  "bin": {
-    "openpromises": "./dist/bin.js"
-  },
-  "homepage": "https://github.com/xternal/openpromises#readme",
-  "keywords": [
-    "promises",
-    "accountability",
-    "fact-checking",
-    "journalism",
-    "open-data",
-    "politics",
-    "yaml"
-  ]
+  "publishConfig": {
+    "access": "public"
+  }
 }

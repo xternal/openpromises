@@ -1,14 +1,26 @@
 {
   "name": "@openpromises/quotes",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "Exact-quote matching for OpenPromises: normalisation per language, exact / close / none tiers, spans in stored text",
+  "keywords": [
+    "promises",
+    "accountability",
+    "fact-checking",
+    "journalism",
+    "open-data",
+    "politics",
+    "yaml"
+  ],
   "license": "Apache-2.0",
   "type": "module",
+  "homepage": "https://github.com/xternal/openpromises#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xternal/openpromises.git",
     "directory": "packages/quotes"
+  },
+  "bugs": {
+    "url": "https://github.com/xternal/openpromises/issues"
   },
   "engines": {
     "node": ">=22.18.0"
@@ -22,20 +34,15 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "scripts": {
     "build": "tsup"
   },
   "dependencies": {},
-  "homepage": "https://github.com/xternal/openpromises#readme",
-  "keywords": [
-    "promises",
-    "accountability",
-    "fact-checking",
-    "journalism",
-    "open-data",
-    "politics",
-    "yaml"
-  ]
+  "publishConfig": {
+    "access": "public"
+  }
 }

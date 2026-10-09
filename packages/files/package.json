@@ -1,14 +1,26 @@
 {
   "name": "@openpromises/files",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "Read and write an OpenPromises content folder, compare with a git base, migrate older formats",
+  "keywords": [
+    "promises",
+    "accountability",
+    "fact-checking",
+    "journalism",
+    "open-data",
+    "politics",
+    "yaml"
+  ],
   "license": "Apache-2.0",
   "type": "module",
+  "homepage": "https://github.com/xternal/openpromises#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xternal/openpromises.git",
     "directory": "packages/files"
+  },
+  "bugs": {
+    "url": "https://github.com/xternal/openpromises/issues"
   },
   "engines": {
     "node": ">=22.18.0"
@@ -22,7 +34,9 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "scripts": {
     "build": "tsup"
@@ -32,14 +46,7 @@
     "@openpromises/quotes": "workspace:*",
     "yaml": "2.9.1"
   },
-  "homepage": "https://github.com/xternal/openpromises#readme",
-  "keywords": [
-    "promises",
-    "accountability",
-    "fact-checking",
-    "journalism",
-    "open-data",
-    "politics",
-    "yaml"
-  ]
+  "publishConfig": {
+    "access": "public"
+  }
 }

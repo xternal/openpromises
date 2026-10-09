@@ -2,7 +2,7 @@
 
 Three promise trackers wrote the same idea separately, and their formats drifted. This document maps each one's cards to [format v1](FORMAT.md), field by field, and says what each site gains and loses by moving. The converters that do it are `fromPublicLedger`, `fromBoroughBook` and `fromRussiaLedger` in `@openpromises/core`; `openpromises migrate` runs them.
 
-Read on 9 October 2026 from each site's `main` branch: Public Ledger (45 cards, 16 actors), Borough Book (18 cards, 2 parties, 3 decision links). The third site, a bilingual Russian and English tracker, is private: only its **format** is described here, never its content.
+Read on 9 October 2026 from each site's `main` branch: Public Ledger (45 cards, 16 actors), Borough Book (18 cards, 2 parties, 3 decision links). The third site, [Russia Ledger](https://russialedger.com), in Russian and English, keeps its repository private: only its **format** is described here, never its content.
 
 ## At a glance
 
