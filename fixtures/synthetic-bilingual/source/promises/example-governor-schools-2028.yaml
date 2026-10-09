@@ -1,0 +1,64 @@
+# Invented for tests: not a real promise. In the bilingual site's own format.
+id: example-governor-schools-2028
+headline: { ru: Построить 100 школ в Примерной области, en: Build 100 schools in the Example Region }
+actor_id: example-governor
+made_on: "2025-03-01"
+venue: governor_address
+venue_label: { ru: Послание губернатора 2025, en: Governor's address 2025 }
+area: "07"
+status: in_plan
+origin: manual
+sources:
+  - title: Региональная программа строительства школ
+    url: https://example.org/region/schools-programme
+    archived_url: https://web.archive.org/web/20250601000000/https://example.org/region/schools-programme
+    kind: official
+versions:
+  - version: 1
+    text: "До конца 2027 года мы построим в области сто новых школ."
+    text_en: "By the end of 2027 we will build a hundred new schools in the region."
+    recorded_on: "2025-03-02"
+    source_url: https://example.org/region/address-2025
+    archived_url: https://web.archive.org/web/20250302000000/https://example.org/region/address-2025
+    quote_checked_on: "2025-03-03"
+    parameters:
+      who: { ru: Школьники области, en: Schoolchildren in the region }
+      when: { ru: До конца 2027 года, en: By the end of 2027 }
+      deadline: "2027-12-31"
+      funded_by: null
+      metric: { series_id: example_schools_built, target: 100, direction: at_least, unit: школ, by: "2027-12-31" }
+  - version: 2
+    text: "Сто новых школ появятся в области до конца 2028 года."
+    text_en: "A hundred new schools will open in the region by the end of 2028."
+    recorded_on: "2026-03-02"
+    source_url: https://example.org/region/address-2026
+    archived_url: https://web.archive.org/web/20260302000000/https://example.org/region/address-2026
+    quote_checked_on: "2026-03-03"
+    parameters:
+      who: { ru: Школьники области, en: Schoolchildren in the region }
+      when: { ru: До конца 2028 года, en: By the end of 2028 }
+      deadline: "2028-12-31"
+      funded_by: null
+      metric: { series_id: example_schools_built, target: 100, direction: at_least, unit: школ, by: "2028-12-31" }
+measurement:
+  status: delayed
+  since: "2026-01-01"
+  note: { ru: Данные о вводе школ публикуются с задержкой в год., en: Data on new schools is published a year late. }
+events:
+  - date: "2025-03-01"
+    type: promised
+    description: { ru: Обещание в послании губернатора, en: Promised in the governor's address }
+  - date: "2025-06-01"
+    type: in_plan
+    description: { ru: Принята региональная программа, en: A regional programme is adopted }
+    evidence_url: https://example.org/region/schools-programme
+  - date: "2026-03-01"
+    type: reworded
+    subtype: deadline_moved
+    description: { ru: Срок перенесён на конец 2028 года, en: The deadline moved to the end of 2028 }
+    evidence_url: https://example.org/region/address-2026
+replies: []
+corrections: []
+reviews:
+  - { by: Editor A, kind: editor, on: "2026-03-04", batch: true }
+  - { by: Editor C, kind: editor, on: "2026-03-05", batch: true, note: Проверено по программе. }

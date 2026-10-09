@@ -1,0 +1,9 @@
+# Invented for tests: not a real person.
+id: example-governor
+name: { ru: Губернатор Примерной области, en: Governor of the Example Region }
+kind: person
+level: regional
+party_id: example-party-b
+roles:
+  - title: { ru: Губернатор Примерной области, en: Governor of the Example Region }
+    from: "2024-09-15"

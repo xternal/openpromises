@@ -1,0 +1,6 @@
+# Invented for tests: not a real party.
+id: example-party-b
+name: { ru: Партия «Пример Б», en: Party Example B }
+kind: party
+level: federal
+roles: []

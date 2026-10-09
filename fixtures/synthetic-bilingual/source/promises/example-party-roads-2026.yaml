@@ -1,0 +1,43 @@
+# Invented for tests: not a real promise. In the bilingual site's own format.
+id: example-party-roads-2026
+headline: { ru: Отремонтировать сельские дороги, en: Repair rural roads }
+actor_id: example-party-a
+made_on: "2026-05-10"
+venue: party_programme
+venue_label: { ru: Программа партии 2026, en: Party programme 2026 }
+area: "04"
+status: promised
+origin: manual
+sources:
+  - title: Программа партии «Пример А»
+    url: https://example.org/party-a/programme
+    archived_url: https://web.archive.org/web/20260511000000/https://example.org/party-a/programme
+    kind: party
+    designation_ru: { status: none, checked_on: "2026-05-11" }
+versions:
+  - version: 1
+    text: "Мы отремонтируем все сельские дороги, ведущие к школам и больницам."
+    text_en: "We will repair every rural road that leads to a school or a hospital."
+    recorded_on: "2026-05-11"
+    source_url: https://example.org/party-a/programme
+    archived_url: https://web.archive.org/web/20260511000000/https://example.org/party-a/programme
+    quote_checked_on: "2026-05-12"
+    parameters:
+      who: { ru: Жители сёл, en: People in villages }
+      how_much_bn_per_year: null
+      cost_note: { ru: "Партия не назвала сумму, и независимой оценки нет.", en: The party gave no figure and there is no independent estimate. }
+      when: { ru: Срок не назван, en: No date given }
+      funded_by: null
+events:
+  - date: "2026-05-10"
+    type: promised
+    description: { ru: Обещание в программе партии, en: Promised in the party programme }
+  - date: "2026-09-01"
+    type: restated
+    description: { ru: Повторено в предвыборных дебатах теми же словами, en: Repeated in the same words in an election debate }
+    evidence_url: https://example.org/debate-2026-09-01
+replies: []
+corrections: []
+reviews:
+  - { by: Editor A, kind: editor, on: "2026-09-02" }
+  - { by: Editor B, kind: editor, on: "2026-09-03" }

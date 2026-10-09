@@ -1,0 +1,77 @@
+format: openpromises/1
+id: uk-reform-energy-bills-250-2026
+headline:
+  en: Cut energy bills by over £250 a year
+actor_id: reform-uk
+made_on: "2026-09-05"
+venue_label:
+  en: "The First 100 Days: Our Pledges to You, page 8"
+area: economic_affairs
+status: promised
+status_note:
+  en: >-
+    Reform UK is not in government, so the card stays at Promised. The VAT part overlaps with the
+    government's own cut: domestic electricity has been zero-rated in Great Britain since 1 October
+    2026 (see the card "Cut taxes on energy bills").
+origin: manual
+sources:
+  - title: "Reform UK: The First 100 Days: Our Pledges to You (PDF), September 2026"
+    url: https://www.reformparty.uk/policies/the-first-100-days-our-pledges-to-you/pdf
+  - title: >-
+      ITV News: Reform launching its conference with pledges for first 100 days in government (3 Sep
+      2026)
+    url: https://www.itv.com/news/2026-09-03/reform-launching-its-conference-with-pledges-for-first-100-days-in-government
+versions:
+  - version: 1
+    text: >-
+      In total, our plan will remove over £250 per year from energy bills, through removing
+      government policy costs from electricity and gas bills, scrapping carbon taxes on generators
+      and permanently taking VAT off of consumer energy bills.
+    recorded_on: "2026-09-05"
+    source_url: https://www.reformparty.uk/policies/the-first-100-days-our-pledges-to-you/pdf
+    quote_checked_on: "2026-10-08"
+    parameters:
+      who:
+        en: >-
+          Households paying gas and electricity bills. Gas generators would stop paying carbon
+          taxes, and four schemes now charged on bills would be paid by the Treasury instead.
+      cost:
+        range: [8.9, 9.9, 10.9]
+        note:
+          en: >-
+            Year shown: the fifth year, the latest year Reform UK costed. The party's own figure is
+            £9.9bn by the fifth year: £2.1bn from removing VAT, £4.8bn from removing energy taxes,
+            and the rest from moving scheme costs onto the Treasury. No independent costing was
+            found on 8 Oct 2026. Low–high is an editorial ±10% because the source gives a central
+            figure only.
+        sources:
+          - title: "Reform UK: The First 100 Days, Costings (PDF)"
+            url: https://www.reformparty.uk/policies/the-first-100-days-our-pledges-to-you/pdf
+      when:
+        en: >-
+          "A Reform Government would take these measures within 100 days of taking office."
+      funded_by:
+        en: >-
+          Previously announced savings: £52bn a year from the Making Welfare Work programme by the
+          end of the next Parliament, £7bn from eliminating most foreign aid, £10bn from cutting net
+          zero programmes and £7bn from shrinking the government by the end of the next Parliament,
+          plus immigration-related savings (the party lists £91bn of itemised savings and new
+          revenue against £58bn of costs).
+events:
+  - date: "2026-09-05"
+    type: promised
+    text:
+      en: >-
+        Reform UK publishes its First 100 Days document at its conference, pledging to cut energy
+        bills by over £250 a year
+replies: []
+reviews:
+  - by: AI Journalist
+    kind: automated
+    "on": "2026-10-08"
+    note:
+      en: >-
+        Quote checked word for word at the source; dates, figures and links checked against the
+        cited sources.
+x:
+  editor_check_required: true

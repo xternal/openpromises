@@ -1,0 +1,68 @@
+# Invented for tests: not a real promise. In the bilingual site's own format.
+id: example-pensions-2027
+headline: { ru: "Проиндексировать пенсии на 7,6% в 2027 году", en: Raise pensions by 7.6% in 2027 }
+actor_id: example-government
+made_on: "2026-06-01"
+venue: address
+venue_label: { ru: Обращение 1 июня 2026 года, en: Address of 1 June 2026 }
+area: "10"
+status: legislated
+status_note:
+  ru: Индексация записана в законе о бюджете на 2027 год.
+  en: The rise is written into the 2027 budget law.
+origin: manual
+sources:
+  - title: Текст обращения
+    url: https://example.org/address-2026
+    archived_url: https://web.archive.org/web/20260602000000/https://example.org/address-2026
+    kind: official
+  - title: Пример-новости о законе
+    url: https://example.org/news/pensions-law
+    archived_url: https://web.archive.org/web/20260921000000/https://example.org/news/pensions-law
+    kind: media
+    designation_ru: { status: none, checked_on: "2026-09-21" }
+versions:
+  - version: 1
+    text: "Мы проиндексируем пенсии неработающим пенсионерам на 7,6 процента с 1 января 2027 года — это наше обязательство."
+    text_en: "We will raise pensions for non-working pensioners by 7.6 percent from 1 January 2027 — that is our commitment."
+    recorded_on: "2026-06-02"
+    source_url: https://example.org/address-2026
+    archived_url: https://web.archive.org/web/20260602000000/https://example.org/address-2026
+    quote_checked_on: "2026-06-03"
+    parameters:
+      who: { ru: Неработающие пенсионеры, en: Pensioners who no longer work }
+      how_much_bn_per_year: [480, 520, 560]
+      cost_note:
+        ru: Год 2027. Оценка министерства финансов; диапазон ±8% задан редакцией.
+        en: Year 2027. The finance ministry's estimate; the ±8% range is editorial.
+      cost_sources:
+        - title: Пояснительная записка к закону о бюджете
+          url: https://example.org/budget-2027-note
+          archived_url: https://web.archive.org/web/20260920000000/https://example.org/budget-2027-note
+          kind: official
+      when: { ru: С 1 января 2027 года, en: From 1 January 2027 }
+      deadline: "2027-01-01"
+      funded_by: { ru: Федеральный бюджет, en: The federal budget }
+      funding_verifiable: true
+events:
+  - date: "2026-06-01"
+    type: promised
+    description: { ru: Обещание в обращении, en: Promised in an address }
+  - date: "2026-07-15"
+    type: in_plan
+    description: { ru: Внесено в проект бюджета, en: Included in the draft budget }
+    evidence_url: https://example.org/draft-budget-2027
+  - date: "2026-09-20"
+    type: legislated
+    description: { ru: Закон о бюджете подписан, en: The budget law is signed }
+    evidence_url: https://example.org/budget-law-2027
+replies: []
+corrections:
+  - date: "2026-09-25"
+    path: events[1].description
+    was: { ru: Внесено в бюджет, en: Included in the budget }
+    now: { ru: Внесено в проект бюджета, en: Included in the draft budget }
+    reason: В июле это был только проект бюджета.
+reviews:
+  - { by: Editor A, kind: editor, on: "2026-09-26" }
+  - { by: Editor C, kind: editor, on: "2026-09-27" }

@@ -1,0 +1,33 @@
+import { defineConfig } from "@openpromises/core";
+
+// An invented bilingual tracker in the third site's format, on format v1: the cards in v1/, converted from source/.
+export default defineConfig({
+  site: { name: "Example bilingual tracker" },
+  content: "v1",
+  timezone: "Europe/Moscow",
+  locales: { default: "ru", all: ["ru", "en"] },
+  money: { currency: "RUB", unit: "bn", period: "year" },
+  actors: { kinds: ["person", "party", "government", "region"], standing: "none", levels: ["federal", "regional"] },
+  venues: [
+    "address",
+    "direct_line",
+    "decree",
+    "national_goal",
+    "national_project",
+    "government_programme",
+    "party_programme",
+    "election_programme",
+    "governor_address",
+    "speech",
+    "interview",
+    "press_release",
+    "parliament",
+    "social",
+  ],
+  areas: { kind: "codes", pattern: "^(0[1-9]|1[0-4])$" },
+  ladder: "national",
+  editorial: { approvals: 2, partyConflict: true },
+  quotes: { archive: "required", require: "match" },
+  modules: ["metrics", "designations", "lever"],
+  legacy: "russia-ledger",
+});

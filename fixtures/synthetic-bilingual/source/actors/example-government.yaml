@@ -1,0 +1,7 @@
+# Invented for tests: not a real actor.
+id: example-government
+name: { ru: Правительство Примерной Федерации, en: Government of the Example Federation }
+short_name: { ru: Правительство, en: Government }
+kind: government
+level: federal
+roles: []
