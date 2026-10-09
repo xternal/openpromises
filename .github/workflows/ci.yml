@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      # Node 22's bundled Corepack cannot run pnpm 12; this version can (as in Public Ledger's CI).
+      - run: npm install -g corepack@0.34.5 && corepack enable pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      # Every rule's passing and failing tests, the fixtures from each site, and the one-standard conformance suite.
+      - run: pnpm test
+      - run: pnpm build
+      - name: JSON Schema matches the built package
+        run: pnpm schema && git diff --exit-code -- packages/core/schema
+      # The built command, as a user runs it: Node reads the TypeScript configuration itself.
+      - name: The built command runs on a site's cards
+        run: node packages/cli/dist/bin.js stats --config fixtures/public-ledger/openpromises.config.ts
