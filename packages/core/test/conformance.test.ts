@@ -95,8 +95,12 @@ describe.each(SITES)("one standard for every party: %s", (name) => {
     const before = validateContent(base).issues.map((i) => key(i, rename)).sort();
     const after = validateContent(renamed).issues.map((i) => key(i)).sort();
     expect(after).toEqual(before);
-    // The check has teeth: every party's own editor is refused on that party's cards.
-    for (const id of ids) expect(before.some((k) => k.includes(`may not approve a card about their own party (${rename.get(id)})`)), id).toBe(true);
+    // The check has teeth: on every card with a party, that party's own editor is refused.
+    const withParty = base.cards.filter((c) => {
+      const actor = base.actors.find((a) => (a.data as Raw).id === (c.data as Raw).actor_id)?.data as Raw | undefined;
+      return actor?.kind === "party" || typeof actor?.party_id === "string";
+    });
+    expect(before.filter((k) => k.includes("may not approve a card about their own party"))).toHaveLength(withParty.length);
   });
 
   it("gives a card the same outcome under any other party in the same position", async () => {

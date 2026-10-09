@@ -343,7 +343,7 @@ const approvals: Rule = {
       const e = ctx.editors.find((x) => x.handle === r.by);
       if (!e) return add(["reviews", i, "by"], `"${r.by}" is not in the editors list`);
       if (r.on < e.since || (e.until && r.on > e.until)) return add(["reviews", i, "on"], `${r.by} was not an editor on ${r.on} (an editor from ${e.since}${e.until ? ` to ${e.until}` : ""})`);
-      if (e.party && owners.has(e.party)) return add(["reviews", i, "by"], `${r.by} may not approve a card about their own party (${e.party}); another editor does`);
+      if (e.party && owners.has(e.party)) return add(["reviews", i, "by"], `${r.by} may not approve a card about their own party; another editor does`);
       if (seen.has(r.by)) return add(["reviews", i, "by"], `${r.by} has already approved this card; a second approval must come from a different editor`);
       seen.add(r.by);
     });

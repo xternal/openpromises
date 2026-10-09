@@ -54,6 +54,8 @@ export interface Io {
   cwd: string;
   /** Today's date for this run (tests fix it); otherwise today in the site's time zone. */
   today?: string;
+  /** Environment variables (tests set them); otherwise the process's. */
+  env?: Record<string, string | undefined>;
 }
 
 const defaultIo = (): Io => ({ out: (l) => console.log(l), err: (l) => console.error(l), cwd: process.cwd() });
@@ -77,6 +79,21 @@ async function loadSite(args: Args, io: Io): Promise<Site> {
   return { config: loaded.config, configFile: loaded.file, contentDir, shown: `${relative(io.cwd, contentDir) || "."}/` };
 }
 
+/**
+ * The editors list from outside the content folder: --editors, or the
+ * OPENPROMISES_EDITORS environment variable. A site that keeps its editors'
+ * declarations private passes it this way (decision 10).
+ */
+function editorsOverride(args: Args, io: Io): { file: string; text: string } | undefined {
+  const given = text(args, "editors") ?? (io.env ?? process.env).OPENPROMISES_EDITORS;
+  if (!given) return undefined;
+  const path = resolve(io.cwd, given);
+  if (!existsSync(path)) throw new UsageError(`there is no editors list at ${given}`);
+  return { file: relative(io.cwd, path) || path, text: readFileSync(path, "utf8") };
+}
+
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 const today = (io: Io, config: Config, args?: Args) => (args && text(args, "today")) ?? io.today ?? todayIn(config.timezone);
 
@@ -92,10 +109,10 @@ function printIssues(issues: readonly FileIssue[], shown: string, io: Io): void 
 async function validate(args: Args, io: Io): Promise<number> {
   onlyFlags(args, ["config", "content", "base", "no-base", "editors", "json"], "validate");
   const site = await loadSite(args, io);
-  const editorsFile = text(args, "editors");
+  const editors = editorsOverride(args, io);
   const r = checkFolder(site.contentDir, site.config, {
     base: args.flags["no-base"] ? null : text(args, "base"),
-    ...(editorsFile ? { editorsFile: resolve(io.cwd, editorsFile) } : {}),
+    ...(editors ? { editorsFile: resolve(io.cwd, editors.file) } : {}),
   });
   const errors = r.issues.filter((i) => i.severity === "error").length;
   const warnings = r.issues.length - errors;
@@ -168,24 +185,24 @@ async function newCard(args: Args, io: Io): Promise<number> {
 // ---------------------------------------------------------------- review
 
 async function review(args: Args, io: Io): Promise<number> {
-  onlyFlags(args, ["config", "content", "by", "quote-checked", "note", "note.*", "editors", "today"], "review");
+  onlyFlags(args, ["config", "content", "by", "on", "quote-checked", "note", "note.*", "editors", "today"], "review");
   const id = args.positional[0];
   const by = text(args, "by");
   if (!id || !by) throw new UsageError('usage: openpromises review <card id> --by "<editor handle>" [--quote-checked] [--note "…"]');
   const site = await loadSite(args, io);
   const { config } = site;
-  const day = today(io, config, args);
+  const now = today(io, config, args);
+  // --on records an approval given earlier, such as one imported from a pull request (decision 11).
+  const day = text(args, "on") ?? now;
+  if (!ISO_DAY.test(day) || Number.isNaN(Date.parse(day))) throw new UsageError(`--on is a date written YYYY-MM-DD, not "${day}"`);
+  if (day > now) throw new UsageError(`--on ${day} is in the future; an approval is recorded on or after the day it was given`);
   const refuse = (m: string) => {
     io.err(`refused: ${m}`);
     return 1;
   };
 
-  const editorsFile = text(args, "editors");
-  const read = readContent(
-    folderSource(site.contentDir),
-    config,
-    editorsFile ? { editors: { file: editorsFile, text: existsSync(resolve(io.cwd, editorsFile)) ? readFileSync(resolve(io.cwd, editorsFile), "utf8") : null } } : {},
-  );
+  const editors = editorsOverride(args, io);
+  const read = readContent(folderSource(site.contentDir), config, editors ? { editors } : {});
   const result = validateContent(read.input);
   const entry = read.input.cards.find((c) => c.file === `drafts/${id}.yaml` || c.file === `promises/${id}.yaml`);
   if (!entry) return refuse(`there is no card or draft "${id}" in ${site.shown}`);
@@ -201,8 +218,9 @@ async function review(args: Args, io: Io): Promise<number> {
   if (approvers(card, ctx).has(by)) return refuse(`${by} has already approved "${id}"; a second approval must come from a different editor`);
   const actor = result.actors.get(card.actor_id);
   const party = actor?.kind === "party" ? actor.id : actor?.party_id;
-  if (editor.party && (editor.party === card.actor_id || editor.party === party)) return refuse(`${by} may not approve a card about their own party (${editor.party}); another editor does`);
+  if (editor.party && (editor.party === card.actor_id || editor.party === party)) return refuse(`${by} may not approve a card about their own party; another editor does`);
   if (args.flags["quote-checked"] && where === "promises") return refuse("a published card's versions are history: record a correction instead of a new quote check");
+  if (args.flags["quote-checked"] && text(args, "on")) return refuse("--quote-checked records a check made today, so it cannot be combined with --on");
 
   // The note, in one language (--note) or several (--note.en, --note.ru).
   const note: Record<string, string> = {};
@@ -403,9 +421,10 @@ async function migrate(args: Args, io: Io): Promise<number> {
 // ---------------------------------------------------------------- stats
 
 async function stats(args: Args, io: Io): Promise<number> {
-  onlyFlags(args, ["config", "content", "json"], "stats");
+  onlyFlags(args, ["config", "content", "editors", "json"], "stats");
   const site = await loadSite(args, io);
-  const r = validateContent(readContent(folderSource(site.contentDir), site.config).input);
+  const editors = editorsOverride(args, io);
+  const r = validateContent(readContent(folderSource(site.contentDir), site.config, editors ? { editors } : {}).input);
   const s = contentStats(r.cards, site.config, r.actors, r.editors);
   if (args.flags.json) {
     io.out(JSON.stringify(s, null, 2));
@@ -430,14 +449,17 @@ const HELP: Record<string, string> = {
   validate: `openpromises validate [--base <ref> | --no-base] [--editors <file>] [--json]
   Checks every card, draft and actor and the editors list against format v1 and its rules, then
   compares every published card with the base branch: VALIDATE_BASE, then origin/$GITHUB_BASE_REF,
-  then origin/main (--base chooses one, --no-base skips it). Exits 1 on any error.`,
+  then origin/main (--base chooses one, --no-base skips it). Exits 1 on any error.
+  --editors (or OPENPROMISES_EDITORS) reads the editors list from outside the content folder.`,
   new: `openpromises new <id> --actor <actor id> [--made-on YYYY-MM-DD] [--venue <venue>] [--area <area>] [--source-url <url>] [--quote <words>]
   Writes drafts/<id>.yaml with every field to fill in.`,
-  review: `openpromises review <id> --by "<editor>" [--quote-checked] [--note "…" | --note.en "…" --note.ru "…"] [--editors <file>]
+  review: `openpromises review <id> --by "<editor>" [--on YYYY-MM-DD] [--quote-checked] [--note "…" | --note.en "…" --note.ru "…"] [--editors <file>]
   Records an editor's approval in the card. Refuses an editor not in the list, a second approval by
   the same editor, and an approval of a card about the editor's own party. On the last approval
   needed, moves the card from drafts/ to promises/ (only if it passes every other rule).
-  --quote-checked also records that the editor checked each version's words at the source today.`,
+  --quote-checked also records that the editor checked each version's words at the source today.
+  --on records an approval the editor gave earlier (for example on a pull request, before the site
+  moved to OpenPromises), with that date; say where in --note.`,
   "check-quote": `openpromises check-quote <id> --text <file> | --html <file> [--version <n>] [--record]
   Checks a version's words (default: the current one) against a stored copy of its source: exact,
   close (case, punctuation or spacing differ) or none. --record writes the result to quotes.json,
@@ -452,7 +474,7 @@ const HELP: Record<string, string> = {
   Rewrites cards and actors in the site's older format (legacy in the configuration, or --from:
   ${LEGACY_FORMATS.join(", ")}) in format v1, in place. With --in and --out, converts a whole folder
   into a new one.`,
-  stats: `openpromises stats [--json]
+  stats: `openpromises stats [--editors <file>] [--json]
   Counts published cards by category, status, actor and area, and drafts by approval.`,
 };
 

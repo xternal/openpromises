@@ -126,7 +126,7 @@ describe("a content folder", () => {
 
   it("checks the editors list", () => {
     const editors = { file: "editors.yaml", data: { editors: [...EDITORS, { handle: "Sam", since: "2026-01-01", party: "red-party" }] } };
-    expect(found(content({ editors }))).toEqual(['editors.yaml editors.3.handle: "Sam" is listed twice', 'editors.yaml editors.3.party: "red-party" is not a party among the actors']);
+    expect(found(content({ editors }))).toEqual(['editors.yaml editors.3.handle: "Sam" is listed twice', 'editors.yaml editors.3.party: is not a party among the actors']);
   });
 });
 

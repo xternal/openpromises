@@ -311,7 +311,7 @@ describe("approvals", () => {
   it("never counts an editor approving a card about their own party", () => {
     const c = card((c) => (c.reviews![1] = { by: "Kim", kind: "editor", on: "2026-05-04", approves: true }));
     expect(ruleIssues("approvals", c)).toEqual([
-      "reviews[1].by: Kim may not approve a card about their own party (green-party); another editor does",
+      "reviews[1].by: Kim may not approve a card about their own party; another editor does",
       "reviews: a published card needs 2 editors' approvals; it has 1. Keep it in drafts/ until editors approve it (openpromises review)",
     ]);
   });

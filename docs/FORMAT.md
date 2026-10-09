@@ -304,7 +304,7 @@ A **review** is a check of the whole card, shown on it.
 | `approves` | `true` or `false` | An editor's approval to publish. |
 | `batch` | `true` | The approval was given for a batch of cards by a recorded decision, not card by card. |
 
-**Approvals.** A card in `promises/` needs `editorial.approvals` approvals (default 2): reviews with `kind: editor` and `approves: true`, by different editors in the editors list, each made while they were an editor. When `editorial.partyConflict` is on, an editor never approves a card about their own party: the card's actor, or the actor's party. An automated review never approves.
+**Approvals.** A card in `promises/` needs `editorial.approvals` approvals (default 2): reviews with `kind: editor` and `approves: true`, by different editors in the editors list, each made while they were an editor. An approval given before a site moved to OpenPromises (on a pull request, say) is recorded with the day it was given and a note saying where (`openpromises review --on`). When `editorial.partyConflict` is on, an editor never approves a card about their own party: the card's actor, or the actor's party. An automated review never approves.
 
 **Modules** add optional data. A card may use a module only when the configuration lists it.
 
@@ -366,7 +366,7 @@ editors:
     party: riverside-greens
 ```
 
-A site that has promised its editors to keep their declarations private can keep this file outside its public repository and pass it to the check: `openpromises validate --editors /path/to/editors.yaml`.
+A site that has promised its editors to keep their declarations private can keep this file outside its public repository and pass it to the commands with `--editors /path/to/editors.yaml`, or with the `OPENPROMISES_EDITORS` environment variable (in CI, from a secret: see [MIGRATING.md](MIGRATING.md)). No message the engine prints names an editor's declared party.
 
 ## 13. What the rules check
 

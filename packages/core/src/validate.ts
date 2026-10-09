@@ -135,7 +135,7 @@ export function validateContent(input: ContentInput): ContentResult {
         const add = (path: (string | number)[], m: string) => issues.push({ file: input.editors!.file, ...issue("editors", ["editors", i, ...path], m) });
         if (handles.has(e.handle)) add(["handle"], `"${e.handle}" is listed twice`);
         handles.add(e.handle);
-        if (e.party !== null && actors.get(e.party)?.kind !== "party") add(["party"], `"${e.party}" is not a party among the actors`);
+        if (e.party !== null && actors.get(e.party)?.kind !== "party") add(["party"], "is not a party among the actors");
         if (e.until && e.until < e.since) add(["until"], "is before since");
       });
     }

@@ -29,12 +29,18 @@ Notes made while building, so a reader can see how each decision was read. None 
 - **Deadline markers and date order.** Events are in date order except automatic ones (the RFC's rule) and `deadline` markers, which Public Ledger dates in the future. Without this exception, the first event added after a future deadline marker would break the order.
 - **The YAML the engine writes** quotes dates and the `on` key of a review, so that YAML 1.1 readers such as PyYAML read them as text, not as dates and `true`.
 
+## Accepted on 9 October 2026, after RFC-0001
+
+Proposed while converting the sites' cards (docs/COMPARISON.md), and accepted by Pavel Guzhikov as recommended on 9 October 2026. None of them changes a decision in RFC-0001 §12.
+
+| # | Decided on | Question | Decision | Why |
+|---|---|---|---|---|
+| 10 | 9 Oct 2026 | Public Ledger's editors' guide promises that their party declarations stay private, but the party check needs them. | **Keep the promise.** The editors list stays out of the public repository and reaches the checks privately: `--editors <file>` or the `OPENPROMISES_EDITORS` environment variable, from a CI secret. Cards show each approving editor's handle. No message the engine prints names an editor's declared party. | Breaking a privacy promise to volunteers costs more than it gains. The check still runs on every change; what is lost is outsiders re-running the party check themselves. |
+| 11 | 9 Oct 2026 | Public Ledger's 45 published cards have no approvals in the card, and all are still flagged `editor_check_required: true`. | **Import the approvals that were really given** (each approval on the pull request that published a card, by someone on the editors list) with their original date and a note naming the pull request: `openpromises review --on <date> --note …`. **Editors review the remaining cards one by one.** No batch approval. | The flag says these cards have not had their full check, so a batch approval would record a check that never happened. Importing real approvals saves editors' time without inventing any. |
+| 12 | 9 Oct 2026 | The repository will be public and names Russia Ledger (the copied RFC, COMPARISON.md, `fromRussiaLedger`, the format id `russia-ledger`). Should those names go before it is public? | **Keep them.** The recommendation was to rename only if Russia Ledger's own decision on who is visible (its D3) wanted no visible link. D3 was answered on 9 October 2026: the owner is named on that site. No history rewrite is needed. | The link is already public by Russia Ledger's own decision, so renaming would hide nothing. Its content still never comes into this repository. |
+
+How each one is carried out is in [MIGRATING.md](MIGRATING.md).
+
 ## Proposed, waiting for the owner
 
-These came up while converting the sites' cards (docs/COMPARISON.md). None changes the RFC; each is a choice only the owner can make.
-
-| # | Question | Recommendation | Why |
-|---|---|---|---|
-| P1 | Public Ledger's editors list: its guide promises editors that their party declarations stay private, but the party check needs them. | Keep the promise. Keep the list out of the public repository and give it to the check privately (`openpromises validate --editors`, from a CI secret). Cards show editors' handles as now. | Breaking a privacy promise to volunteers costs more than it gains. The check still runs on every change; what is lost is outsiders re-running the party check themselves. |
-| P2 | Public Ledger's 45 published cards have no approvals in the card, and all are still flagged `editor_check_required: true`. | Import the approvals that already exist (two GitHub approvals on the pull request that published a card) as `kind: editor, approves: true` reviews, noting the pull request. Have editors review the remaining cards one by one, not as a batch. | The flag says these cards have not had their full check, so a batch approval would record a check that never happened. Importing real approvals saves editors' time without inventing any. |
-| P3 | The repository will be public, and it names Russia Ledger: in the copied RFC, in COMPARISON.md, in `fromRussiaLedger` and in the legacy format id `russia-ledger`. Russia Ledger's own rules keep its working title out of code, and leave the owner's visibility to its decision D3. | Decide before the repository goes public. If D3 wants no visible link, rename these to a neutral name (for example `bilingual-ledger`), and publish with fresh history, because git history would keep the old names. | Renaming takes minutes now. After the repository is public, the names cannot be taken back. |
+None.

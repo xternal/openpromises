@@ -22,9 +22,9 @@ const write = (path: string, text: string) => {
 };
 
 /** Run a command line in a folder; returns the exit code and everything printed. */
-async function op(cwd: string, line: string | string[], today = "2026-10-09") {
+async function op(cwd: string, line: string | string[], today = "2026-10-09", env: Record<string, string> = {}) {
   const out: string[] = [];
-  const io: Io = { cwd, today, out: (l) => out.push(l), err: (l) => out.push(l) };
+  const io: Io = { cwd, today, env, out: (l) => out.push(l), err: (l) => out.push(l) };
   const argv = Array.isArray(line) ? line : [...line.matchAll(/"([^"]*)"|(\S+)/g)].map((m) => m[1] ?? m[2]!);
   const code = await run(argv, io);
   return { code, out: out.join("\n") };
@@ -170,7 +170,7 @@ describe("review", () => {
   it("refuses an unlisted editor, a second approval by the same editor, and an editor's own party", async () => {
     const d = site();
     expect((await op(d, "review bus-fares --by Robin")).out).toBe('refused: "Robin" is not in the editors list');
-    expect((await op(d, "review bus-fares --by Kim")).out).toBe("refused: Kim may not approve a card about their own party (green-party); another editor does");
+    expect((await op(d, "review bus-fares --by Kim")).out).toBe("refused: Kim may not approve a card about their own party; another editor does");
     await op(d, "review bus-fares --by Sam");
     expect((await op(d, "review bus-fares --by Sam")).out).toContain("has already approved");
   });
@@ -187,6 +187,42 @@ describe("review", () => {
     // Confirming the quote while approving lets it through.
     expect((await op(d, "review bus-fares --by Alex --quote-checked")).code).toBe(0);
     expect(file(d, "promises/bus-fares.yaml")).toContain('quote_checked_on: "2026-10-09"');
+  });
+});
+
+describe("a private editors list (decision 10)", () => {
+  it("is read from outside the content folder, and no message names an editor's party", async () => {
+    const d = site();
+    const secret = join(tmp(), "editors.yaml");
+    writeFileSync(secret, file(d, "editors.yaml"));
+    rmSync(join(d, "content", "editors.yaml"));
+    expect((await op(d, "review bus-fares --by Sam")).out).toContain("there is no editors list");
+    expect((await op(d, "review bus-fares --by Sam", "2026-10-09", { OPENPROMISES_EDITORS: secret })).code).toBe(0);
+    const refused = await op(d, ["review", "bus-fares", "--by", "Kim", "--editors", secret]);
+    expect(refused.out).toBe("refused: Kim may not approve a card about their own party; another editor does");
+    // An approval written into the card by hand is refused by validate, again without naming the party.
+    write(join(d, "content", "drafts", "bus-fares.yaml"), `${file(d, "drafts/bus-fares.yaml")}  - { by: Kim, kind: editor, "on": "2026-10-09", approves: true }\n`);
+    const v = await op(d, "validate --no-base", "2026-10-09", { OPENPROMISES_EDITORS: secret });
+    expect(v.out).toContain("reviews[1].by: Kim may not approve a card about their own party; another editor does");
+    expect(v.out).not.toContain("green-party");
+    expect(v.out).not.toContain("blue-party");
+  });
+});
+
+describe("importing an earlier approval (decision 11)", () => {
+  it("records it with the day it was given and a note saying where", async () => {
+    const d = site();
+    const r = await op(d, ["review", "bus-fares", "--by", "Sam", "--on", "2026-06-12", "--note", "Approved on GitHub in pull request #12"]);
+    expect(r.code).toBe(0);
+    expect(file(d, "drafts/bus-fares.yaml")).toContain('- by: Sam\n    kind: editor\n    "on": "2026-06-12"\n    approves: true\n    note:\n      en: "Approved on GitHub in pull request #12"\n');
+  });
+
+  it("refuses a day in the future, a day before the person was an editor, and a quote check on an earlier day", async () => {
+    const d = site();
+    expect((await op(d, "review bus-fares --by Sam --on 2026-12-01")).out).toContain("is in the future");
+    expect((await op(d, "review bus-fares --by Sam --on 2025-12-31")).out).toBe("refused: Sam is not an editor on 2025-12-31");
+    expect((await op(d, "review bus-fares --by Sam --on 12/06/2026")).code).toBe(2);
+    expect((await op(d, "review bus-fares --by Sam --on 2026-06-12 --quote-checked")).out).toContain("cannot be combined with --on");
   });
 });
 
