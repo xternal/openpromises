@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveConfig } from "@openpromises/core";
-import { appendToList, setField, checkFolder, findConfig, folderSource, gitSource, loadConfig, readContent, readYaml, resolveBase, toYaml } from "@openpromises/files";
+import { appendToList, setField, checkFolder, commentLines, findConfig, folderSource, gitSource, loadConfig, placeComments, readContent, readYaml, resolveBase, toYaml } from "@openpromises/files";
 
 const FIXTURES = join(import.meta.dirname, "..", "..", "..", "fixtures");
 const dirs: string[] = [];
@@ -245,5 +245,30 @@ describe("finding the base", () => {
     write(join(d, "promises", "bus-fares.yaml"), toYaml(CARD, "card"));
     const r = checkFolder(d, resolveConfig({ site: { name: "T" } }), {});
     expect(r.base.note).toContain("the append-only check was skipped");
+  });
+});
+
+describe("comments on migration (decision 16)", () => {
+  const text = "# A note about the id\nid: someone\nroles:\n  - title: Mayor\n    # Source: https://example.org/mayor (\"Someone became mayor in May.\")\n    from: \"2026-05-01\"\n";
+  const data = { format: "openpromises/1", id: "someone", kind: "person", roles: [{ title: { en: "Mayor" }, from: "2026-05-01" }] };
+  const config = resolveConfig({ site: { name: "T" } });
+
+  it("finds the field every comment stands above", () => {
+    expect(commentLines(text).map((c) => [c.line, c.path])).toEqual([
+      [1, ["id"]],
+      [5, ["roles", 0, "from"]],
+    ]);
+  });
+
+  it("leaves every comment of a format it does not know for an editor, and drops none", () => {
+    const placed = placeComments("borough-book", "actor", text, data, config);
+    expect(placed.data).toEqual(data);
+    expect(placed.report.map((r) => r.outcome)).toEqual(["not placed", "not placed"]);
+  });
+
+  it("moves a Public Ledger role source into its field", () => {
+    const placed = placeComments("public-ledger", "actor", text, data, config);
+    expect((placed.data as { roles: { source?: unknown }[] }).roles[0]!.source).toEqual({ url: "https://example.org/mayor", quote: "Someone became mayor in May." });
+    expect(placed.report.map((r) => r.outcome)).toEqual(["not placed", "moved"]);
   });
 });

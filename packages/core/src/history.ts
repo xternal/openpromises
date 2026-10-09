@@ -76,10 +76,27 @@ export const LATE_FIELDS: Readonly<Record<(typeof HISTORY)[number], readonly str
   replies: [],
 };
 
+export type LateFields = Partial<Record<(typeof HISTORY)[number], readonly string[]>>;
+
+/**
+ * The v1 fields each older format had no place for (decision 15). A site
+ * converted from that format (its `legacy` setting) may fill them in once on
+ * a published entry, like the late fields above. Kept here, per format, and
+ * never in a site's configuration, so no site can make its own history
+ * editable.
+ */
+export const LEGACY_LATE_FIELDS: Readonly<Record<string, LateFields>> = {
+  // A cost's quality label: Public Ledger's and Russia Ledger's costs had none.
+  "public-ledger": { versions: [".parameters.cost.quality"] },
+  "russia-ledger": { versions: [".parameters.cost.quality"] },
+  // A cost's sources: Borough Book's costs had none.
+  "borough-book": { versions: [".parameters.cost.sources"] },
+};
+
 /** The entry as it stands, without any late field the published entry did not have. */
-function withoutLateFields(key: (typeof HISTORY)[number], published: unknown, now: unknown): unknown {
+function withoutLateFields(tails: readonly string[], published: unknown, now: unknown): unknown {
   let out = now;
-  for (const tail of LATE_FIELDS[key]) if (fieldAt(published, tail) === null && fieldAt(out, tail) !== null) out = withField(out, tail, null);
+  for (const tail of tails) if (fieldAt(published, tail) === null && fieldAt(out, tail) !== null) out = withField(out, tail, null);
   return out;
 }
 
@@ -91,10 +108,11 @@ const list = (o: Record<string, unknown>, k: string): unknown[] => (Array.isArra
  * there, in the same place, and unchanged, unless corrections appended in this
  * change record exactly what changed: undoing them, newest first, must give
  * back the published entry. Corrections and reviews never change either.
- * A late field (LATE_FIELDS) may be filled in once where the published entry
- * lacked it. Key order and YAML style never matter.
+ * A late field (LATE_FIELDS, and for a converted site the fields its old
+ * format lacked, LEGACY_LATE_FIELDS) may be filled in once where the
+ * published entry lacked it. Key order and YAML style never matter.
  */
-export function appendOnlyIssues(before: unknown, after: unknown): Issue[] {
+export function appendOnlyIssues(before: unknown, after: unknown, opts: { legacy?: string } = {}): Issue[] {
   const b = (before ?? {}) as Record<string, unknown>;
   const a = (after ?? {}) as Record<string, unknown>;
   const out: Issue[] = [];
@@ -116,7 +134,8 @@ export function appendOnlyIssues(before: unknown, after: unknown): Issue[] {
   const fresh = allCorrections.slice(oldCorrections.length) as { path?: unknown; was?: unknown }[];
   for (const key of HISTORY) {
     const was = list(b, key);
-    const now = list(a, key).map((entry, i) => (i < was.length && entry !== undefined ? withoutLateFields(key, was[i], entry) : entry));
+    const late = [...LATE_FIELDS[key], ...((opts.legacy && LEGACY_LATE_FIELDS[opts.legacy]?.[key]) || [])];
+    const now = list(a, key).map((entry, i) => (i < was.length && entry !== undefined ? withoutLateFields(late, was[i], entry) : entry));
     was.forEach((item, i) => {
       if (same(item, now[i])) return;
       if (now[i] === undefined) {

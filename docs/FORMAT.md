@@ -306,6 +306,14 @@ Two checks hold every correction to account: the card's field must equal the `no
 |---|---|
 | `versions[n].parameters.cost.by` | 9 October 2026 (decision 14) |
 
+A site converted from an older format (its `legacy` setting) may also fill in, once, the fields that format had no place for (decision 15). The list is the engine's, per format, so no site can make its own history editable. Keep `legacy` in the configuration after converting, so these stay allowed.
+
+| Converted from | May fill in once |
+|---|---|
+| `public-ledger` | `versions[n].parameters.cost.quality` (its costs had no quality label) |
+| `russia-ledger` | `versions[n].parameters.cost.quality` |
+| `borough-book` | `versions[n].parameters.cost.sources` (its costs had no sources) |
+
 ## 10. Reviews, approvals and modules
 
 A **review** is a check of the whole card, shown on it.
@@ -325,7 +333,7 @@ A **review** is a check of the whole card, shown on it.
 
 | Module | Where | Data |
 |---|---|---|
-| `contracts` | `links.contracts` | Public contracts behind delivery: an OCDS id (`ocds-h6vhtk-…`), or `{ ocid, award_id?, notice_url? }`. |
+| `contracts` | `links.contracts` | Public contracts behind delivery: an OCDS id (`ocds-h6vhtk-…`), or `{ ocid, award_id?, notice_url?, note? }`, where `note` (a language map) says why the contract is linked to the card. |
 | `decisions` | `links.decisions` | Council decisions that moved the card: `{ decision_id, event, quote, suggested_by?, suggested_on? }`. The card must have an event of type `event`. |
 | `lever` | `links.lever` | A scenario in the site's sandbox: a lever id, or `{ id?, settings?, label? }`. |
 | `metrics` | `parameters.metric`, `links.measurement` | An indicator target `{ series_id, target, direction: at_least \| at_most \| below, unit, by }`, and whether its data can still be checked: `{ status: open \| delayed \| closed, since?, note? }`. |
@@ -356,12 +364,13 @@ same_as: [https://www.gov.uk/government/people/keir-starmer]
 | `name` | language map | yes | |
 | `short_name` | language map | no | For tight spaces ("Labour"). |
 | `party_id` | actor id | no | A person's party; must be an actor of kind `party`. |
-| `roles` | list of `{ title, from?, to? }` | no | Titles as language maps. |
-| `standing` | `in_power`, `opposition` or `public_body` | with `standing: manual` | Where the actor stands now. Shown to readers; it never changes a status or a rule, except the `not_in_power` rule below. |
+| `roles` | list of `{ title, from?, to?, source? }` | no | Titles as language maps. `source` is `{ url, quote? }`: where the role is confirmed, with its words there. |
+| `standing` | `in_power`, `opposition` or `public_body` | for a party, with `standing: manual` (a person takes their party's) | Where the actor stands now. Shown to readers; it never changes a status or a rule, except the `not_in_power` rule below. |
 | `seats` | whole number | with `standing: fromSeats`, for parties | Seats the party holds now. A party with more than half of all seats is in power; otherwise every party is out of power. |
 | `level` | one of `actors.levels` | no | Such as `federal` or `regional`. A filter, never a different rule. |
 | `identifiers` | `{ key: value }` | no | Outside ids, keys from `actors.ids`. One id belongs to one actor. |
 | `same_as` | list of URLs | no | Official pages about this actor, checked by an editor. |
+| `same_as_checked_on` | date | no | When an editor last checked those pages. |
 | `x` | anything | no | The site's own fields. |
 
 **`not_in_power`** (in the `local` preset). When a site works out standing, a card whose party is out of power must be `not_in_power` or `unscoreable`, and a card whose party is in power cannot be `not_in_power`. The same rule applies to every party.
@@ -407,11 +416,12 @@ error  content/promises/uk-bus-cap.yaml  events[1].evidence_url: an "in_plan" ev
 | `corrections` | Each correction names a field that exists, and the field equals the `now` of its last correction. |
 | `approvals` | A published card has enough approvals, from listed editors, made while they were editors, none from an editor about their own party; automated reviews never approve. |
 | `standing` | The `not_in_power` rule (§11). |
+| `actors` | Actors use the configured kinds, levels and identifiers, and their parties exist. Standing and seats fit `actors.standing`; with `standing: manual`, every party states its standing (a warning until 0.4.0, decision 18). |
 | `quotes` | Every version of a published card has its words confirmed: a stored-source span that matches character for character, an archive check (`quotes.json`) that found them (`exact`, or `close` with `quote_checked_on`), or, when `quotes.require` is `editor`, `quote_checked_on`. A machine check that did not find the words is always an error. With `quotes.archive: required`, every version has an `archived_url`. |
 | `responsible` | `responsible` names an actor that exists and whose kind is in `actors.responsible`, or is `null`; with `actors.responsibleRequired`, every card has it (a warning in a draft). |
 | `brought-about-by` | `brought_about_by` names an actor that exists, and the card's status is the third step of the ladder or beyond. |
 | `references` | The actor, reply actors and parties exist; ids are unique across `promises/` and `drafts/` and match the file names; outside identifiers belong to one actor each. |
-| `modules` | Module data is used only when the module is on, and is well formed. Lever settings need a label (a warning until 0.3.0, decision 13.2). |
+| `modules` | Module data is used only when the module is on, and is well formed. Lever settings need a label (an error from 0.3.0; a warning in 0.2.0, decision 13.2). |
 | `append-only` | Compared with the base branch, a published card's history only grew (below). |
 
 Drafts in `drafts/` pass the same rules except `approvals`; a missing headline or an unconfirmed quote is a warning there, not an error. A stored-source span that does not match is an error in a draft too.

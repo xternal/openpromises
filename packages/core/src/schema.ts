@@ -164,7 +164,16 @@ export const Review = z.strictObject({
 export type Review = z.infer<typeof Review>;
 
 export const Ocid = z.string().regex(/^ocds-[a-z0-9]+-[A-Za-z0-9-]+$/, "should be an OCDS id, such as ocds-h6vhtk-0525b3");
-export const ContractRef = z.union([Ocid, z.strictObject({ ocid: Ocid, award_id: Text.optional(), notice_url: Url.optional() })]);
+export const ContractRef = z.union([
+  Ocid,
+  z.strictObject({
+    ocid: Ocid,
+    award_id: Text.optional(),
+    notice_url: Url.optional(),
+    /** Why this contract is linked to the card, in the editors' words (decision 16). */
+    note: LangMap.optional(),
+  }),
+]);
 export type ContractRef = z.infer<typeof ContractRef>;
 
 export const DecisionLink = z.strictObject({
@@ -243,12 +252,24 @@ export const Actor = z.strictObject({
   name: LangMap,
   short_name: LangMap.optional(),
   party_id: Slug.optional(),
-  roles: z.array(z.strictObject({ title: LangMap, from: IsoDate.optional(), to: IsoDate.optional() })).optional(),
+  roles: z
+    .array(
+      z.strictObject({
+        title: LangMap,
+        from: IsoDate.optional(),
+        to: IsoDate.optional(),
+        /** Where the role is confirmed, with its words there (decision 16). */
+        source: z.strictObject({ url: Url, quote: Text.optional() }).optional(),
+      }),
+    )
+    .optional(),
   standing: z.enum(STANDINGS).optional(),
   level: Text.optional(),
   seats: z.number().int().nonnegative().optional(),
   identifiers: z.record(Word, z.union([Text, z.number().int()])).optional(),
   same_as: z.array(Url).optional(),
+  /** When an editor last checked the official pages in same_as (decision 16). */
+  same_as_checked_on: IsoDate.optional(),
   x: z.record(z.string(), z.unknown()).optional(),
 });
 export type Actor = z.infer<typeof Actor>;

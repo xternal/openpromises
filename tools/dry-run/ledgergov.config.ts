@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { defineConfig } from "@openpromises/core";
-import base from "../../fixtures/public-ledger/openpromises.config";
+import base from "../../fixtures/public-ledger/openpromises.config.ts";
 
 /**
  * Public Ledger as it would be configured on the day it moves: the fixture's

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveConfig, type Card, type QuoteCheck } from "@openpromises/core";
+import { resolveConfig, validateActor, type Card, type QuoteCheck } from "@openpromises/core";
 import { actors, BASE, card, check, CONFIG_INPUT, ruleIssues } from "./helpers";
 
 describe("the base card", () => {
@@ -558,9 +558,22 @@ describe("brought-about-by (decision 14)", () => {
   });
 });
 
-describe("lever label (decision 13.2: a warning first)", () => {
-  it("warns about lever settings with no label, until it becomes an error in 0.3.0", () => {
+describe("lever label (decision 13.2: a warning in 0.2.0, an error from 0.3.0)", () => {
+  it("refuses lever settings with no label", () => {
     const issues = check(card((c) => (c.links = { lever: { settings: { bus_cap: 1 } } }))).filter((i) => i.rule === "modules");
-    expect(issues.map((i) => [i.severity, i.message])).toEqual([["warning", 'is missing: lever settings need a label saying what they show, such as "£2 bus cap, as announced" (an error from version 0.3.0)']]);
+    expect(issues.map((i) => [i.severity, i.message])).toEqual([["error", 'is missing: lever settings need a label saying what they show, such as "£2 bus cap, as announced"']]);
+  });
+});
+
+describe("standing (decision 18)", () => {
+  const manual = resolveConfig({ ...CONFIG_INPUT, actors: { ...CONFIG_INPUT.actors, standing: "manual" } });
+  const actor = (a: Record<string, unknown>) => validateActor({ format: "openpromises/1", name: { en: "Someone" }, ...a }, manual).issues.filter((i) => i.path[0] === "standing");
+
+  it("asks a party for its standing, as a warning until 0.4.0, and lets a person take their party's", () => {
+    expect(actor({ id: "red-party", kind: "party" }).map((i) => [i.severity, i.message])).toEqual([
+      ["warning", "is missing: on this site every party states where it stands (in_power, opposition or public_body); a person takes their party's (an error from version 0.4.0)"],
+    ]);
+    expect(actor({ id: "red-party", kind: "party", standing: "opposition" })).toEqual([]);
+    expect(actor({ id: "sam-doe", kind: "person", party_id: "red-party" })).toEqual([]);
   });
 });

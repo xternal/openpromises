@@ -63,7 +63,7 @@ export function checkFolder(contentDir: string, config: Config, opts: CheckOptio
           });
           continue;
         }
-        for (const i of appendOnlyIssues(was.data, current.data)) issues.push({ file: was.file, ...i });
+        for (const i of appendOnlyIssues(was.data, current.data, config.legacy ? { legacy: config.legacy } : {})) issues.push({ file: was.file, ...i });
       }
       if (!before.input.cards.length) base.note = `nothing is published on ${ref} yet, so there was nothing to compare`;
     }

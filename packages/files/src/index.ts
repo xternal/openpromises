@@ -8,3 +8,4 @@ export * from "./config";
 export * from "./read";
 export * from "./check";
 export * from "./write";
+export * from "./comments";

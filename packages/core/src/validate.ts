@@ -69,6 +69,9 @@ export function validateActor(data: unknown, config: Config): { actor: Actor | n
   if (!kinds.includes(a.kind)) add(["kind"], `"${a.kind}" is not an actor kind in the configuration (${kinds.join(", ")})`);
   if (a.standing !== undefined && standing !== "manual")
     add(["standing"], standing === "fromSeats" ? "is worked out from seats on this site, so it is not written by hand" : "is not recorded on this site (actors.standing is none)");
+  // Decision 18: a party states where it stands; a person takes their party's. A warning until 0.4.0 (decision 13.2).
+  if (standing === "manual" && a.kind === "party" && a.standing === undefined)
+    out.push(issue("actors", ["standing"], "is missing: on this site every party states where it stands (in_power, opposition or public_body); a person takes their party's (an error from version 0.4.0)", "warning"));
   if (a.seats !== undefined && standing !== "fromSeats") add(["seats"], "only counts when the configuration works standing out from seats (actors.standing: fromSeats)");
   if (a.seats !== undefined && a.kind !== "party") add(["seats"], "belong to a party, not to a person or other actor");
   if (a.level !== undefined && !levels?.includes(a.level))

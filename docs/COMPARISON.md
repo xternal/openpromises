@@ -43,6 +43,7 @@ Read on 9 October 2026 from each site's `main` branch: Public Ledger (54 cards, 
 | `submission_ref`, `credit` | `x.submission_ref`, `x.credit` | Only Public Ledger has reader submissions so far. |
 | `outcome_by` | `responsible` (`{ actor_id, note }`, or `null`) | Who must act to deliver it (decision 14). Until 9 October 2026 Public Ledger's `outcome_by` meant credit for an outcome someone else brought about; the converter reads the current meaning. |
 | `brought_about_by` | `brought_about_by` | Credit for an outcome someone other than the card's actor brought about (decision 14). |
+| YAML comments | `links.contracts[].note`, `roles[].source`, `same_as_checked_on` | Why a contract is linked, where a role is confirmed, when official pages were checked: moved by `openpromises migrate` (decision 16). Of 63 comment lines at 77a86b4, 38 move into fields, 15 repeat what the configuration says, and 10 are listed for an editor. |
 | `editor_check_required` | `x.editor_check_required` | Kept for the record; in v1, approvals in the card say whether a card has been checked. |
 | `sources` | `sources` | Same shape. |
 | `versions[].version`, `text`, `recorded_on`, `source_url`, `quote_checked_on` | the same | |

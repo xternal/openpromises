@@ -869,6 +869,17 @@
                   "notice_url": {
                     "type": "string",
                     "format": "uri"
+                  },
+                  "note": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "pattern": "^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+                    },
+                    "additionalProperties": {
+                      "type": "string",
+                      "pattern": "\\S"
+                    }
                   }
                 },
                 "required": [

@@ -47,7 +47,11 @@ openpromises migrate
 openpromises validate
 ```
 
-`migrate` rewrites every card (and actor) in format v1. Put nothing else in this change. `validate` compares the converted forms with the base branch, so it shows that the change rewrites no history. Keep `legacy` in the configuration until this change is merged.
+`migrate` rewrites every card (and actor) in format v1. Put nothing else in this change. `validate` compares the converted forms with the base branch, so it shows that the change rewrites no history.
+
+Comments in the old files are not lost (decision 16). `migrate` moves each one it understands into its field: why a contract is linked, where a role is confirmed, when official pages were checked. It then lists every comment line with what happened to it. Those it could not place are left for an editor to decide. Read the list before merging; `--dry-run` shows it without writing anything.
+
+Keep `legacy` in the configuration after this change too. Editors may then fill in, once and with no correction, the fields the old format had no place for, such as Public Ledger's cost quality labels (decision 15, FORMAT.md §9).
 
 ## 4. Record approvals
 
@@ -79,6 +83,6 @@ While steps 4 and 5 are in progress, run `openpromises validate` in CI next to t
 
 | Site | When | What is left after converting |
 |---|---|---|
-| Public Ledger | After 28 October 2026 (decision 9) | Editors list kept private (decision 10). Approvals for 54 cards (main at 77a86b4): import those given on pull requests, review the rest (decision 11). Quality labels on 29 costs. The configuration to start from is `tools/dry-run/ledgergov.config.ts`: the site's own words, quote licences, its renamed reviewer, `money.costedBy: "required"` and `actors.responsibleRequired: true` (decision 14). Its contract and figures entries and its contracts section go to the engine through `publishFiles({ site })`. One check stays in the site's own `validate` script, which keeps running for its budget data: `submission_ref` and `credit` only on a reader submission (agreed by Pavel Guzhikov on 9 October 2026, rather than a hook for each site's own rules). |
+| Public Ledger | After 17 November 2026 (decision 19) | Editors list kept private (decision 10). Approvals for 54 cards (main at 77a86b4): import those given on pull requests, review the rest (decision 11). Quality labels on 29 costs, added after converting with no correction needed (decision 15; keep `legacy: public-ledger` in the configuration). `migrate` moves 38 of the 63 comment lines into fields and lists the rest (decision 16). Drafts stay in the site's own format until the intake moves (decision 17). The configuration to start from is `tools/dry-run/ledgergov.config.ts`: the site's own words, quote licences, its renamed reviewer, `money.costedBy: "required"` and `actors.responsibleRequired: true` (decision 14). Its contract and figures entries and its contracts section go to the engine through `publishFiles({ site })`. One check stays in the site's own `validate` script, which keeps running for its budget data: `submission_ref` and `credit` only on a reader submission (agreed by Pavel Guzhikov on 9 October 2026, rather than a hook for each site's own rules). |
 | Borough Book | After Public Ledger (RFC §10, E3) | Approvals and headlines for 18 cards; record each quote check; untangle the timeline of `hf-free-home-care`; move two cards only on decisions taken after the pledge; give the parks cost a range and a source. |
 | Bilingual tracker | With its milestones M5/M7 (RFC §10, E4) | Correction reasons and review notes in both languages; quality labels on costs. |

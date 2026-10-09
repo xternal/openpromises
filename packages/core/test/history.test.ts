@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appendOnlyIssues, fieldAt, fromPublicLedger, stable, withField } from "@openpromises/core";
+import { appendOnlyIssues, fieldAt, fromPublicLedger, LEGACY_LATE_FIELDS, stable, withField } from "@openpromises/core";
 import { BASE, card } from "./helpers";
 
 /** The same value with every object's keys in reverse order. */
@@ -178,5 +178,25 @@ describe("Public Ledger's fields of 9 October 2026 (decision 14)", () => {
     expect(v1.x).toBeUndefined();
     expect(v1.corrections[0].path).toBe("versions[0].parameters.cost.by");
     expect((fromPublicLedger({ ...legacy, outcome_by: null }) as Record<string, unknown>).responsible).toBeNull();
+  });
+});
+
+describe("fields an older format had no place for (decision 15)", () => {
+  const unlabelled = card((c) => delete c.versions[0]!.parameters!.cost!.quality);
+  const labelled = card((c) => (c.versions[0]!.parameters!.cost!.quality = "sourced"));
+
+  it("lets a site converted from Public Ledger add a cost's quality label once, with no correction", () => {
+    expect(messages(unlabelled, labelled)).toHaveLength(1);
+    expect(appendOnlyIssues(unlabelled, labelled, { legacy: "public-ledger" })).toEqual([]);
+  });
+
+  it("treats a change to the label, once there, as history like the rest", () => {
+    const changed = card((c) => (c.versions[0]!.parameters!.cost!.quality = "approx"));
+    expect(appendOnlyIssues(labelled, changed, { legacy: "public-ledger" })).toHaveLength(1);
+  });
+
+  it("lists, for each older format, only fields it had no place for", () => {
+    expect(LEGACY_LATE_FIELDS["public-ledger"]).toEqual({ versions: [".parameters.cost.quality"] });
+    expect(appendOnlyIssues(unlabelled, labelled, { legacy: "borough-book" })).toHaveLength(1);
   });
 });

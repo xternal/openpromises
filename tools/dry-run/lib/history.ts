@@ -56,7 +56,7 @@ export function replayHistory(contentDir: string, config: Config, ref: string): 
     for (const [file, was] of before) {
       const now = after.get(file);
       if (now === undefined) issues.push({ file, message: "was deleted or renamed" });
-      else for (const i of appendOnlyIssues(was, now)) issues.push({ file, message: i.message });
+      else for (const i of appendOnlyIssues(was, now, config.legacy ? { legacy: config.legacy } : {})) issues.push({ file, message: i.message });
     }
     return { commit: commit.slice(0, 7), date, subject, compared: before.size, issues };
   });

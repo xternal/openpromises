@@ -473,9 +473,9 @@ const modules: Rule = {
     card.versions.forEach((v, i) => {
       if (v.parameters?.metric && !on.has("metrics")) off("metrics", ["versions", i, "parameters", "metric"]);
     });
-    // Decision 13.2: a stricter rule is a warning for one minor release first.
+    // A warning in 0.2.0, an error from 0.3.0 (decision 13.2).
     if (on.has("lever") && links.lever && typeof links.lever === "object" && links.lever.settings && !links.lever.label)
-      add(["links", "lever", "label"], "is missing: lever settings need a label saying what they show, such as \"£2 bus cap, as announced\" (an error from version 0.3.0)", "warning");
+      add(["links", "lever", "label"], "is missing: lever settings need a label saying what they show, such as \"£2 bus cap, as announced\"");
     if (links.measurement && on.has("metrics") && !card.versions.some((v) => v.parameters?.metric))
       add(["links", "measurement"], "belongs to a card with an indicator target (parameters.metric)");
 

@@ -27,6 +27,7 @@ import {
   findConfig,
   folderSource,
   loadConfig,
+  placeComments,
   quoteKey,
   quoteLang,
   quoteUrl,
@@ -37,6 +38,7 @@ import {
   sha256,
   toYaml,
   withQuoteCheck,
+  type CommentReport,
 } from "@openpromises/files";
 import { findSpan, matchQuote, textFromHtml } from "@openpromises/quotes";
 import { cardViews, publishFiles } from "@openpromises/publish";
@@ -386,14 +388,31 @@ async function migrate(args: Args, io: Io): Promise<number> {
   }
   const inPlace = out === source;
   const writes = new Map<string, string>();
-  for (const m of read.migrated) writes.set(m.file, toYaml(m.data, m.kind));
+  // Decision 16: comments move into their fields, and every one is reported.
+  const sourceFiles = folderSource(source);
+  const comments: { file: string; report: CommentReport[] }[] = [];
+  for (const m of read.migrated) {
+    const placed = placeComments(legacy, m.kind, sourceFiles.read(m.file) ?? "", m.data, config);
+    if (placed.report.length) comments.push({ file: m.file, report: placed.report });
+    writes.set(m.file, toYaml(placed.data, m.kind));
+  }
   if (!inPlace) {
     // A copy of the whole folder in format v1: files already in v1 are rewritten in the stable format too.
     for (const c of read.input.cards) if (!writes.has(c.file)) writes.set(c.file, toYaml(c.data, "card"));
     for (const a of read.input.actors) if (!writes.has(a.file)) writes.set(a.file, toYaml(a.data, "actor"));
   }
+  const reportComments = () => {
+    const all = comments.flatMap((c) => c.report.map((r) => ({ file: c.file, ...r })));
+    if (!all.length) return;
+    const count = (o: CommentReport["outcome"]) => all.filter((r) => r.outcome === o).length;
+    io.out(
+      `Comments: ${plural(all.length, "line")} read. ${count("moved")} moved into their fields, ${count("partly moved")} partly moved, ${count("configuration")} already said by the configuration, ${count("not placed")} left for an editor:`,
+    );
+    for (const r of all) io.out(`  ${shown}${r.file}:${r.line}  ${r.outcome}: ${r.detail}  # ${r.text}`);
+  };
   if (args.flags["dry-run"]) {
     for (const f of writes.keys()) io.out(`would write ${outShown}${f}`);
+    reportComments();
     io.out(`Dry run: ${plural(writes.size, "file")} would be written in format v1; nothing was written.`);
     return 0;
   }
@@ -410,6 +429,7 @@ async function migrate(args: Args, io: Io): Promise<number> {
   }
   const cards = read.migrated.filter((m) => m.kind === "card").length;
   io.out(`Converted ${plural(cards, "card")} and ${plural(read.migrated.length - cards, "actor")} from the ${legacy} format; wrote ${plural(writes.size, "file")} to ${outShown}`);
+  reportComments();
   if (inPlace && legacy === "borough-book") {
     const left = ["parties.yaml", "decision_links.yaml", "seats.yaml"].filter((f) => existsSync(join(source, f)));
     if (existsSync(join(source, "councillors")) && readdirSync(join(source, "councillors")).length) left.push("councillors/");

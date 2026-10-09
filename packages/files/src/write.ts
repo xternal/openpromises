@@ -29,8 +29,10 @@ const ORDER: Record<string, readonly string[]> = {
   correction: ["date", "path", "was", "now", "reason", "source_url"],
   review: ["by", "kind", "on", "approves", "batch", "note"],
   links: ["contracts", "decisions", "lever", "measurement", "ward"],
-  actor: ["format", "id", "kind", "name", "short_name", "party_id", "standing", "level", "seats", "roles", "identifiers", "same_as", "x"],
-  role: ["title", "from", "to"],
+  contract: ["ocid", "award_id", "notice_url", "note"],
+  actor: ["format", "id", "kind", "name", "short_name", "party_id", "standing", "level", "seats", "roles", "identifiers", "same_as", "same_as_checked_on", "x"],
+  role: ["title", "from", "to", "source"],
+  roleSource: ["url", "quote"],
   editor: ["handle", "since", "until", "party"],
   editors: ["editors"],
 };
@@ -42,6 +44,8 @@ const CHILD: Record<string, Record<string, string>> = {
   parameters: { cost: "cost", capital_cost: "cost" },
   cost: { by: "costBy", sources: "source" },
   actor: { roles: "role" },
+  role: { source: "roleSource" },
+  links: { contracts: "contract" },
   editors: { editors: "editor" },
 };
 

@@ -1,3 +1,4 @@
+import { fromPublicLedger } from "@openpromises/core";
 import type { Mutation } from "./lib/mutations";
 import type { Accepted } from "./lib/report";
 
@@ -111,6 +112,15 @@ export const MUTATIONS: Mutation[] = [
       }),
   },
   {
+    check: "a quality label added to a published cost, which Public Ledger's format had no place for (decision 15)",
+    site: null,
+    allowed: true,
+    card: BUS,
+    kind: "history",
+    // Converted to format v1 in the same change, then labelled: the label exists only in v1.
+    change: (c) => set(fromPublicLedger(c), "versions.0.parameters.cost.quality", "sourced"),
+  },
+  {
     check: "costed_by filled in on a published version that did not have it (the site's LATE_FIELDS)",
     site: null,
     allowed: true,
@@ -149,12 +159,6 @@ export const ACCEPTED: Accepted[] = [
     match: /other links? \(the site's own pages\)/,
     verdict: "site",
     reason: "Public Ledger's llms.txt guides the whole site (budget, people, method). The site keeps writing it, and can take its promise list from the engine's.",
-  },
-  {
-    area: "Checks",
-    match: /The site refuses it, the engine warns: a card with lever_settings needs a preset_label/,
-    verdict: "accepted",
-    reason: "Decision 13.2: a stricter rule arrives as a warning for one minor release, and becomes an error in 0.3.0.",
   },
   {
     area: "Checks",

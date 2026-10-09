@@ -2,6 +2,22 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
+## Unreleased (0.3.0)
+
+Decisions 15 to 19, from Public Ledger's migration plan.
+
+- **Fields an older format lacked** (decision 15): a site converted from Public Ledger's or Russia Ledger's format may add a cost's quality label once, and one converted from Borough Book's may add a cost's sources once, with no correction. The list is the engine's, per format (`LEGACY_LATE_FIELDS`); `appendOnlyIssues` takes the site's `legacy`.
+- **No comment is lost on migration** (decision 16): three optional fields, `links.contracts[].note`, an actor role's `source` (`{ url, quote? }`) and an actor's `same_as_checked_on`. `openpromises migrate` moves Public Ledger's comments into them and reports every comment line: moved, partly moved, already said by the configuration, or left for an editor. New in `@openpromises/files`: `commentLines`, `placeComments`.
+- **Standing** (decision 18): with `actors.standing: manual`, a party without a standing gets a warning (an error from 0.4.0); a person takes their party's. FORMAT.md now says so.
+- **Public Ledger moves after 17 November 2026** (decision 19), and keeps its own draft format until the intake moves (decision 17).
+- The dry run's Public Ledger configuration loads under Node itself, not only in the tests.
+
+### Upgrading from 0.2.0
+
+- Lever settings without a label (`links.lever.label`) are now an error, as the 0.2.0 warning said.
+- New warning: a party with no `standing` on a site with `actors.standing: manual`. It becomes an error in 0.4.0.
+- A converted site keeps `legacy` in its configuration after converting, so its late fields stay allowed.
+
 ## 0.2.0 (9 October 2026)
 
 Everything the Public Ledger dry run found missing (`pnpm dry-run`, tools/dry-run): what the engine would publish for ledgergov.uk is now as good as what the site serves, or better, in every area it compares.

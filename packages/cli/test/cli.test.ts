@@ -303,4 +303,23 @@ describe("migrate and stats", () => {
     expect(s).toMatchObject({ drafts: 2, draftsWaiting: 2 });
     expect((await op(d, "stats")).out).toContain("0 published cards; 2 drafts (0 with every approval, 2 waiting for editors)");
   });
+
+  it("moves comments into their fields and reports every one (decision 16)", async () => {
+    const d = site();
+    write(join(d, "openpromises.config.yaml"), `${CONFIG}legacy: public-ledger\n`);
+    const source = (dir: string, name: string) => readFileSync(join(ROOT, "fixtures", "public-ledger", "source", dir, name), "utf8");
+    write(join(d, "content", "drafts", "uk-nhs-18-weeks-2024.yaml"), source("promises", "uk-nhs-18-weeks-2024.yaml"));
+    write(join(d, "content", "actors", "andy-burnham.yaml"), source("actors", "andy-burnham.yaml"));
+    const lines = (text: string) => text.split("\n").filter((l) => /^\s*#/.test(l)).length;
+    const total = lines(source("promises", "uk-nhs-18-weeks-2024.yaml")) + lines(source("actors", "andy-burnham.yaml"));
+    const m = await op(d, "migrate");
+    expect(m.out).toContain(`Comments: ${total} lines read.`);
+    expect(m.out.split("\n").filter((l) => /^  .*:\d+  (moved|partly moved|configuration|not placed): /.test(l))).toHaveLength(total);
+    const card = file(d, "drafts/uk-nhs-18-weeks-2024.yaml");
+    expect(card).toContain("    - ocid: ocds-h6vhtk-05e464\n      note:\n        en: >-\n          Waiting-list validation bought");
+    const actor = file(d, "actors/andy-burnham.yaml");
+    expect(actor).toContain("    source:\n      url: https://www.gov.uk/government/ministers/prime-minister\n      quote: Andy Burnham became Prime Minister on 20 July 2026.");
+    expect(actor).toContain('same_as_checked_on: "2026-10-08"');
+    expect(actor).not.toContain("#");
+  });
 });
