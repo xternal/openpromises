@@ -21,10 +21,21 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsup"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "homepage": "https://github.com/xternal/openpromises#readme",
+  "keywords": [
+    "promises",
+    "accountability",
+    "fact-checking",
+    "journalism",
+    "open-data",
+    "politics",
+    "yaml"
+  ]
 }

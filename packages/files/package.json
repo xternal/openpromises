@@ -21,7 +21,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsup"
@@ -30,5 +31,15 @@
     "@openpromises/core": "workspace:*",
     "@openpromises/quotes": "workspace:*",
     "yaml": "2.9.1"
-  }
+  },
+  "homepage": "https://github.com/xternal/openpromises#readme",
+  "keywords": [
+    "promises",
+    "accountability",
+    "fact-checking",
+    "journalism",
+    "open-data",
+    "politics",
+    "yaml"
+  ]
 }

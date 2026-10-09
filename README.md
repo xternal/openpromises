@@ -131,7 +131,7 @@ From then on its history only grows: a status change is a new event with an `evi
 | `openpromises migrate` | Converts cards in an older format to format v1. |
 | `openpromises stats` | Counts cards by status, actor and area. |
 
-Run `openpromises help <command>` for the options.
+Run `openpromises help <command>` for the options, and `openpromises help rules` for every rule.
 
 ## Packages
 

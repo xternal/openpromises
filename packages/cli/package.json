@@ -21,7 +21,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "tsup"
@@ -33,5 +34,15 @@
   },
   "bin": {
     "openpromises": "./dist/bin.js"
-  }
+  },
+  "homepage": "https://github.com/xternal/openpromises#readme",
+  "keywords": [
+    "promises",
+    "accountability",
+    "fact-checking",
+    "journalism",
+    "open-data",
+    "politics",
+    "yaml"
+  ]
 }

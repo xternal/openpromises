@@ -26,6 +26,15 @@ Notes made while building, so a reader can see how each decision was read. None 
 - **Decision 4 and private declarations.** The editors list is a file the configuration points to (`editorial.editorsFile`, default `editors.yaml`), and `openpromises validate --editors <path>` can read it from somewhere else. A site that has promised its editors to keep their declarations private can therefore keep the list out of its public repository and give it to its checks privately; a site that publishes its list keeps it beside the cards.
 - **Corrections and reviews are not optional.** RFC §7 lists `corrections` and `reviews` among Public Ledger's modules. Because principles 3 (public corrections) and 4 (two editors, recorded in the card) are rules for every site, both are always on. The names are still accepted in `modules`, so the RFC's example configuration works unchanged.
 
+- **Deadline markers and date order.** Events are in date order except automatic ones (the RFC's rule) and `deadline` markers, which Public Ledger dates in the future. Without this exception, the first event added after a future deadline marker would break the order.
+- **The YAML the engine writes** quotes dates and the `on` key of a review, so that YAML 1.1 readers such as PyYAML read them as text, not as dates and `true`.
+
 ## Proposed, waiting for the owner
 
-None yet.
+These came up while converting the sites' cards (docs/COMPARISON.md). None changes the RFC; each is a choice only the owner can make.
+
+| # | Question | Recommendation | Why |
+|---|---|---|---|
+| P1 | Public Ledger's editors list: its guide promises editors that their party declarations stay private, but the party check needs them. | Keep the promise. Keep the list out of the public repository and give it to the check privately (`openpromises validate --editors`, from a CI secret). Cards show editors' handles as now. | Breaking a privacy promise to volunteers costs more than it gains. The check still runs on every change; what is lost is outsiders re-running the party check themselves. |
+| P2 | Public Ledger's 45 published cards have no approvals in the card, and all are still flagged `editor_check_required: true`. | Import the approvals that already exist (two GitHub approvals on the pull request that published a card) as `kind: editor, approves: true` reviews, noting the pull request. Have editors review the remaining cards one by one, not as a batch. | The flag says these cards have not had their full check, so a batch approval would record a check that never happened. Importing real approvals saves editors' time without inventing any. |
+| P3 | The repository will be public, and it names Russia Ledger: in the copied RFC, in COMPARISON.md, in `fromRussiaLedger` and in the legacy format id `russia-ledger`. Russia Ledger's own rules keep its working title out of code, and leave the owner's visibility to its decision D3. | Decide before the repository goes public. If D3 wants no visible link, rename these to a neutral name (for example `bilingual-ledger`), and publish with fresh history, because git history would keep the old names. | Renaming takes minutes now. After the repository is public, the names cannot be taken back. |
