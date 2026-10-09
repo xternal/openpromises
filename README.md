@@ -1,6 +1,6 @@
 # OpenPromises
 
-[![CI](https://github.com/xternal/openpromises/actions/workflows/ci.yml/badge.svg)](https://github.com/xternal/openpromises/actions/workflows/ci.yml) [![Licence: Apache-2.0](https://img.shields.io/badge/licence-Apache--2.0-blue.svg)](LICENSE)
+[![CI](https://github.com/xternal/openpromises/actions/workflows/ci.yml/badge.svg)](https://github.com/xternal/openpromises/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/@openpromises/cli.svg)](https://www.npmjs.com/package/@openpromises/cli) [![Licence: Apache-2.0](https://img.shields.io/badge/licence-Apache--2.0-blue.svg)](LICENSE)
 
 **An open engine for tracking what people in power promise.**
 

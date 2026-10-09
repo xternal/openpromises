@@ -2,7 +2,7 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
-## 0.1.0 (October 2026)
+## 0.1.0 (9 October 2026)
 
 The first public release: the engine behind Public Ledger, Borough Book and Russia Ledger, as one open project.
 
