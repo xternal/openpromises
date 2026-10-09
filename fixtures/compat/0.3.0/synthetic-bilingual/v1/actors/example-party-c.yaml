@@ -1,0 +1,8 @@
+format: openpromises/1
+id: example-party-c
+kind: party
+name:
+  ru: Партия «Пример В»
+  en: Party Example C
+level: federal
+roles: []

@@ -1,6 +1,6 @@
 {
   "name": "@openpromises/quotes",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Exact-quote matching for OpenPromises: normalisation per language, exact / close / none tiers, spans in stored text",
   "keywords": [
     "promises",
