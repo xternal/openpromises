@@ -1,0 +1,8 @@
+# Not a Borough Book file. Seats each party holds on the council, counted from
+# borough-ledger content/councillors/*.yaml (party field) at origin/main
+# bc918903, 9 October 2026: 50 councillors. Borough Book works this out from
+# its councillor files; the fixtures keep only the counts, so no councillor
+# data is copied here.
+seats:
+  labour: 38
+  conservative: 12

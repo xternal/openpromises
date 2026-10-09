@@ -1,0 +1,34 @@
+{
+  "name": "@openpromises/files",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Read and write an OpenPromises content folder, compare with a git base, migrate older formats",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xternal/openpromises.git",
+    "directory": "packages/files"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "dependencies": {
+    "@openpromises/core": "workspace:*",
+    "@openpromises/quotes": "workspace:*",
+    "yaml": "2.9.1"
+  }
+}

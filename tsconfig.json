@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@openpromises/core": ["./packages/core/src/index.ts"],
+      "@openpromises/files": ["./packages/files/src/index.ts"],
+      "@openpromises/quotes": ["./packages/quotes/src/index.ts"],
+      "@openpromises/cli": ["./packages/cli/src/index.ts"]
+    }
+  },
+  "include": ["packages/*/src", "packages/*/test", "packages/*/scripts", "packages/*/tsup.config.ts", "fixtures/**/*.ts", "vitest.config.ts"]
+}

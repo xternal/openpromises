@@ -1,0 +1,30 @@
+{
+  "name": "@openpromises/quotes",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Exact-quote matching for OpenPromises: normalisation per language, exact / close / none tiers, spans in stored text",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xternal/openpromises.git",
+    "directory": "packages/quotes"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "dependencies": {}
+}
