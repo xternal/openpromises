@@ -12,7 +12,7 @@ export const FORMAT = "openpromises/1";
 /** An id: lower-case letters, digits and hyphens, starting and ending with a letter or digit. */
 export const Slug = z
   .string()
-  .regex(/^[a-z0-9](?:[a-z0-9-]{0,98}[a-z0-9])?$/, "should be an id: lower-case letters, digits and hyphens (for example keir-starmer)");
+  .regex(/^[a-z0-9](?:[a-z0-9-]{0,98}[a-z0-9])?$/, "should be an id: lower-case letters, digits and hyphens (for example bus-fares-2026)");
 
 /** A status, event type or kind: lower-case letters, digits and underscores. */
 export const Word = z.string().regex(/^[a-z][a-z0-9_]{0,59}$/, "should be lower-case letters, digits and _ (for example in_plan)");

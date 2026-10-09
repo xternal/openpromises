@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { relative, resolve, sep } from "node:path";
 
 /**
@@ -60,7 +60,9 @@ export function gitRoot(dir: string): string | null {
 export function gitSource(contentDir: string, ref: string): ContentSource {
   const top = gitRoot(contentDir);
   if (!top) throw new Error(`${contentDir} is not in a git repository`);
-  const prefix = relative(top, resolve(contentDir)).split(sep).join("/");
+  // Git reports real paths (on macOS /var is a link to /private/var), so compare real paths.
+  const real = existsSync(contentDir) ? realpathSync(contentDir) : resolve(contentDir);
+  const prefix = relative(realpathSync(top), real).split(sep).join("/");
   const at = (path: string) => [prefix, path].filter(Boolean).join("/");
   return {
     label: `${ref}:${prefix ? `${prefix}/` : ""}`,

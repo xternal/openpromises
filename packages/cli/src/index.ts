@@ -33,7 +33,7 @@ import {
   QUOTES_FILE,
   readContent,
   readYaml,
-  setIn,
+  setField,
   sha256,
   toYaml,
   withQuoteCheck,
@@ -213,7 +213,7 @@ async function review(args: Args, io: Io): Promise<number> {
 
   const path = join(site.contentDir, entry.file);
   let yaml = readFileSync(path, "utf8");
-  if (args.flags["quote-checked"]) card.versions.forEach((v, i) => !v.quote_checked_on && (yaml = setIn(yaml, ["versions", i, "quote_checked_on"], day)));
+  if (args.flags["quote-checked"]) card.versions.forEach((v, i) => !v.quote_checked_on && (yaml = setField(yaml, ["versions", i], "quote_checked_on", day)));
   yaml = appendToList(yaml, "reviews", [r], "review");
 
   const after = readYaml(yaml);

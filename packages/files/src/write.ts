@@ -154,11 +154,44 @@ export function appendToList(text: string, key: "events" | "reviews" | "replies"
   return out;
 }
 
-/** Set fields inside a list item (versions[0].quote_checked_on), keeping the rest of the file. */
+/**
+ * Set one field of an object in a YAML file (versions[0].quote_checked_on),
+ * changing only that line: the value is replaced where it is, or a new line is
+ * added after the object's last field. Falls back to rewriting the file when
+ * the object is written on one line.
+ */
+export function setField(text: string, objectPath: (string | number)[], key: string, value: string | number | boolean | null): string {
+  const doc = parseDocument(text);
+  const map = doc.getIn(objectPath, true);
+  const expected = readYaml(text) as Record<string, unknown>;
+  let target: Record<string, unknown> = expected;
+  for (const p of objectPath) target = (target as Record<string | number, unknown>)[p] as Record<string, unknown>;
+  if (target && typeof target === "object") target[key] = value;
+  const rendered = toYaml({ [key]: value }, "card").trimEnd().slice(key.length + 2);
+  let out: string | null = null;
+  if (isMap(map) && !map.flow && map.items.length) {
+    const pair = map.items.find((p) => isScalar(p.key) && p.key.value === key);
+    const v = pair?.value as Node | null | undefined;
+    if (pair && isScalar(v) && v.range) out = `${text.slice(0, v.range[0])}${rendered}${text.slice(v.range[1])}`;
+    else if (!pair) {
+      const firstKey = map.items[0]!.key as Node;
+      const indent = firstKey.range![0] - lineStart(text, firstKey.range![0]);
+      const last = map.items[map.items.length - 1]!;
+      const end = ((last.value as Node | null)?.range ?? (last.key as Node).range!)[1];
+      const at = text[end - 1] === "\n" ? end : text.indexOf("\n", end) + 1 || text.length;
+      const before = text.slice(0, at);
+      out = `${before}${before.endsWith("\n") ? "" : "\n"}${" ".repeat(indent)}${key}: ${rendered}\n${text.slice(at)}`;
+    }
+  }
+  if (out !== null && same(readYaml(out), expected)) return out;
+  return setIn(text, [...objectPath, key], value);
+}
+
+/** Set a field anywhere in a YAML file by rewriting the file (setField changes less). */
 export function setIn(text: string, path: (string | number)[], value: unknown): string {
   const doc = parseDocument(text);
-  doc.setIn(path, value);
-  const node = doc.getIn(path, true);
+  const node = doc.createNode(value);
   if (typeof value === "string" && ISO_DATE.test(value) && isScalar(node)) node.type = Scalar.QUOTE_DOUBLE;
+  doc.setIn(path, node);
   return doc.toString({ lineWidth: 0 });
 }

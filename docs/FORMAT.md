@@ -2,7 +2,7 @@
 
 This is the standard a promise tracker built on OpenPromises follows: how a promise card, an actor and the editors list are written, which rules they must pass, and what may change once a card is published. It is enough to write valid cards and run `openpromises validate` without reading the code. The design behind it is [RFC-0001](RFC-0001.md) §8.
 
-Every file is YAML. Dates are written `"YYYY-MM-DD"`, in quotation marks. URLs are full `http://` or `https://` addresses.
+Every file is YAML. Dates are written `"YYYY-MM-DD"`, in quotation marks. URLs are full `http://` or `https://` addresses. The engine reads YAML 1.2. Tools in other languages should too (in Python, `ruamel.yaml`); an older YAML 1.1 reader such as PyYAML takes an unquoted `on:` key for `true` and unquoted dates for dates, so files the engine writes put both in quotation marks.
 
 ## 1. A content folder
 

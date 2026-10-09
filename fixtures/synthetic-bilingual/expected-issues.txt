@@ -1,0 +1,6 @@
+# Problems format v1 finds in this site's converted data; explained in docs/COMPARISON.md.
+error  promises/example-governor-schools-2028.yaml  reviews[1].note.en  (languages)
+error  promises/example-pensions-2027.yaml  corrections[0].reason.en  (languages)
+error  promises/example-pensions-2027.yaml  versions[0].parameters.cost.quality  (cost)
+warn   drafts/example-party-c-tax-2026.yaml  versions[0].quote_checked_on  (quotes)
+warn   drafts/example-party-c-tax-2026.yaml  sources[0].designation.status  (modules)
