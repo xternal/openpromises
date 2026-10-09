@@ -13,3 +13,4 @@ export * from "./deadlines";
 export * from "./lint";
 export * from "./stats";
 export * from "./adapters";
+export * from "./json-schema";
