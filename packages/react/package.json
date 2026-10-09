@@ -1,0 +1,55 @@
+{
+  "name": "@openpromises/react",
+  "version": "0.0.0",
+  "private": true,
+  "description": "React server components for OpenPromises: the promise card, lists, status ladder and deadlines, rendered without JavaScript",
+  "license": "Apache-2.0",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xternal/openpromises.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://github.com/xternal/openpromises#readme",
+  "keywords": [
+    "promises",
+    "accountability",
+    "fact-checking",
+    "journalism",
+    "open-data",
+    "politics",
+    "yaml"
+  ],
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
+    },
+    "./styles.css": "./styles.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "styles.css"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "dependencies": {
+    "@openpromises/core": "workspace:*",
+    "@openpromises/publish": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=19"
+  }
+}

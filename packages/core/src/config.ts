@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { CATEGORIES, DEFAULT_DEADLINE_TEXT, DEFAULT_LABELS, EVENT_TYPES, type LadderStatus, PRESETS, PROMISED } from "./ladder";
-import { Locale, Url, Word } from "./schema";
+import { Locale, Slug, Url, Word } from "./schema";
 
 /**
  * A site's configuration (RFC-0001 §7, docs/FORMAT.md §2): one file,
@@ -26,11 +26,37 @@ const HeadlineLimits = z.strictObject({
 });
 type HeadlineLimits = z.infer<typeof HeadlineLimits>;
 
+/** Text per language: { en: "…", ru: "…" }. */
+const PerLocale = z.record(Locale, z.string().min(1));
+/** A path on the site, with placeholders: "/promise/{id}". */
+const PathTemplate = z.string().regex(/^\/[^\s]*$/, "should be a path starting with /, such as /promise/{id}");
+/** Labels and URL slugs for areas: { taxes: { en: "Taxes" } }, { economic_affairs: "transport-and-economy" }. */
+const AreaLabels = z.record(z.string(), PerLocale);
+const AreaSlugs = z.record(z.string(), Slug);
+
 /** A Zod schema for the site's own `x` fields (TypeScript configuration only). */
 const SchemaLike = z.custom<z.ZodType>((v) => !!v && typeof (v as { safeParse?: unknown }).safeParse === "function", "should be a Zod schema");
 
 export const ConfigInput = z.strictObject({
-  site: z.strictObject({ name: z.string().min(1), url: Url.optional() }),
+  site: z.strictObject({
+    name: z.string().min(1),
+    url: Url.optional(),
+    /** What the site is, per language: used by feeds, llms.txt and structured data. */
+    description: PerLocale.optional(),
+    /** Where the site serves its pages; {id} and {area} are filled in. */
+    paths: z
+      .strictObject({
+        promises: PathTemplate.optional(),
+        card: PathTemplate.optional(),
+        actor: PathTemplate.optional(),
+        area: PathTemplate.optional(),
+        /** A folder ("/feeds": /feeds/all.xml, /feeds/promise/<id>.xml), or a feed beside each page ("{page}/feed.xml"). */
+        feeds: z.string().regex(/^(\/[^\s]*|\{page\}[^\s]*)$/, 'should be a folder such as /feeds, or "{page}/feed.xml"').optional(),
+      })
+      .optional(),
+    /** The path each language's pages start with: { ru: "", en: "/en" }. */
+    localePaths: z.record(Locale, z.string().regex(/^(\/[A-Za-z0-9-]+)*$/, 'should be "" or a path such as /en')).optional(),
+  }),
   content: z.string().min(1).optional(),
   timezone: z.string().min(1).optional(),
   locales: z.strictObject({ default: Locale, all: z.array(Locale).min(1) }).optional(),
@@ -53,8 +79,8 @@ export const ConfigInput = z.strictObject({
   venues: z.array(Word).min(1).optional(),
   areas: z
     .discriminatedUnion("kind", [
-      z.strictObject({ kind: z.literal("enum"), values: z.array(z.string().min(1)).min(1) }),
-      z.strictObject({ kind: z.literal("codes"), pattern: z.string().min(1) }),
+      z.strictObject({ kind: z.literal("enum"), values: z.array(z.string().min(1)).min(1), labels: AreaLabels.optional(), slugs: AreaSlugs.optional() }),
+      z.strictObject({ kind: z.literal("codes"), pattern: z.string().min(1), labels: AreaLabels.optional(), slugs: AreaSlugs.optional() }),
       z.strictObject({ kind: z.literal("text") }),
     ])
     .optional(),
@@ -88,12 +114,32 @@ export const ConfigInput = z.strictObject({
       allow: z.record(Locale, z.array(z.string().min(1))).optional(),
     })
     .optional(),
+  /** Words on pages, feeds and Markdown, per language, replacing the built-in ones (@openpromises/publish MESSAGES). */
+  messages: z.record(Locale, z.record(z.string(), z.string())).optional(),
+  publish: z
+    .strictObject({
+      /** The fixed start of every feed entry id (RFC 4151 tag URI): "ledgergov.uk,2026". Set it once and never change it. */
+      tag: z.string().regex(/^[A-Za-z0-9.-]+,\d{4}(-\d{2}(-\d{2})?)?$/, 'should be an authority and a date, such as "example.org,2026"').optional(),
+      /** Which feed format to write. */
+      feeds: z.enum(["atom", "rss", "both"]).optional(),
+      /** The licence of the site's own writing (headlines, notes, events), for Markdown and open data. */
+      licence: z.strictObject({ name: z.string().min(1), url: Url }).optional(),
+    })
+    .optional(),
   x: z.strictObject({ card: SchemaLike.optional(), actor: SchemaLike.optional() }).optional(),
 });
 export type ConfigInput = z.input<typeof ConfigInput>;
 
+export interface SitePaths {
+  promises: string;
+  card: string;
+  actor: string;
+  area: string;
+  feeds: string;
+}
+
 export interface Config {
-  site: { name: string; url?: string };
+  site: { name: string; url?: string; description: Record<string, string>; paths: SitePaths; localePaths: Record<string, string> };
   /** The content folder, relative to the configuration file. */
   content: string;
   timezone: string;
@@ -102,7 +148,10 @@ export interface Config {
   actors: { kinds: string[]; standing: "manual" | "fromSeats" | "none"; levels?: string[]; ids?: Record<string, string> };
   /** Allowed venues; undefined allows any. */
   venues?: string[];
-  areas: { kind: "enum"; values: string[] } | { kind: "codes"; pattern: string } | { kind: "text" };
+  areas:
+    | { kind: "enum"; values: string[]; labels?: Record<string, Record<string, string>>; slugs?: Record<string, string> }
+    | { kind: "codes"; pattern: string; labels?: Record<string, Record<string, string>>; slugs?: Record<string, string> }
+    | { kind: "text" };
   ladder: { name: string; statuses: LadderStatus[] };
   /** Status labels per language. */
   labels: Record<string, Record<string, string>>;
@@ -114,8 +163,13 @@ export interface Config {
   legacy?: LegacyFormat;
   deadlines: { text: Record<string, string> };
   lint: { words: Record<string, string[]>; allow: Record<string, string[]> };
+  /** Message overrides per language, for @openpromises/publish and @openpromises/react. */
+  messages: Record<string, Record<string, string>>;
+  publish: { tag?: string; feeds: "atom" | "rss" | "both"; licence?: { name: string; url: string } };
   x: { card?: z.ZodType; actor?: z.ZodType };
 }
+
+const DEFAULT_PATHS: SitePaths = { promises: "/promises", card: "/promise/{id}", actor: "/actor/{id}", area: "/promises/area/{area}", feeds: "/feeds" };
 
 export class ConfigError extends Error {
   constructor(public readonly problems: string[]) {
@@ -191,6 +245,27 @@ export function resolveConfig(input: unknown): Config {
     else problems.push(`deadlines.text: no words for the automatic deadline_missed event in "${l}"`);
   }
 
+  const paths: SitePaths = { ...DEFAULT_PATHS, ...(c.site.paths ?? {}) };
+  for (const [key, placeholder] of [
+    ["card", "{id}"],
+    ["actor", "{id}"],
+    ["area", "{area}"],
+  ] as const)
+    if (!paths[key].includes(placeholder)) problems.push(`site.paths.${key} needs ${placeholder} in it`);
+  for (const l of Object.keys(c.site.localePaths ?? {})) if (!locales.all.includes(l)) problems.push(`site.localePaths.${l}: "${l}" is not one of the configured languages`);
+  for (const l of [...Object.keys(c.site.description ?? {}), ...Object.keys(c.messages ?? {})])
+    if (!locales.all.includes(l)) problems.push(`"${l}" in site.description or messages is not one of the configured languages`);
+  if (c.areas && c.areas.kind !== "text") {
+    const known = c.areas.kind === "enum" ? new Set(c.areas.values) : null;
+    for (const [field, map] of [
+      ["labels", c.areas.labels],
+      ["slugs", c.areas.slugs],
+    ] as const)
+      for (const key of Object.keys(map ?? {})) if (known && !known.has(key)) problems.push(`areas.${field}.${key}: "${key}" is not one of areas.values`);
+    const slugs = Object.values(c.areas.slugs ?? {});
+    if (new Set(slugs).size !== slugs.length) problems.push("areas.slugs gives two areas the same slug");
+  }
+
   if (c.areas?.kind === "codes") {
     try {
       new RegExp(c.areas.pattern, "u");
@@ -210,7 +285,13 @@ export function resolveConfig(input: unknown): Config {
   if (problems.length) throw new ConfigError(problems);
 
   return {
-    site: c.site,
+    site: {
+      name: c.site.name,
+      ...(c.site.url ? { url: c.site.url } : {}),
+      description: c.site.description ?? {},
+      paths,
+      localePaths: Object.fromEntries(locales.all.map((l) => [l, c.site.localePaths?.[l] ?? (l === locales.default ? "" : `/${l}`)])),
+    },
     content: c.content ?? "content",
     timezone: c.timezone ?? "UTC",
     locales: { default: locales.default, all: [...locales.all] },
@@ -232,6 +313,8 @@ export function resolveConfig(input: unknown): Config {
     ...(c.legacy ? { legacy: c.legacy } : {}),
     deadlines: { text: deadlineText },
     lint: { words: c.lint?.words ?? {}, allow: c.lint?.allow ?? {} },
+    messages: c.messages ?? {},
+    publish: { ...(c.publish?.tag ? { tag: c.publish.tag } : {}), feeds: c.publish?.feeds ?? "atom", ...(c.publish?.licence ? { licence: c.publish.licence } : {}) },
     x: { ...(c.x?.card ? { card: c.x.card } : {}), ...(c.x?.actor ? { actor: c.x.actor } : {}) },
   };
 }
