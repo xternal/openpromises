@@ -1,0 +1,49 @@
+format: openpromises/1
+id: example-party-c-tax-2026
+headline:
+  ru: Снизить налог для малого бизнеса
+  en: Cut the small business tax
+actor_id: example-party-c
+made_on: "2026-08-20"
+venue: election_programme
+area: "01"
+status: promised
+origin: llm_intake
+sources:
+  - title: Предвыборная программа партии «Пример В»
+    url: https://example.org/party-c/programme
+    archived_url: https://web.archive.org/web/20260821000000/https://example.org/party-c/programme
+    kind: party
+    designation:
+      status: unchecked
+versions:
+  - version: 1
+    text: Снизим налог для малого бизнеса с 6 до 4 процентов.
+    lang: ru
+    translations:
+      en: We will cut the small business tax from 6 to 4 percent.
+    recorded_on: "2026-08-21"
+    source_url: https://example.org/party-c/programme
+    archived_url: https://web.archive.org/web/20260821000000/https://example.org/party-c/programme
+    quote_checked_on: null
+    parameters:
+      who:
+        ru: Малый бизнес
+        en: Small businesses
+      when:
+        ru: Срок не назван
+        en: No date given
+      funded_by: null
+events:
+  - date: "2026-08-20"
+    type: promised
+    text:
+      ru: Обещание в предвыборной программе
+      en: Promised in the election programme
+replies: []
+corrections: []
+reviews:
+  - by: Editor B
+    kind: editor
+    "on": "2026-08-22"
+    approves: true

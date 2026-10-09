@@ -1,0 +1,347 @@
+{
+  "errors": [
+    "promises/example-governor-schools-2028.yaml  reviews[1].note.en  (languages)",
+    "promises/example-pensions-2027.yaml  corrections[0].reason.en  (languages)",
+    "promises/example-pensions-2027.yaml  versions[0].parameters.cost.quality  (cost)"
+  ],
+  "feeds": {
+    "/feeds/all.xml": [
+      "tag:example.org,2026:feed/all",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1",
+      "tag:example.org,2026:promise/example-pensions-2027/event/0",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2"
+    ],
+    "/feeds/promise/example-pensions-2027.xml": [
+      "tag:example.org,2026:feed/promise/example-pensions-2027",
+      "tag:example.org,2026:promise/example-pensions-2027/event/0",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2"
+    ],
+    "/feeds/promise/example-party-roads-2026.xml": [
+      "tag:example.org,2026:feed/promise/example-party-roads-2026",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1"
+    ],
+    "/feeds/promise/example-governor-schools-2028.xml": [
+      "tag:example.org,2026:feed/promise/example-governor-schools-2028",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2"
+    ],
+    "/feeds/actor/example-government.xml": [
+      "tag:example.org,2026:feed/actor/example-government",
+      "tag:example.org,2026:promise/example-pensions-2027/event/0",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2"
+    ],
+    "/feeds/actor/example-governor.xml": [
+      "tag:example.org,2026:feed/actor/example-governor",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2"
+    ],
+    "/feeds/actor/example-party-a.xml": [
+      "tag:example.org,2026:feed/actor/example-party-a",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1"
+    ],
+    "/feeds/actor/example-party-b.xml": [
+      "tag:example.org,2026:feed/actor/example-party-b",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2"
+    ],
+    "/feeds/area/04.xml": [
+      "tag:example.org,2026:feed/area/04",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1"
+    ],
+    "/feeds/area/07.xml": [
+      "tag:example.org,2026:feed/area/07",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2"
+    ],
+    "/feeds/area/10.xml": [
+      "tag:example.org,2026:feed/area/10",
+      "tag:example.org,2026:promise/example-pensions-2027/event/0",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2"
+    ],
+    "/feeds/all.rss": [
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1",
+      "tag:example.org,2026:promise/example-pensions-2027/event/0",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2"
+    ],
+    "/feeds/promise/example-pensions-2027.rss": [
+      "tag:example.org,2026:promise/example-pensions-2027/event/0",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2"
+    ],
+    "/feeds/promise/example-party-roads-2026.rss": [
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1"
+    ],
+    "/feeds/promise/example-governor-schools-2028.rss": [
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2"
+    ],
+    "/feeds/actor/example-government.rss": [
+      "tag:example.org,2026:promise/example-pensions-2027/event/0",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2"
+    ],
+    "/feeds/actor/example-governor.rss": [
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2"
+    ],
+    "/feeds/actor/example-party-a.rss": [
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1"
+    ],
+    "/feeds/actor/example-party-b.rss": [
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2"
+    ],
+    "/feeds/area/04.rss": [
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1"
+    ],
+    "/feeds/area/07.rss": [
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2"
+    ],
+    "/feeds/area/10.rss": [
+      "tag:example.org,2026:promise/example-pensions-2027/event/0",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2"
+    ],
+    "/en/feeds/all.xml": [
+      "tag:example.org,2026:feed/all#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/0#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2#en"
+    ],
+    "/en/feeds/promise/example-pensions-2027.xml": [
+      "tag:example.org,2026:feed/promise/example-pensions-2027#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/0#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2#en"
+    ],
+    "/en/feeds/promise/example-party-roads-2026.xml": [
+      "tag:example.org,2026:feed/promise/example-party-roads-2026#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1#en"
+    ],
+    "/en/feeds/promise/example-governor-schools-2028.xml": [
+      "tag:example.org,2026:feed/promise/example-governor-schools-2028#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2#en"
+    ],
+    "/en/feeds/actor/example-government.xml": [
+      "tag:example.org,2026:feed/actor/example-government#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/0#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2#en"
+    ],
+    "/en/feeds/actor/example-governor.xml": [
+      "tag:example.org,2026:feed/actor/example-governor#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2#en"
+    ],
+    "/en/feeds/actor/example-party-a.xml": [
+      "tag:example.org,2026:feed/actor/example-party-a#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1#en"
+    ],
+    "/en/feeds/actor/example-party-b.xml": [
+      "tag:example.org,2026:feed/actor/example-party-b#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2#en"
+    ],
+    "/en/feeds/area/04.xml": [
+      "tag:example.org,2026:feed/area/04#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1#en"
+    ],
+    "/en/feeds/area/07.xml": [
+      "tag:example.org,2026:feed/area/07#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2#en"
+    ],
+    "/en/feeds/area/10.xml": [
+      "tag:example.org,2026:feed/area/10#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/0#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2#en"
+    ],
+    "/en/feeds/all.rss": [
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/0#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2#en"
+    ],
+    "/en/feeds/promise/example-pensions-2027.rss": [
+      "tag:example.org,2026:promise/example-pensions-2027/event/0#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2#en"
+    ],
+    "/en/feeds/promise/example-party-roads-2026.rss": [
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1#en"
+    ],
+    "/en/feeds/promise/example-governor-schools-2028.rss": [
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2#en"
+    ],
+    "/en/feeds/actor/example-government.rss": [
+      "tag:example.org,2026:promise/example-pensions-2027/event/0#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2#en"
+    ],
+    "/en/feeds/actor/example-governor.rss": [
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2#en"
+    ],
+    "/en/feeds/actor/example-party-a.rss": [
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1#en"
+    ],
+    "/en/feeds/actor/example-party-b.rss": [
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2#en"
+    ],
+    "/en/feeds/area/04.rss": [
+      "tag:example.org,2026:promise/example-party-roads-2026/event/0#en",
+      "tag:example.org,2026:promise/example-party-roads-2026/event/1#en"
+    ],
+    "/en/feeds/area/07.rss": [
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/0#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/1#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/event/2#en",
+      "tag:example.org,2026:promise/example-governor-schools-2028/version/2#en"
+    ],
+    "/en/feeds/area/10.rss": [
+      "tag:example.org,2026:promise/example-pensions-2027/event/0#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/1#en",
+      "tag:example.org,2026:promise/example-pensions-2027/event/2#en"
+    ]
+  },
+  "files": [
+    "/data/promises.csv",
+    "/data/promises.json",
+    "/en/llms-full.txt",
+    "/en/llms.txt",
+    "/en/promise/example-governor-schools-2028.md",
+    "/en/promise/example-party-roads-2026.md",
+    "/en/promise/example-pensions-2027.md",
+    "/llms-full.txt",
+    "/llms.txt",
+    "/promise/example-governor-schools-2028.md",
+    "/promise/example-party-roads-2026.md",
+    "/promise/example-pensions-2027.md",
+    "/sitemap-promises.xml"
+  ],
+  "pages": [
+    "/en/promise/example-governor-schools-2028",
+    "/en/promise/example-party-roads-2026",
+    "/en/promise/example-pensions-2027",
+    "/promise/example-governor-schools-2028",
+    "/promise/example-party-roads-2026",
+    "/promise/example-pensions-2027"
+  ],
+  "sitemap": [
+    "https://example.org/actor/example-government",
+    "https://example.org/actor/example-governor",
+    "https://example.org/actor/example-party-a",
+    "https://example.org/actor/example-party-b",
+    "https://example.org/promise/example-governor-schools-2028",
+    "https://example.org/promise/example-party-roads-2026",
+    "https://example.org/promise/example-pensions-2027",
+    "https://example.org/promises",
+    "https://example.org/promises/area/04",
+    "https://example.org/promises/area/07",
+    "https://example.org/promises/area/10"
+  ],
+  "csvHeader": [
+    "id",
+    "url",
+    "headline",
+    "actor_id",
+    "actor",
+    "party",
+    "made_on",
+    "venue",
+    "area",
+    "status",
+    "status_label",
+    "status_category",
+    "deadline",
+    "cost_low",
+    "cost_central",
+    "cost_high",
+    "cost_quality",
+    "funding_stated",
+    "quote",
+    "quote_lang",
+    "source_url",
+    "archived_url",
+    "quote_checked_on",
+    "versions",
+    "corrections",
+    "last_updated",
+    "cost_by_kind",
+    "cost_by_name",
+    "responsible_id",
+    "brought_about_by_id"
+  ]
+}

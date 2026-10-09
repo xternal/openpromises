@@ -160,7 +160,7 @@ export const ACCEPTED: Accepted[] = [
     area: "Checks",
     match: /submission_ref and credit belong to cards with origin: reader_submission/,
     verdict: "site",
-    reason: "Both fields are Public Ledger's own (in x), and the check needs the card's origin, which a site's x schema cannot see. Public Ledger keeps this one check in its validate script, which keeps running for its budget data (docs/MIGRATING.md, Per site).",
+    reason: "Both fields are Public Ledger's own (in x), and the check needs the card's origin, which a site's x schema cannot see. Public Ledger keeps this one check in its validate script, which keeps running for its budget data; agreed on 9 October 2026 (docs/MIGRATING.md, Per site).",
   },
   {
     area: "Structured data",

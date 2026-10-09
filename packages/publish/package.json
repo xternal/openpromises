@@ -1,6 +1,6 @@
 {
   "name": "@openpromises/publish",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Publishing for OpenPromises: Atom and RSS feeds, JSON-LD, Markdown, llms.txt, sitemap, open data and IndexNow change lists, built from cards",
   "keywords": [
     "promises",

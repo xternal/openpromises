@@ -2,7 +2,7 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
-## Unreleased (0.2.0)
+## 0.2.0 (9 October 2026)
 
 Everything the Public Ledger dry run found missing (`pnpm dry-run`, tools/dry-run): what the engine would publish for ledgergov.uk is now as good as what the site serves, or better, in every area it compares.
 

@@ -1,0 +1,26 @@
+format: openpromises/1
+id: lab-2026-high-streets
+actor_id: labour
+made_on: "2026-05-01"
+venue: manifesto
+area: Planning and the local economy
+status: promised
+versions:
+  - version: 1
+    text: >-
+      Invest in our high streets. Extend our unique European partnerships so more local young people
+      gain international work experience
+    recorded_on: "2026-10-07"
+    source_url: https://hflabour.com/wp-content/uploads/2026/05/HF-manifesto-EXEC.pdf
+    archived_url: https://web.archive.org/web/20260617065909/https://hflabour.com/wp-content/uploads/2026/05/HF-manifesto-EXEC.pdf
+    page: 6
+    parameters:
+      deadline: null
+events:
+  - date: "2026-05-01"
+    type: promised
+    text:
+      en: Headline pledge in the 2026 Labour manifesto
+replies: []
+x:
+  editor_check_required: false

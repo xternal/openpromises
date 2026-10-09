@@ -1,0 +1,15 @@
+format: openpromises/1
+id: keir-starmer
+kind: person
+name:
+  en: Keir Starmer
+party_id: labour
+roles:
+  - title:
+      en: Prime Minister
+    from: "2024-07-05"
+    to: "2026-07-20"
+identifiers:
+  parliament_member_id: 4514
+same_as:
+  - https://www.gov.uk/government/people/keir-starmer

@@ -1,6 +1,6 @@
 {
   "name": "@openpromises/react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "React server components for OpenPromises: the promise card, lists, status ladder and deadlines, rendered without JavaScript",
   "keywords": [
     "promises",

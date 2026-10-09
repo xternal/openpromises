@@ -1,0 +1,14 @@
+format: openpromises/1
+id: john-healey
+kind: person
+name:
+  en: John Healey
+party_id: labour
+roles:
+  - title:
+      en: Chancellor of the Exchequer
+    from: "2026-07-20"
+identifiers:
+  parliament_member_id: 400
+same_as:
+  - https://www.gov.uk/government/people/john-healey

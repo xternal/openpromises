@@ -1,6 +1,6 @@
 {
   "name": "@openpromises/core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "OpenPromises card format v1, configuration and rules: pure functions, no I/O",
   "keywords": [
     "promises",
