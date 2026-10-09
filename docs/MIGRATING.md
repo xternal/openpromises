@@ -6,7 +6,7 @@ This guide is for a site that already has promise cards in its own format (Publi
 
 ## 1. Configure, and see where you stand
 
-Write `openpromises.config.ts` at the root of the site, starting from that site's file in `fixtures/<site>/openpromises.config.ts`. Set `legacy` to the site's current format, so cards without a `format:` line are read as v1:
+You need Node 22.18 or later: the configuration is a TypeScript file, which earlier versions cannot read. Write `openpromises.config.ts` at the root of the site, starting from that site's file in `fixtures/<site>/openpromises.config.ts`. Set `legacy` to the site's current format, so cards without a `format:` line are read as v1:
 
 ```bash
 openpromises validate --no-base
