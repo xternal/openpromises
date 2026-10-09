@@ -1,6 +1,8 @@
+import { join } from "node:path";
 import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
-import { resolveConfig } from "@openpromises/core";
+import { resolveConfig, validateContent } from "@openpromises/core";
+import { folderSource, loadConfig, readContent } from "@openpromises/files";
 import {
   absolute,
   areaSlug,
@@ -33,7 +35,7 @@ import {
   words,
   xmlEscape,
 } from "@openpromises/publish";
-import { site } from "./helpers";
+import { ROOT, site } from "./helpers";
 
 const xmlOk = (text: string) => {
   const doc = new new JSDOM("").window.DOMParser().parseFromString(text, "application/xml");
@@ -161,9 +163,12 @@ describe("feeds", () => {
     const f = buildFeed(s.views, "promise", "uk-nato-5pc-2035-2025", { config: s.config, w: words(s.config, "en"), today: s.today }, "atom");
     expect(xmlOk(f.body)).toBe(true);
     expect([...f.body.matchAll(/<entry>\s*<id>([^<]+)<\/id>/g)].map((m) => m[1])).toEqual([
+      "tag:ledgergov.uk,2026:promise/uk-nato-5pc-2035-2025/cost/correction/1",
       "tag:ledgergov.uk,2026:promise/uk-nato-5pc-2035-2025/event/1",
       "tag:ledgergov.uk,2026:promise/uk-nato-5pc-2035-2025/event/0",
     ]);
+    // A cost correction, as Public Ledger's feeds word it since 9 October 2026.
+    expect(f.body).toContain("<title type=\"text\">Cost changed: now costs £36bn to £44bn a year, was costs £32.4bn to £39.6bn a year (Keir Starmer)</title>");
     expect(f.body).toContain(
       "<title type=\"text\">In plan: Defence Investment Plan restates the 3.5% of GDP core defence commitment for 2035; funding set out to 2029-30 at 2.7% (Keir Starmer)</title>",
     );
@@ -242,7 +247,7 @@ describe("Markdown", () => {
       "- **Status:** In plan",
       "- **Status ladder:** Promised → In plan → Legislated → Funded → Delivering → Delivered",
     ]);
-    expect(md).toContain("- **Cost a year:** Costs £0.36bn to £0.44bn a year (central £0.4bn)");
+    expect(md).toContain("- **Cost a year:** Costs £0.36bn to £0.44bn a year (central £0.4bn by Department for Transport, official)");
     expect(md).toContain("(checked word for word at its source on 6 October 2026)");
     expect(md).toContain("- 1 January 2027, Deadline (to come): Due to start");
   });
@@ -264,7 +269,7 @@ describe("Markdown", () => {
     const s = await site("public-ledger");
     const text = llmsTxt(s.views, { config: s.config, w: words(s.config, "en"), today: s.today });
     expect(text.startsWith("# Public Ledger\n\n> What UK governments")).toBe(true);
-    expect(text.match(/^- \[.*\]\(https:\/\/ledgergov\.uk\/promise\//gm)).toHaveLength(45);
+    expect(text.match(/^- \[.*\]\(https:\/\/ledgergov\.uk\/promise\//gm)).toHaveLength(54);
   });
 });
 
@@ -331,5 +336,69 @@ describe("publishing a whole site", () => {
     const s = await site("public-ledger");
     expect(() => absolute({ site: { ...s.config.site, url: undefined } }, "/")).toThrow("site.url is needed");
     expect(cardViews([], new Map())).toEqual([]);
+  });
+});
+
+describe("what Public Ledger showed the dry run was missing", () => {
+  it("writes an amount under £0.1bn in millions, so a small range stays a range", async () => {
+    const gbp = resolveConfig({ site: { name: "T" }, money: { currency: "GBP", unit: "bn" } });
+    const en = words(gbp, "en");
+    expect(costText(en, gbp, { range: [0.014, 0.016, 0.018] })).toBe("Costs £14m to £18m a year");
+    expect(money(en, gbp, -0.05)).toBe("−£50m");
+    expect(money(en, gbp, 0.36)).toBe("£0.36bn");
+  });
+
+  it("names who made a cost and who brought the outcome about", async () => {
+    const s = await site("public-ledger");
+    const v = s.views.find((x) => x.id === "uk-snp-two-child-cap-2024")!;
+    const md = cardMarkdown(v, { config: s.config, w: words(s.config, "en"), today: s.today });
+    expect(md).toContain("- **Status:** Delivered, brought about by HM Government (The UK Government removed the limit; the SNP is not in government at Westminster.)");
+    expect(v.responsible?.id).toBe("hm-government");
+  });
+
+  it("gives every actor and every configured area a feed, even with no cards yet", async () => {
+    const { config, contentDir } = await loadConfig(join(ROOT, "fixtures", "public-ledger", "openpromises.config.ts"));
+    const r = validateContent(readContent(folderSource(contentDir), config).input);
+    const files = publishFiles({ config, views: cardViews(r.cards, r.actors), today: "2026-10-09", actors: r.actors });
+    const feeds = files.map((f) => f.path).filter((p) => p.startsWith("/feeds/"));
+    expect(feeds).toContain("/feeds/actor/welsh-government.xml");
+    expect(feeds).toContain("/feeds/area/culture.xml");
+    const empty = files.find((f) => f.path === "/feeds/actor/welsh-government.xml")!.body;
+    expect(empty).toContain("<title type=\"text\">Public Ledger: promises by Welsh Government</title>");
+    expect(empty).not.toContain("<entry>");
+  });
+
+  it("puts the site's own entries in the feeds of their card, and the rest only in the feed of everything", async () => {
+    const s = await site("public-ledger");
+    const entry = (id: string, card?: string) => ({ id: tagUri(s.config, id), title: id, date: "2026-10-08", link: "https://ledgergov.uk/", content: id, ...(card ? { card } : {}) });
+    const site_ = { entries: [entry("promise/uk-nato-5pc-2035-2025/contract/x/0", "uk-nato-5pc-2035-2025"), entry("edition/EFO-2026-03")] };
+    const ctx = { config: s.config, w: words(s.config, "en"), today: s.today, siteEntries: site_.entries };
+    const ids = (kind: "all" | "promise" | "actor" | "area", key: string) => [...buildFeed(s.views, kind, key, ctx, "atom").body.matchAll(/<id>(tag:[^<]+)<\/id>/g)].map((m) => m[1]!);
+    expect(ids("promise", "uk-nato-5pc-2035-2025")).toContain("tag:ledgergov.uk,2026:promise/uk-nato-5pc-2035-2025/contract/x/0");
+    expect(ids("actor", "labour")).toContain("tag:ledgergov.uk,2026:promise/uk-nato-5pc-2035-2025/contract/x/0");
+    expect(ids("area", "defence")).not.toContain("tag:ledgergov.uk,2026:edition/EFO-2026-03");
+    expect(ids("all", "")).toContain("tag:ledgergov.uk,2026:edition/EFO-2026-03");
+    expect(ids("promise", "uk-bus-cap-2-2026")).not.toContain("tag:ledgergov.uk,2026:promise/uk-nato-5pc-2035-2025/contract/x/0");
+  });
+
+  it("adds the site's own Markdown sections after the cost, shows a quote's licence and a reviewer's current name", async () => {
+    const s = await site("public-ledger");
+    const config = resolveConfig({
+      ...(await import("../../../fixtures/public-ledger/openpromises.config")).default,
+      quotes: { archive: "optional", require: "editor", licences: [{ hosts: ["gov.uk"], name: "Open Government Licence v3.0" }], otherLicence: "Rights stay with the publisher" },
+      editorial: { renamed: { "Junior Editor": "AI Journalist" } },
+    });
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const md = cardMarkdown(v, { config, w: words(config, "en"), today: s.today, sections: (x) => (x.id === v.id ? [{ title: "Contracts behind delivery", lines: ["None linked yet."] }] : []) });
+    expect(md.indexOf("## Contracts behind delivery")).toBeGreaterThan(md.indexOf("## About the cost"));
+    expect(md.indexOf("## Contracts behind delivery")).toBeLessThan(md.indexOf("## Sources"));
+    expect(md).toContain("checked word for word at its source on 6 October 2026; Open Government Licence v3.0)");
+    expect(md).not.toContain("Junior Editor");
+  });
+
+  it("adds the new open-data columns at the end, so no column moves", async () => {
+    const s = await site("public-ledger");
+    const header = openDataCsv(s.views, s.config, words(s.config, "en"), s.today).split("\r\n")[0]!.split(",");
+    expect(header.slice(-5)).toEqual(["last_updated", "cost_by_kind", "cost_by_name", "responsible_id", "brought_about_by_id"]);
   });
 });

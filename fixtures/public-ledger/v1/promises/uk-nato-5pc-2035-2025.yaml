@@ -14,6 +14,8 @@ status_note:
     June 2025 press release gives a projected split of 3.5% core defence and 1.5% resilience and
     security; the June 2026 Defence Investment Plan restates the 3.5% for 2035, but money is set out
     only to 2029-30, at 2.7% of GDP. The deadline is taken as the end of 2035.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: >-
@@ -40,6 +42,9 @@ versions:
           UK defence and national security (3.5% of GDP core defence, 1.5% resilience and security)
       cost:
         range: [36, 40, 44]
+        by:
+          kind: official
+          name: OBR
         note:
           en: >-
             Year shown: 2034-35, in 2025-26 terms. The government gave no cost. The OBR estimates

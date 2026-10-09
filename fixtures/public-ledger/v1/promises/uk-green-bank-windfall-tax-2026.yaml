@@ -14,6 +14,7 @@ status_note:
     The Green Party is not in government, so the card stays at Promised. The party set out the
     details on 19 August 2026: 38% on the biggest banks' UK retail profits above £800m. The quoted
     sentence also promises support from the welfare state, which is too general to score.
+responsible: null
 origin: manual
 sources:
   - title: "Green Party: Zack Polanski's speech to conference in full (2 Oct 2026)"
@@ -37,6 +38,9 @@ versions:
         en: The UK's biggest banks, on their UK retail profits above £800m
       cost:
         range: [-20.9, -19, -17.1]
+        by:
+          kind: party
+          name: Green Party
         note:
           en: >-
             Raises money, so the figures are negative. Year shown: 2026, one year of profits; the

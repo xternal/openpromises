@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { todayIn, validateContent, type Config, type ContentInput, type ContentResult, type FileIssue } from "@openpromises/core";
 import { folderSource, loadConfig, readContent, type ContentSource, type ReadResult } from "@openpromises/files";
-import { cardViews, publishFiles, type CardView, type PublishedFile } from "@openpromises/publish";
+import { cardViews, publishFiles, type CardView, type PublishedFile, type PublishInput } from "@openpromises/publish";
 
 /**
  * The engine's side of the dry run: the site's content read as it is, checked
@@ -74,12 +74,18 @@ export interface EngineRun extends Checked {
   files: Map<string, PublishedFile>;
 }
 
-export async function runEngine(configFile: string, contentDir: string, today?: string): Promise<EngineRun> {
+export interface SiteParts {
+  /** What the site makes of its own and hands to the engine: feed entries and Markdown sections (PublishInput.site). */
+  site?: PublishInput["site"];
+  today?: string;
+}
+
+export async function runEngine(configFile: string, contentDir: string, parts: SiteParts = {}): Promise<EngineRun> {
   const { config } = await loadConfig(configFile);
   const checked = checkLifting(readContent(folderSource(contentDir), config));
   const views = cardViews(checked.result.cards, checked.result.actors);
-  const day = today ?? todayIn(config.timezone);
-  const files = new Map(publishFiles({ config, views, today: day }).map((f) => [f.path, f]));
+  const day = parts.today ?? todayIn(config.timezone);
+  const files = new Map(publishFiles({ config, views, today: day, actors: checked.result.actors, ...(parts.site ? { site: parts.site } : {}) }).map((f) => [f.path, f]));
   return { ...checked, config, contentDir, today: day, views, published: views.filter((v) => v.where === "promises"), files };
 }
 

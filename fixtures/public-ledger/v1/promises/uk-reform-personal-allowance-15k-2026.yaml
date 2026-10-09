@@ -13,6 +13,7 @@ status_note:
     Reform UK is not in government, so the card stays at Promised. This pledge replaces the party's
     2024 aim of a £20,000 allowance, which it said in November 2025 it was no longer committed to;
     the same document keeps £20,000 as a long-term ambition.
+responsible: null
 origin: manual
 sources:
   - title: "Reform UK: The First 100 Days: Our Pledges to You (PDF), September 2026"
@@ -38,6 +39,9 @@ versions:
           £100,000 is kept.
       cost:
         range: [19, 21.1, 23.2]
+        by:
+          kind: party
+          name: Reform UK
         note:
           en: >-
             Year shown: the fifth year, the latest year Reform UK costed. The party's own costing,

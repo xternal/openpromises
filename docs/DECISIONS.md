@@ -41,11 +41,11 @@ Proposed while converting the sites' cards (docs/COMPARISON.md), and accepted by
 
 How each one is carried out is in [MIGRATING.md](MIGRATING.md).
 
-## Proposed, waiting for the owner
+## Accepted on 9 October 2026, after the Public Ledger dry run
 
-Both come from the Public Ledger dry run of 9 October 2026 (`pnpm dry-run`, [tools/dry-run](../tools/dry-run/README.md)).
+Both came from the Public Ledger dry run of 9 October 2026 (`pnpm dry-run`, [tools/dry-run](../tools/dry-run/README.md)), and Pavel Guzhikov accepted both as recommended the same evening. [UPGRADING.md](UPGRADING.md) is decision 13 for a site's owner; FORMAT.md §5 and §6 carry decision 14.
 
-**13. Upgrading: what never breaks, and how a site upgrades.** Public Ledger changed its card format on 9 October 2026, two hours after release 0.1.0, and 0.1.0 then refused 29 of its 54 cards. Sites and the engine will both keep changing, so a site needs to know what an upgrade can and cannot do to it. Recommended:
+**13. Upgrading: what never breaks, and how a site upgrades.** Public Ledger changed its card format on 9 October 2026, two hours after release 0.1.0, and 0.1.0 then refused 29 of its 54 cards. Sites and the engine will both keep changing, so a site needs to know what an upgrade can and cannot do to it. Decided:
 
 1. **Cards.** A card valid in format v1 stays valid in every later release. The format only grows, by optional fields; whether a site requires one is the site's own setting, never an upgrade's. A field added to the format may be filled in once on a published entry without a correction (FORMAT.md keeps the list, with the date each field was added), as Public Ledger's `LATE_FIELDS` allows. If a v2 is ever needed, the engine reads v1 cards by converting them on read, as it reads the sites' older formats now, so no site rewrites a published card.
 2. **Checks.** A new or stricter rule arrives as a warning that says from which version it becomes an error, and becomes one no sooner than the next minor release. An upgrade never stops a site publishing without notice.
@@ -56,10 +56,14 @@ Both come from the Public Ledger dry run of 9 October 2026 (`pnpm dry-run`, [too
 
 Why: sites can upgrade without fear and without reading code, and the engine can still improve. The cost is discipline at release time (the compatibility fixtures, the API report and the dry runs), which is mostly automatic.
 
-**14. Who made a cost, who must deliver, and who brought it about, in format v1.** Public Ledger added three facts on 9 October 2026 that format v1 has no place for, and the AI reporter's posting rules (its RFC, Amendment 1) read them on both Public Ledger and Borough Book. Recommended, as optional fields (decision 13.1):
+**14. Who made a cost, who must deliver, and who brought it about, in format v1.** Public Ledger added three facts on 9 October 2026 that format v1 has no place for, and the AI reporter's posting rules (its RFC, Amendment 1) read them on both Public Ledger and Borough Book. Decided, as optional fields (decision 13.1):
 
 - `cost.by`: who made a cost's central figure, `{ kind: official | party | independent, name }`. A late field. A site requires it with `money.costedBy: "required"`.
 - `responsible`: the body that would have to act to deliver the promise as worded, as of now, named by its role (an actor whose kind is in `actors.responsible`, such as `government`), or `null` when no body in power is committed. A card-level fact, kept current by ordinary edits. A site requires it with `actors.responsibleRequired: true`. It is not called `outcome_by`, because Public Ledger's `outcome_by` meant something else until 9 October 2026, and a reader of older data would misread it.
 - `brought_about_by`: who brought the outcome about when it was not the card's own actor; only on a card whose status is in progress or finished.
 
 The checks Public Ledger makes on them come with them: the actor exists, `responsible` names a body and never a party or a person, `cost.by` goes with a cost and only with one. Public Ledger's converter maps `costed_by`, `outcome_by` and `brought_about_by` onto these. Why: one reporter, one standard. The alternative, keeping them in each site's `x`, would let each site name them differently and leave the engine unable to check them.
+
+## Proposed, waiting for the owner
+
+None.

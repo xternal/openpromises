@@ -14,6 +14,8 @@ status_note:
     No start date was given in the statement. The Cabinet's Rewiring the State statement (31 July
     2026) lists mayors' control of the budget for 16- to 19-year-olds among the agreed reforms and
     says a white paper this autumn will set out a timetable for implementation.
+responsible:
+  actor_id: hm-government
 origin: llm_intake
 sources:
   - title: "Hansard, House of Commons, 9 Sep 2026: Education and Skills Reform"

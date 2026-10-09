@@ -14,6 +14,8 @@ status_note:
     The Universal Credit (Removal of Two Child Limit) Act 2026 became law on 18 March 2026 and the
     limit stopped applying from assessment periods starting on or after 6 April 2026, as DWP's
     official statistics confirm.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "Hansard, House of Commons, 26 Nov 2025: Financial Statement and Budget Report"
@@ -47,6 +49,9 @@ versions:
         en: Families on Universal Credit with three or more children
       cost:
         range: [2.1285, 2.365, 2.6015]
+        by:
+          kind: official
+          name: HM Treasury
         note:
           en: >-
             Year shown: 2026-27, the first full year (Budget 2025 policy table, certified by the

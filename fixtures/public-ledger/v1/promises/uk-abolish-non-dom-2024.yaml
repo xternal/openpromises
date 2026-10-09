@@ -16,6 +16,8 @@ status_note:
     The previous government had announced an end to the regime in March 2024; Labour's Autumn Budget
     2024 changed parts of the design, such as removing a planned 50% discount on foreign income in
     2025-26.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "Labour Party: Change, 2024 manifesto (PDF), page 21"
@@ -44,6 +46,9 @@ versions:
           foreign income and gains for up to 4 years
       cost:
         range: [-2.7995, -2.545, -2.2905]
+        by:
+          kind: official
+          name: HM Treasury
         note:
           en: >-
             Negative because the pledge raises money. Year used: 2028-29, the year Labour's costings

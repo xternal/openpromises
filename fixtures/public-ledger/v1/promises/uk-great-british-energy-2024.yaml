@@ -16,6 +16,8 @@ status_note:
     in solar for schools, NHS and military sites in its first period to 31 March 2026. The
     manifesto's £8.3bn runs over the Parliament, and the government now counts that sum across both
     Great British Energy and Great British Energy–Nuclear, so the card sits at Delivering.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "Labour Party: Change, 2024 manifesto (PDF), page 53"
@@ -43,6 +45,9 @@ versions:
           Energy billpayers and communities across the UK; taxpayers provide the company's capital
       cost:
         range: [1.53, 1.7, 1.87]
+        by:
+          kind: party
+          name: Labour Party
         note:
           en: >-
             Year used: an average year of the Parliament, as Labour's costings give an annual

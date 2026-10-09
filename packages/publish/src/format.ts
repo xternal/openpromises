@@ -40,9 +40,18 @@ export function currencySymbol(w: Words, currency: string): string {
 
 const MINUS = "−";
 
+/** "Costs" → "costs", for words inside a sentence; "NHS" stays as it is. */
+export const lowerFirst = (s: string) => (/^\p{Lu}\p{Ll}/u.test(s) ? s[0]!.toLowerCase() + s.slice(1) : s);
+
+/** Under 0.1 of a billion, an amount reads in millions, so a small range stays a range ("£14m to £18m", not "£0.01bn to £0.02bn"). */
+const MILLIONS_BELOW_BN = 0.1;
+
 /** An amount in the configured unit: "£1.2bn", "£45m", "1,2 млрд ₽". */
 export function money(w: Words, config: Pick<Config, "money">, value: number): string {
   const unit = config.money.unit;
+  const a = Math.abs(value);
+  if (unit === "bn" && a > 0 && a < MILLIONS_BELOW_BN)
+    return `${value < 0 ? MINUS : ""}${w.t("money.m", { sym: currencySymbol(w, config.money.currency), n: new Intl.NumberFormat(w.m.intl, { maximumFractionDigits: 0 }).format(Math.round(a * 1000)) })}`;
   const key = unit === "bn" || unit === "m" || unit === "k" ? `money.${unit}` : "money.none";
   const text = w.t(key, { sym: currencySymbol(w, config.money.currency), n: figure(w, value) });
   return `${value < 0 ? MINUS : ""}${key === "money.none" && unit ? `${text} ${unit}` : text}`;

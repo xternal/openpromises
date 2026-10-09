@@ -14,6 +14,8 @@ status_note:
     No date was given ("soon"), so the card has no deadline. The independent Curriculum and
     Assessment Review, chaired by Professor Becky Francis, published its final report on 5 November
     2025, alongside a government response.
+responsible:
+  actor_id: hm-government
 origin: llm_intake
 sources:
   - title: "Hansard, House of Commons, 9 Sep 2026: Education and Skills Reform"

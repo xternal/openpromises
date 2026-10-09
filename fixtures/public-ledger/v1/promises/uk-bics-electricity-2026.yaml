@@ -17,6 +17,8 @@ status_note:
     Renewables Obligation and Capacity Market rules were laid on 7 September 2026 and need approval
     by both Houses; none had been made by 7 October 2026. The Exchequer funding is due to be scored
     at Budget 2026, so the card stays at In plan.
+responsible:
+  actor_id: hm-government
 origin: llm_intake
 sources:
   - title: >-
@@ -66,6 +68,9 @@ versions:
           get funding for an equivalent programme, subject to a business case.
       cost:
         range: [0.54, 0.6, 0.66]
+        by:
+          kind: official
+          name: Department for Business and Trade
         note:
           en: >-
             Year shown: a typical year of the scheme from April 2027; the government gives an

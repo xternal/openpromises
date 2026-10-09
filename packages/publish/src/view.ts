@@ -1,4 +1,4 @@
-import { categoryOf, statusLabel, type Actor, type Card, type Config, type LangMap, type ValidCard, type Version } from "@openpromises/core";
+import { categoryOf, climb, statusLabel, type Actor, type Card, type Config, type LangMap, type ValidCard, type Version } from "@openpromises/core";
 import { costText, longDate } from "./format";
 import type { Words } from "./messages";
 
@@ -17,6 +17,10 @@ export interface CardView {
   current: Version;
   /** The speaker's role on the day the promise was made. */
   role: LangMap | null;
+  /** Who brought the outcome about, when it was not the card's own actor (decision 14). */
+  broughtAboutBy?: Actor;
+  /** The body that must act to deliver it (decision 14); null when no body in power is committed, absent when the card does not say. */
+  responsible?: Actor | null;
 }
 
 /** Cards as views, newest promise first (ties by id, so the order never wobbles). Cards whose actor is missing are left out. */
@@ -29,7 +33,19 @@ export function cardViews(cards: readonly (ValidCard | Card)[], actors: Readonly
     if (!actor) continue;
     const party = actor.kind === "party" ? actor : actor.party_id ? (actors.get(actor.party_id) ?? null) : null;
     const role = actor.roles?.find((r) => (!r.from || r.from <= card.made_on) && (!r.to || r.to >= card.made_on))?.title ?? null;
-    out.push({ id: card.id, card, where, actor, party, current: card.versions.at(-1)!, role });
+    const broughtAboutBy = card.brought_about_by ? actors.get(card.brought_about_by.actor_id) : undefined;
+    const responsible = card.responsible === null ? null : card.responsible ? actors.get(card.responsible.actor_id) : undefined;
+    out.push({
+      id: card.id,
+      card,
+      where,
+      actor,
+      party,
+      current: card.versions.at(-1)!,
+      role,
+      ...(broughtAboutBy ? { broughtAboutBy } : {}),
+      ...(responsible !== undefined ? { responsible } : {}),
+    });
   }
   return out.sort((a, b) => b.card.made_on.localeCompare(a.card.made_on) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
@@ -138,20 +154,23 @@ export function relatedCards<V extends CardView>(v: V, all: readonly V[], max = 
   return [...sameArea, ...sameOwner].slice(0, max);
 }
 
-/**
- * The ladder a card climbs: the open and progress statuses and the first
- * finished one (delivered). The other finished statuses (not met, undone) are
- * where a story can end instead, not steps up.
- */
-export function climb(config: Config): string[] {
-  const out: string[] = [];
-  for (const s of config.ladder.statuses) {
-    if (s.category === "off_ladder") continue;
-    out.push(s.id);
-    if (s.category === "finished") break;
+/** The ladder a card climbs (from @openpromises/core, where the rules use it too). */
+export { climb };
+
+/** The terms a quote may be reused on, from its source's address (quotes.licences), or undefined when the site sets none. */
+export function quoteLicence(config: Pick<Config, "quotes">, url: string): string | undefined {
+  let host: string;
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    return config.quotes.otherLicence;
   }
-  return out;
+  const under = (domain: string) => host === domain || host.endsWith(`.${domain}`);
+  return config.quotes.licences.find((l) => l.hosts.some(under))?.name ?? config.quotes.otherLicence;
 }
+
+/** A reviewer's name as readers see it now (editorial.renamed). */
+export const reviewerName = (config: Pick<Config, "editorial">, by: string) => config.editorial.renamed[by] ?? by;
 
 /** The finished statuses that are not the top of the ladder: not met, undone. */
 export const endings = (config: Config) => config.ladder.statuses.filter((s) => s.category === "finished" && !climb(config).includes(s.id)).map((s) => s.id);

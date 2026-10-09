@@ -14,6 +14,8 @@ status_note:
     The Chancellor has said he will set out a roadmap to fiscal devolution at the Budget on 28
     October 2026. The Cabinet statement says detailed arrangements will be confirmed at the upcoming
     Spending Review, with income tax receipts kept locally from April 2028.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "Cabinet Office: Rewiring the State – Cabinet Statement (31 Jul 2026)"

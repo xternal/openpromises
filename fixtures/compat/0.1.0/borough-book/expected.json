@@ -1,0 +1,340 @@
+{
+  "errors": [
+    "promises/con-2026-developments.yaml  headline  (headline)",
+    "promises/con-2026-developments.yaml  reviews  (approvals)",
+    "promises/con-2026-developments.yaml  versions[0].text  (quotes)",
+    "promises/con-2026-green-spaces.yaml  headline  (headline)",
+    "promises/con-2026-green-spaces.yaml  reviews  (approvals)",
+    "promises/con-2026-green-spaces.yaml  versions[0].text  (quotes)",
+    "promises/con-2026-high-streets.yaml  headline  (headline)",
+    "promises/con-2026-high-streets.yaml  reviews  (approvals)",
+    "promises/con-2026-high-streets.yaml  versions[0].text  (quotes)",
+    "promises/con-2026-next-generation.yaml  headline  (headline)",
+    "promises/con-2026-next-generation.yaml  reviews  (approvals)",
+    "promises/con-2026-next-generation.yaml  versions[0].text  (quotes)",
+    "promises/con-2026-parking-permit.yaml  headline  (headline)",
+    "promises/con-2026-parking-permit.yaml  reviews  (approvals)",
+    "promises/con-2026-parking-permit.yaml  versions[0].text  (quotes)",
+    "promises/con-2026-police.yaml  headline  (headline)",
+    "promises/con-2026-police.yaml  reviews  (approvals)",
+    "promises/con-2026-police.yaml  versions[0].text  (quotes)",
+    "promises/con-2026-services-taxes.yaml  headline  (headline)",
+    "promises/con-2026-services-taxes.yaml  reviews  (approvals)",
+    "promises/con-2026-services-taxes.yaml  versions[0].text  (quotes)",
+    "promises/con-2026-social-care.yaml  headline  (headline)",
+    "promises/con-2026-social-care.yaml  reviews  (approvals)",
+    "promises/con-2026-social-care.yaml  versions[0].text  (quotes)",
+    "promises/con-2026-tenants.yaml  headline  (headline)",
+    "promises/con-2026-tenants.yaml  reviews  (approvals)",
+    "promises/con-2026-tenants.yaml  versions[0].text  (quotes)",
+    "promises/hf-free-home-care.yaml  events[0].type  (first-event)",
+    "promises/hf-free-home-care.yaml  events[1].type  (first-event)",
+    "promises/hf-free-home-care.yaml  events[2].date  (event-order)",
+    "promises/hf-free-home-care.yaml  events[2].type  (first-event)",
+    "promises/hf-free-home-care.yaml  headline  (headline)",
+    "promises/hf-free-home-care.yaml  reviews  (approvals)",
+    "promises/hf-free-home-care.yaml  versions[0].text  (quotes)",
+    "promises/lab-2026-affordable-homes.yaml  headline  (headline)",
+    "promises/lab-2026-affordable-homes.yaml  reviews  (approvals)",
+    "promises/lab-2026-affordable-homes.yaml  versions[0].text  (quotes)",
+    "promises/lab-2026-ai-cctv.yaml  headline  (headline)",
+    "promises/lab-2026-ai-cctv.yaml  reviews  (approvals)",
+    "promises/lab-2026-ai-cctv.yaml  versions[0].text  (quotes)",
+    "promises/lab-2026-best-value.yaml  headline  (headline)",
+    "promises/lab-2026-best-value.yaml  reviews  (approvals)",
+    "promises/lab-2026-best-value.yaml  versions[0].text  (quotes)",
+    "promises/lab-2026-green-schemes.yaml  events[1].date  (event-order)",
+    "promises/lab-2026-green-schemes.yaml  headline  (headline)",
+    "promises/lab-2026-green-schemes.yaml  reviews  (approvals)",
+    "promises/lab-2026-green-schemes.yaml  versions[0].text  (quotes)",
+    "promises/lab-2026-high-streets.yaml  headline  (headline)",
+    "promises/lab-2026-high-streets.yaml  reviews  (approvals)",
+    "promises/lab-2026-high-streets.yaml  versions[0].text  (quotes)",
+    "promises/lab-2026-hospital.yaml  headline  (headline)",
+    "promises/lab-2026-hospital.yaml  reviews  (approvals)",
+    "promises/lab-2026-hospital.yaml  versions[0].text  (quotes)",
+    "promises/lab-2026-parks.yaml  headline  (headline)",
+    "promises/lab-2026-parks.yaml  reviews  (approvals)",
+    "promises/lab-2026-parks.yaml  versions[0].parameters.capital_cost.range  (cost)",
+    "promises/lab-2026-parks.yaml  versions[0].parameters.capital_cost.sources  (cost)",
+    "promises/lab-2026-parks.yaml  versions[0].text  (quotes)",
+    "promises/lab-2026-pathway-bond.yaml  events[1].date  (event-order)",
+    "promises/lab-2026-pathway-bond.yaml  headline  (headline)",
+    "promises/lab-2026-pathway-bond.yaml  reviews  (approvals)",
+    "promises/lab-2026-pathway-bond.yaml  versions[0].text  (quotes)"
+  ],
+  "feeds": {
+    "/promises/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-developments/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-green-spaces/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-high-streets/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-next-generation/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-parking-permit/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-police/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-services-taxes/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-social-care/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-tenants/event/0",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/0",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/1",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/2",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/3",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/4",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/5",
+      "tag:borough-ledger,2026:promise/lab-2026-affordable-homes/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-affordable-homes/event/1",
+      "tag:borough-ledger,2026:promise/lab-2026-ai-cctv/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-best-value/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-green-schemes/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-green-schemes/event/1",
+      "tag:borough-ledger,2026:promise/lab-2026-high-streets/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-hospital/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-parks/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-pathway-bond/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-pathway-bond/event/1"
+    ],
+    "/promise/hf-free-home-care/feed.xml": [
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/0",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/1",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/2",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/3",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/4",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/5"
+    ],
+    "/promise/lab-2026-affordable-homes/feed.xml": [
+      "tag:borough-ledger,2026:promise/lab-2026-affordable-homes/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-affordable-homes/event/1"
+    ],
+    "/promise/lab-2026-ai-cctv/feed.xml": [
+      "tag:borough-ledger,2026:promise/lab-2026-ai-cctv/event/0"
+    ],
+    "/promise/lab-2026-best-value/feed.xml": [
+      "tag:borough-ledger,2026:promise/lab-2026-best-value/event/0"
+    ],
+    "/promise/lab-2026-green-schemes/feed.xml": [
+      "tag:borough-ledger,2026:promise/lab-2026-green-schemes/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-green-schemes/event/1"
+    ],
+    "/promise/lab-2026-high-streets/feed.xml": [
+      "tag:borough-ledger,2026:promise/lab-2026-high-streets/event/0"
+    ],
+    "/promise/lab-2026-hospital/feed.xml": [
+      "tag:borough-ledger,2026:promise/lab-2026-hospital/event/0"
+    ],
+    "/promise/lab-2026-parks/feed.xml": [
+      "tag:borough-ledger,2026:promise/lab-2026-parks/event/0"
+    ],
+    "/promise/lab-2026-pathway-bond/feed.xml": [
+      "tag:borough-ledger,2026:promise/lab-2026-pathway-bond/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-pathway-bond/event/1"
+    ],
+    "/promise/con-2026-developments/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-developments/event/0"
+    ],
+    "/promise/con-2026-green-spaces/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-green-spaces/event/0"
+    ],
+    "/promise/con-2026-high-streets/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-high-streets/event/0"
+    ],
+    "/promise/con-2026-next-generation/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-next-generation/event/0"
+    ],
+    "/promise/con-2026-parking-permit/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-parking-permit/event/0"
+    ],
+    "/promise/con-2026-police/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-police/event/0"
+    ],
+    "/promise/con-2026-services-taxes/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-services-taxes/event/0"
+    ],
+    "/promise/con-2026-social-care/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-social-care/event/0"
+    ],
+    "/promise/con-2026-tenants/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-tenants/event/0"
+    ],
+    "/party/conservative/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-developments/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-green-spaces/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-high-streets/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-next-generation/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-parking-permit/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-police/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-services-taxes/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-social-care/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-tenants/event/0"
+    ],
+    "/party/labour/feed.xml": [
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/0",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/1",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/2",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/3",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/4",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/5",
+      "tag:borough-ledger,2026:promise/lab-2026-affordable-homes/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-affordable-homes/event/1",
+      "tag:borough-ledger,2026:promise/lab-2026-ai-cctv/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-best-value/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-green-schemes/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-green-schemes/event/1",
+      "tag:borough-ledger,2026:promise/lab-2026-high-streets/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-hospital/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-parks/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-pathway-bond/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-pathway-bond/event/1"
+    ],
+    "/topic/care-for-older-and-disabled-adults/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-social-care/event/0",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/0",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/1",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/2",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/3",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/4",
+      "tag:borough-ledger,2026:promise/hf-free-home-care/event/5"
+    ],
+    "/topic/climate-and-environment/feed.xml": [
+      "tag:borough-ledger,2026:promise/lab-2026-green-schemes/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-green-schemes/event/1"
+    ],
+    "/topic/community-safety/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-police/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-ai-cctv/event/0"
+    ],
+    "/topic/health/feed.xml": [
+      "tag:borough-ledger,2026:promise/lab-2026-hospital/event/0"
+    ],
+    "/topic/housing-and-homelessness/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-tenants/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-affordable-homes/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-affordable-homes/event/1"
+    ],
+    "/topic/parks-libraries-and-leisure/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-green-spaces/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-parks/event/0"
+    ],
+    "/topic/planning-and-the-local-economy/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-developments/event/0",
+      "tag:borough-ledger,2026:promise/con-2026-high-streets/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-high-streets/event/0"
+    ],
+    "/topic/running-the-council/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-services-taxes/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-best-value/event/0"
+    ],
+    "/topic/streets-waste-and-transport/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-parking-permit/event/0"
+    ],
+    "/topic/young-people-and-jobs/feed.xml": [
+      "tag:borough-ledger,2026:promise/con-2026-next-generation/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-pathway-bond/event/0",
+      "tag:borough-ledger,2026:promise/lab-2026-pathway-bond/event/1"
+    ]
+  },
+  "files": [
+    "/data/promises.csv",
+    "/data/promises.json",
+    "/llms-full.txt",
+    "/llms.txt",
+    "/promise/con-2026-developments.md",
+    "/promise/con-2026-green-spaces.md",
+    "/promise/con-2026-high-streets.md",
+    "/promise/con-2026-next-generation.md",
+    "/promise/con-2026-parking-permit.md",
+    "/promise/con-2026-police.md",
+    "/promise/con-2026-services-taxes.md",
+    "/promise/con-2026-social-care.md",
+    "/promise/con-2026-tenants.md",
+    "/promise/hf-free-home-care.md",
+    "/promise/lab-2026-affordable-homes.md",
+    "/promise/lab-2026-ai-cctv.md",
+    "/promise/lab-2026-best-value.md",
+    "/promise/lab-2026-green-schemes.md",
+    "/promise/lab-2026-high-streets.md",
+    "/promise/lab-2026-hospital.md",
+    "/promise/lab-2026-parks.md",
+    "/promise/lab-2026-pathway-bond.md",
+    "/sitemap-promises.xml"
+  ],
+  "pages": [
+    "/promise/con-2026-developments",
+    "/promise/con-2026-green-spaces",
+    "/promise/con-2026-high-streets",
+    "/promise/con-2026-next-generation",
+    "/promise/con-2026-parking-permit",
+    "/promise/con-2026-police",
+    "/promise/con-2026-services-taxes",
+    "/promise/con-2026-social-care",
+    "/promise/con-2026-tenants",
+    "/promise/hf-free-home-care",
+    "/promise/lab-2026-affordable-homes",
+    "/promise/lab-2026-ai-cctv",
+    "/promise/lab-2026-best-value",
+    "/promise/lab-2026-green-schemes",
+    "/promise/lab-2026-high-streets",
+    "/promise/lab-2026-hospital",
+    "/promise/lab-2026-parks",
+    "/promise/lab-2026-pathway-bond"
+  ],
+  "sitemap": [
+    "https://boroughbook.uk/party/conservative",
+    "https://boroughbook.uk/party/labour",
+    "https://boroughbook.uk/promise/con-2026-developments",
+    "https://boroughbook.uk/promise/con-2026-green-spaces",
+    "https://boroughbook.uk/promise/con-2026-high-streets",
+    "https://boroughbook.uk/promise/con-2026-next-generation",
+    "https://boroughbook.uk/promise/con-2026-parking-permit",
+    "https://boroughbook.uk/promise/con-2026-police",
+    "https://boroughbook.uk/promise/con-2026-services-taxes",
+    "https://boroughbook.uk/promise/con-2026-social-care",
+    "https://boroughbook.uk/promise/con-2026-tenants",
+    "https://boroughbook.uk/promise/hf-free-home-care",
+    "https://boroughbook.uk/promise/lab-2026-affordable-homes",
+    "https://boroughbook.uk/promise/lab-2026-ai-cctv",
+    "https://boroughbook.uk/promise/lab-2026-best-value",
+    "https://boroughbook.uk/promise/lab-2026-green-schemes",
+    "https://boroughbook.uk/promise/lab-2026-high-streets",
+    "https://boroughbook.uk/promise/lab-2026-hospital",
+    "https://boroughbook.uk/promise/lab-2026-parks",
+    "https://boroughbook.uk/promise/lab-2026-pathway-bond",
+    "https://boroughbook.uk/promises",
+    "https://boroughbook.uk/topic/care-for-older-and-disabled-adults",
+    "https://boroughbook.uk/topic/climate-and-environment",
+    "https://boroughbook.uk/topic/community-safety",
+    "https://boroughbook.uk/topic/health",
+    "https://boroughbook.uk/topic/housing-and-homelessness",
+    "https://boroughbook.uk/topic/parks-libraries-and-leisure",
+    "https://boroughbook.uk/topic/planning-and-the-local-economy",
+    "https://boroughbook.uk/topic/running-the-council",
+    "https://boroughbook.uk/topic/streets-waste-and-transport",
+    "https://boroughbook.uk/topic/young-people-and-jobs"
+  ],
+  "csvHeader": [
+    "id",
+    "url",
+    "headline",
+    "actor_id",
+    "actor",
+    "party",
+    "made_on",
+    "venue",
+    "area",
+    "status",
+    "status_label",
+    "status_category",
+    "deadline",
+    "cost_low",
+    "cost_central",
+    "cost_high",
+    "cost_quality",
+    "funding_stated",
+    "quote",
+    "quote_lang",
+    "source_url",
+    "archived_url",
+    "quote_checked_on",
+    "versions",
+    "corrections",
+    "last_updated"
+  ]
+}

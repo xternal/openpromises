@@ -19,6 +19,8 @@ status_note:
     Police workforce, 31 March 2026). The manifesto text says "thousands"; its costings (page 129)
     and the government's milestone put the number at 13,000. The manifesto gives no date; the
     government's milestone is this Parliament, taken as by 1 July 2029.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "Labour Party: Change, 2024 manifesto (PDF), pages 64-65"
@@ -51,6 +53,9 @@ versions:
           special constables into neighbourhood roles
       cost:
         range: [0.36, 0.4, 0.44]
+        by:
+          kind: party
+          name: Labour Party
         note:
           en: >-
             Year used: the year of highest cost, as Labour's costings give one annualised figure.

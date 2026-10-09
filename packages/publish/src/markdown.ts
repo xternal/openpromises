@@ -3,7 +3,7 @@ import { correctionTarget, correctionValue } from "./corrections";
 import { costFacts, costText, longDate } from "./format";
 import type { Words } from "./messages";
 import { absolute, paths } from "./urls";
-import { actorName, areaLabel, cardCostText, climb, eventLabel, headline, lastUpdated, metricText, pick, quoteIn, statusMix, type CardView } from "./view";
+import { actorName, areaLabel, cardCostText, climb, eventLabel, headline, lastUpdated, metricText, pick, quoteIn, quoteLicence, reviewerName, statusMix, type CardView } from "./view";
 
 /**
  * Promise cards as Markdown, for AI assistants and anyone who reads plain
@@ -18,6 +18,14 @@ export interface MdContext {
   config: Config;
   w: Words;
   today: string;
+  /** The site's own sections for a card (contracts, wards), in Markdown lines; they follow "About the cost", as on the card page. */
+  sections?: (v: CardView, locale: string) => readonly MdSection[];
+}
+
+/** A section a site adds to a card's Markdown. */
+export interface MdSection {
+  title: string;
+  lines: readonly string[];
 }
 
 const flat = (s: string) => s.replace(/\s+/g, " ").trim();
@@ -29,7 +37,9 @@ function costLine(v: CardView, ctx: MdContext): string {
   const { config, w } = ctx;
   const cost = v.current.parameters?.cost;
   const text = cardCostText(v, config, w);
-  return cost?.range ? `${text} (${w.t("cost.central", { value: costFacts(w, config, cost.range).central })})` : text;
+  if (!cost?.range) return text;
+  const value = costFacts(w, config, cost.range).central;
+  return `${text} (${cost.by ? w.t("cost.central_by", { value, name: cost.by.name, kind: w.t(`cost.by.${cost.by.kind}`) }) : w.t("cost.central", { value })})`;
 }
 
 /** One card in Markdown. `level` is its title's heading level: 1 for its own file, 2 inside llms-full.txt. */
@@ -59,7 +69,12 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
   const measurement = f.links?.measurement;
   const deadline = params?.deadline;
   const facts: [string, string | null][] = [
-    ["card.status", statusLabel(config, f.status, L)],
+    [
+      "card.status",
+      v.broughtAboutBy
+        ? `${w.t("card.brought_about_by", { status: statusLabel(config, f.status, L), who: actorName(v.broughtAboutBy, L, config) })}${f.brought_about_by?.note ? ` (${pick(f.brought_about_by.note, L, config)})` : ""}`
+        : statusLabel(config, f.status, L),
+    ],
     ["card.status_ladder", offLadder ? null : ladder.join(" → ")],
     ["card.area", link(areaLabel(config, f.area, L), absolute(config, p.area(f.area, L)))],
     ["card.speaker", link(actorName(v.actor, L, config), absolute(config, p.actor(v.actor.id, L))) + (role ? `, ${role}` : "")],
@@ -76,13 +91,15 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
         : null,
     ],
     ["card.who", pick(params?.who, L, config) ?? null],
-    ["card.when", pick(params?.when, L, config) ?? null],
+    // "When" is text, but a bare date reads as one: "1 April 2027".
+    ["card.when", params?.when ? longDate(w, pick(params.when, L, config) ?? "") || null : null],
     ["funding.label", params ? (pick(params.funded_by, L, config) ?? w.t("funding.not_stated_long")) : null],
     [
       "card.quote_source",
       `${v.current.source_url} (${[
         ...(v.current.archived_url ? [link(w.t("card.archive"), v.current.archived_url)] : []),
         v.current.quote_checked_on ? w.t("md.quote_checked", { date: longDate(w, v.current.quote_checked_on) }) : w.t("md.quote_not_checked"),
+        ...[quoteLicence(config, v.current.source_url)].filter((x): x is string => !!x),
       ].join("; ")})`,
     ],
     ["card.updated", updated ? longDate(w, updated) : null],
@@ -108,6 +125,7 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
     ...(cost?.note ? [flat(pick(cost.note, L, config)!)] : []),
     ...(cost?.sources?.length ? ["", `${w.t("card.cost_sources")}:`, ...cost.sources.map((s) => `- ${link(s.title, s.url)}`)] : []),
   ]);
+  for (const extra of ctx.sections?.(v, L) ?? []) section(extra.title, [...extra.lines]);
   section(
     w.t("card.replies"),
     (f.replies ?? []).map((r) => {
@@ -135,8 +153,8 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
     w.t("card.checks"),
     [...(f.reviews ?? [])].reverse().map((r) =>
       r.kind === "editor" && r.approves
-        ? `- ${w.t("card.approved_by", { by: r.by, date: longDate(w, r.on) })}${r.batch ? ` ${w.t("card.approved_batch")}` : ""}.`
-        : `- ${w.t("card.reviewed_by", { by: r.by, kind: w.t(`card.review_kind.${r.kind}`), date: longDate(w, r.on) })}.`,
+        ? `- ${w.t("card.approved_by", { by: reviewerName(config, r.by), date: longDate(w, r.on) })}${r.batch ? ` ${w.t("card.approved_batch")}` : ""}.`
+        : `- ${w.t("card.reviewed_by", { by: reviewerName(config, r.by), kind: w.t(`card.review_kind.${r.kind}`), date: longDate(w, r.on) })}.`,
     ),
   );
   return `${out.join("\n").trimEnd()}\n`;

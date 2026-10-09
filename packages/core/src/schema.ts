@@ -50,9 +50,21 @@ export const Source = z.strictObject({
 });
 export type Source = z.infer<typeof Source>;
 
+/** Who made a cost's central figure (decision 14): an official body, a party (its own figure), or anyone else. */
+export const COST_MAKERS = ["official", "party", "independent"] as const;
+
+export const CostBy = z.strictObject({
+  kind: z.enum(COST_MAKERS),
+  /** The maker as a reader would say it: "OBR", "HM Treasury", "IFS", or the party by its usual name. */
+  name: Text,
+});
+export type CostBy = z.infer<typeof CostBy>;
+
 export const Cost = z.strictObject({
   range: Range.optional(),
   quality: Word.optional(),
+  /** Who made the central figure (decision 14). Added after format v1 was first published, so it may be filled in once on a published version (FORMAT.md §9). */
+  by: CostBy.optional(),
   note: LangMap.optional(),
   sources: z.array(Source).optional(),
 });
@@ -190,6 +202,10 @@ export type Links = z.infer<typeof Links>;
 
 export const ORIGINS = ["manual", "reader_submission", "llm_intake"] as const;
 
+/** An actor named for a reason, with a note saying why. */
+export const ActorRef = z.strictObject({ actor_id: Slug, note: LangMap.optional() });
+export type ActorRef = z.infer<typeof ActorRef>;
+
 export const Card = z.strictObject({
   format: z.literal(FORMAT, { error: `should be "${FORMAT}": a v1 card starts with "format: ${FORMAT}"` }),
   id: Slug,
@@ -201,6 +217,10 @@ export const Card = z.strictObject({
   area: Text,
   status: Word,
   status_note: LangMap.optional(),
+  /** Who brought the outcome about, when it was not the card's own actor (decision 14). */
+  brought_about_by: ActorRef.optional(),
+  /** The body that would have to act to deliver the promise as worded, as of now, named by its role; null when no body in power is committed (decision 14). */
+  responsible: ActorRef.nullable().optional(),
   origin: z.enum(ORIGINS).optional(),
   sources: z.array(Source).optional(),
   versions: z.array(Version).min(1, "needs at least one version: the promise as worded"),

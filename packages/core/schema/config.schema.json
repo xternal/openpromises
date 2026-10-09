@@ -125,6 +125,13 @@
             "type": "string",
             "pattern": "^[a-z][a-z0-9_]{0,59}$"
           }
+        },
+        "costedBy": {
+          "type": "string",
+          "enum": [
+            "required",
+            "optional"
+          ]
         }
       },
       "required": [
@@ -168,6 +175,17 @@
           "additionalProperties": {
             "type": "string"
           }
+        },
+        "responsible": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,59}$"
+          }
+        },
+        "responsibleRequired": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false
@@ -409,6 +427,17 @@
           "type": "string",
           "minLength": 1
         },
+        "renamed": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "model": {
           "type": "string",
           "const": "in-file"
@@ -441,6 +470,35 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "licences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "hosts": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9.-]+$"
+                }
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "hosts",
+              "name"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "otherLicence": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "additionalProperties": false

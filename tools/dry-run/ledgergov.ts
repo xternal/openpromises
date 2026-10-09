@@ -121,6 +121,9 @@ export const MUTATIONS: Mutation[] = [
   },
 ];
 
+/** What the site keeps making itself and hands to the engine: feed entries by kind, and Markdown sections by title. */
+export const OWN = { entries: ["contract", "edition"], sections: ["Contracts behind delivery"] } as const;
+
 /** Differences already decided, and what stays the site's own. */
 export const ACCEPTED: Accepted[] = [
   {
@@ -146,6 +149,18 @@ export const ACCEPTED: Accepted[] = [
     match: /other links? \(the site's own pages\)/,
     verdict: "site",
     reason: "Public Ledger's llms.txt guides the whole site (budget, people, method). The site keeps writing it, and can take its promise list from the engine's.",
+  },
+  {
+    area: "Checks",
+    match: /The site refuses it, the engine warns: a card with lever_settings needs a preset_label/,
+    verdict: "accepted",
+    reason: "Decision 13.2: a stricter rule arrives as a warning for one minor release, and becomes an error in 0.3.0.",
+  },
+  {
+    area: "Checks",
+    match: /submission_ref and credit belong to cards with origin: reader_submission/,
+    verdict: "site",
+    reason: "Both fields are Public Ledger's own (in x), and the check needs the card's origin, which a site's x schema cannot see. Public Ledger keeps this one check in its validate script, which keeps running for its budget data (docs/MIGRATING.md, Per site).",
   },
   {
     area: "Structured data",

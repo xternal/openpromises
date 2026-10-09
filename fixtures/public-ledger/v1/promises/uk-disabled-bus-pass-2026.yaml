@@ -13,6 +13,8 @@ status_note:
   en: >-
     Announced with £60m from existing DWP and DfT budgets, to start on 1 April 2027. No plan,
     legislation or funding allocation has been published since, so the card stays at Promised.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "Press release, 18 Aug 2026: Free bus travel 24/7 for disabled people"

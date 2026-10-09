@@ -31,9 +31,9 @@ The JSON Schema files in `packages/core/schema/` are generated from the Zod sche
 1. Open an issue first for anything larger than a fix, so we can agree the approach.
 2. Work on a branch; keep each pull request to one change.
 3. Add or change tests with the code. A new rule needs at least one card that passes it and one that fails it.
-4. Update `docs/FORMAT.md` when the card format or a rule changes. The format is a public standard: a change that would make a valid card invalid needs a new format version and a migration (`openpromises migrate`).
+4. Update `docs/FORMAT.md` when the card format or a rule changes. The format is a public standard, and an upgrade never breaks a site (decision 13, [docs/UPGRADING.md](docs/UPGRADING.md)): new fields are optional; a field added to the format is listed as a late field (`LATE_FIELDS` in `packages/core/src/history.ts`, FORMAT.md §9); a new or stricter rule is a warning for one minor release first, and says from which version it becomes an error. `fixtures/compat/` holds every released version's outputs, and its test fails if a change breaks one.
 5. Two maintainers review every pull request, as two editors approve every card.
-6. Before a release, run each site's dry run (`pnpm dry-run`, [tools/dry-run](tools/dry-run/README.md)): what the engine publishes for a live site must be as good as what the site serves, or better.
+6. To release, record what the version publishes before anything changes again: copy each fixture site's `v1/` and configuration to `fixtures/compat/<version>/<site>/` and run `UPDATE_COMPAT=1 pnpm test`, which writes the outputs and exported names once. Then run each site's dry run (`pnpm dry-run`, [tools/dry-run](tools/dry-run/README.md)): what the engine publishes for a live site must be as good as what the site serves, or better.
 
 ## Licence
 

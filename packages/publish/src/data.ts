@@ -70,6 +70,11 @@ export const CSV_COLUMNS = [
   "versions",
   "corrections",
   "last_updated",
+  // Added in 0.2.0 (decision 14). New columns go at the end, so a column never moves (decision 13.3).
+  "cost_by_kind",
+  "cost_by_name",
+  "responsible_id",
+  "brought_about_by_id",
 ] as const;
 
 /** Every published card as CSV, one row each, in the language of `w` for headlines and labels. */
@@ -107,6 +112,11 @@ export function openDataCsv(views: readonly CardView[], config: Config, w: Words
         versions: v.card.versions.length,
         corrections: v.card.corrections?.length ?? 0,
         last_updated: lastUpdated(v.card, today) ?? "",
+        cost_by_kind: p?.cost?.by?.kind ?? "",
+        cost_by_name: p?.cost?.by?.name ?? "",
+        // "none" when the card says no body in power is committed; empty when it does not say.
+        responsible_id: v.card.responsible === null ? "none" : (v.card.responsible?.actor_id ?? ""),
+        brought_about_by_id: v.card.brought_about_by?.actor_id ?? "",
       };
       return CSV_COLUMNS.map((c) => csvField(row[c])).join(",");
     });

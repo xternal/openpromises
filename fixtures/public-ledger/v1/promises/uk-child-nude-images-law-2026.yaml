@@ -16,6 +16,8 @@ status_note:
     press release says features that keep users scrolling for longer, such as videos that play one
     after another and personalised feeds, will also be switched off by default for 16 and
     17-year-olds; no date is given for this either.
+responsible:
+  actor_id: hm-government
 origin: llm_intake
 sources:
   - title: >-

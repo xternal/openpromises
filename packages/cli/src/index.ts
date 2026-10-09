@@ -434,7 +434,7 @@ async function publish(args: Args, io: Io): Promise<number> {
     return 1;
   }
   const day = today(io, site.config, args);
-  const files = publishFiles({ config: site.config, views: cardViews(r.cards, r.actors), today: day });
+  const files = publishFiles({ config: site.config, views: cardViews(r.cards, r.actors), today: day, actors: r.actors });
   const dir = resolve(io.cwd, out);
   const shown = `${relative(io.cwd, dir) || "."}/`;
   if (args.flags["dry-run"]) {

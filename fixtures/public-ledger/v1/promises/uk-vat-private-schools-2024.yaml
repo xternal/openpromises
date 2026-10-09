@@ -18,6 +18,8 @@ status_note:
     13 June 2025 and the Court of Appeal dismissed the appeals on 27 February 2026; the Supreme
     Court gave permission to appeal on 22 May 2026 and has listed a hearing for 1–2 December 2026.
     This card tracks the two tax changes, not how the money is spent.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "Labour Party: Change, 2024 manifesto (PDF), page 82"
@@ -58,6 +60,9 @@ versions:
           investment in state schools
       cost:
         range: [-1.75, -1.75, -1.51]
+        by:
+          kind: official
+          name: HM Treasury
         note:
           en: >-
             Negative because the pledge raises money. Year used: 2028-29, the year Labour's costings

@@ -14,6 +14,8 @@ status_note:
     NHS settlement to it. The share of waiting-list pathways (cases) under 18 weeks met the interim
     65% goal in March 2026 (65.3%) and stood at 65.4% in July 2026, 26.6 percentage points below the
     92% standard, so the card sits at Delivering.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "Plan for Change: Milestones for mission-led government (PDF), 5 Dec 2024"

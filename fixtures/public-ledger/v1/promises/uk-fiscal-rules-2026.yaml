@@ -15,6 +15,8 @@ status_note:
     plans meet the rules in the Charter for Budget Responsibility. The Prime Minister repeated the
     commitment at Prime Minister's Questions on 2 September 2026, describing the debt rule as debt
     falling "by the end of the Parliament"; the Charter sets 2029-30.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: >-

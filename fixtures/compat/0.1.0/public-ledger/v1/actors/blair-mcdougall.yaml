@@ -1,0 +1,20 @@
+format: openpromises/1
+id: blair-mcdougall
+kind: person
+name:
+  en: Blair McDougall
+party_id: labour
+roles:
+  - title:
+      en: >-
+        Parliamentary Under-Secretary of State (Minister for Reindustrialisation), Department for
+        Business, Innovation, Science and Trade and Department for Energy Security and Net Zero
+    from: "2026-07-22"
+  - title:
+      en: Parliamentary Under-Secretary of State, Department for Business and Trade
+    from: "2025-09-07"
+    to: "2026-07-22"
+identifiers:
+  parliament_member_id: 5076
+same_as:
+  - https://www.gov.uk/government/people/blair-mcdougall

@@ -13,6 +13,7 @@ status_note:
   en: >-
     The Conservatives are not in government, so the card stays at Promised. The same release says
     the individual tax-free threshold would rise to £500,000.
+responsible: null
 origin: manual
 sources:
   - title: >-
@@ -38,6 +39,9 @@ versions:
           threshold, which would rise to £500,000 per person
       cost:
         range: [6, 7.7, 10.9]
+        by:
+          kind: independent
+          name: Tax Policy Associates
         note:
           en: >-
             Year shown: 2029-30. Low is the party's own figure, £6bn a year, from an Onward and

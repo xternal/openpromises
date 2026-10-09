@@ -13,6 +13,8 @@ status_note:
   en: >-
     The government says it will legislate for the change during this Parliament. Until April 2030
     the State Pension keeps rising by the triple lock; the Budget sets the April 2027 rise.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: >-

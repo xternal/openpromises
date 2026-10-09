@@ -1,12 +1,13 @@
-import { statusLabel, type Config } from "@openpromises/core";
-import { longDate } from "./format";
+import { same, statusLabel, type Actor, type Config } from "@openpromises/core";
+import { costText, longDate, lowerFirst } from "./format";
 import type { Words } from "./messages";
 import { absolute, paths, type FeedFormat, type FeedKind } from "./urls";
 import { actorName, areaLabel, eventLabel, headline, pick, quoteIn, truncate, type CardView } from "./view";
 
 /**
- * Feeds (Atom 1.0, RFC 4287, and RSS 2.0), built from cards alone: one entry
- * per timeline event, per rewording (version 2 onwards) and per reply. Entry
+ * Feeds (Atom 1.0, RFC 4287, and RSS 2.0), built from cards: one entry per
+ * timeline event, per rewording (version 2 onwards), per reply and per change
+ * to the current cost, plus any entries the site adds of its own. Entry
  * ids are tag URIs (RFC 4151) that depend only on the card id and the entry's
  * place in its append-only history, so they never change: a feed reader never
  * shows an entry twice. Ported from Public Ledger's feeds, whose ids they keep.
@@ -20,6 +21,14 @@ export interface FeedEntry {
   link: string;
   content: string;
   category?: { term: string; label: string };
+}
+
+/** An entry the site makes itself (a contract linked, a new edition of its figures), placed in the feeds of the card it belongs to, or only in the feed of everything. */
+export interface SiteEntry extends FeedEntry {
+  /** The card it belongs to; without one it goes only in the feed of everything. */
+  card?: string;
+  /** Its language; the site's default when left out. */
+  locale?: string;
 }
 
 export interface FeedMeta {
@@ -58,6 +67,55 @@ export interface EntryContext {
   today: string;
   /** An actor's name, for replies from someone other than the card's actor. */
   actorName?: (id: string) => string | undefined;
+  /** Every actor, so a feed for an actor with no cards yet still has its name. */
+  actors?: ReadonlyMap<string, Actor>;
+  /** The site's own entries (SiteEntry), added to the feeds of the cards they belong to. */
+  siteEntries?: readonly SiteEntry[];
+}
+
+const COST_CORRECTION = /^versions\[(\d+)\]\.parameters\.cost\.range$/;
+
+/**
+ * Changes to a card's current cost: one entry per correction of a version's
+ * cost made while that version was the current one, and one per new version
+ * whose cost differs from the one before. Their ids, like every entry's,
+ * depend only on the entry's place in the card's history.
+ */
+function costEntries(v: CardView, ctx: EntryContext, base: { link: string; category: FeedEntry["category"]; who: string; quote: string; statusLine: string }): FeedEntry[] {
+  const { config, w, today } = ctx;
+  const f = v.card;
+  const range = (r: unknown) => (Array.isArray(r) && r.length === 3 ? (r as [number, number, number]) : null);
+  const text = (r: unknown) => lowerFirst(range(r) ? costText(w, config, { range: range(r)! }) : w.t("cost.not_stated"));
+  const maker = (k: number, figure: unknown) => {
+    const cost = f.versions[k]?.parameters?.cost;
+    return cost?.by && same(cost.range, figure) ? w.t("feed.cost_by", { name: cost.by.name, kind: w.t(`cost.by.${cost.by.kind}`) }) : null;
+  };
+  const entry = (id: string, date: string, now: unknown, was: unknown, lines: (string | null)[]): FeedEntry => ({
+    id: tagUri(config, `promise/${v.id}/cost/${id}`, w.locale),
+    title: w.t("feed.cost_title", { now: text(now), was: text(was), who: base.who }),
+    date,
+    link: base.link,
+    category: base.category,
+    content: [w.t("feed.cost_line", { date: longDate(w, date), now: text(now), was: text(was) }), ...lines, "", base.quote, base.statusLine].filter((x) => x !== null).join("\n"),
+  });
+  const out: FeedEntry[] = [];
+  (f.corrections ?? []).forEach((c, i) => {
+    const m = COST_CORRECTION.exec(c.path);
+    if (!m || c.date > today || same(c.was, c.now)) return;
+    const k = Number(m[1]);
+    const next = f.versions[k + 1];
+    if (next && next.recorded_on <= c.date) return; // that version was no longer the current one
+    const why = pick(c.reason, w.locale, config);
+    out.push(entry(`correction/${i}`, c.date, c.now, c.was, [maker(k, c.now), why ? w.t("feed.why", { reason: why }) : null, c.source_url ? w.t("feed.source", { url: c.source_url }) : null]));
+  });
+  f.versions.forEach((ver, k) => {
+    if (k === 0 || ver.recorded_on > today) return;
+    const was = f.versions[k - 1]!.parameters?.cost?.range ?? null;
+    const now = ver.parameters?.cost?.range ?? null;
+    if (same(was, now)) return;
+    out.push(entry(`version/${ver.version}`, ver.recorded_on, now, was, [maker(k, now), w.t("feed.cost_reworded", { n: ver.version, url: ver.source_url })]));
+  });
+  return out;
 }
 
 /** Every dated entry of one card, oldest first. Deadline markers are not changes, so they are left out. */
@@ -118,6 +176,7 @@ export function cardEntries(v: CardView, ctx: EntryContext): FeedEntry[] {
         .join("\n"),
     });
   });
+  out.push(...costEntries(v, ctx, { link, category, who, quote, statusLine }));
   return out;
 }
 
@@ -238,14 +297,15 @@ export function buildFeed(views: readonly CardView[], kind: FeedKind, key: strin
   const p = paths(config);
   const selected = cardsFor(views, kind, key);
   const site = config.site.name;
-  const actor = views.find((v) => v.actor.id === key)?.actor ?? views.find((v) => v.party?.id === key)?.party ?? null;
+  const actor = views.find((v) => v.actor.id === key)?.actor ?? views.find((v) => v.party?.id === key)?.party ?? ctx.actors?.get(key) ?? null;
+  const who = actor ? actorName(actor, w.locale, config) : (ctx.actorName?.(key) ?? key);
   const title =
     kind === "all"
       ? w.t("feed.all", { site })
       : kind === "promise"
         ? w.t("feed.card", { site, headline: selected[0] ? headline(selected[0], w.locale, config) : key })
         : kind === "actor"
-          ? w.t("feed.actor", { site, who: actor ? actorName(actor, w.locale, config) : key })
+          ? w.t("feed.actor", { site, who })
           : kind === "area"
             ? w.t("feed.area", { site, area: areaLabel(config, key, w.locale) })
             : w.t("feed.ward", { site, ward: key });
@@ -254,12 +314,23 @@ export function buildFeed(views: readonly CardView[], kind: FeedKind, key: strin
   const meta: FeedMeta = {
     id: tagUri(config, kind === "all" ? "feed/all" : `feed/${kind}/${key}`, w.locale),
     title,
-    ...(config.site.description[w.locale] ? { subtitle: config.site.description[w.locale] } : {}),
+    subtitle:
+      kind === "all"
+        ? w.t("feed.sub.all")
+        : kind === "promise"
+          ? w.t("feed.sub.card")
+          : kind === "actor"
+            ? w.t(actor?.kind === "party" ? "feed.sub.party" : "feed.sub.actor", { who })
+            : kind === "area"
+              ? w.t("feed.sub.area", { area: lowerFirst(areaLabel(config, key, w.locale)) })
+              : w.t("feed.sub.ward", { ward: key }),
     self: absolute(config, path),
     page: absolute(config, pagePath),
     fallbackDate: selected.map((v) => v.card.made_on).sort().at(-1) ?? "2026-01-01",
   };
-  const entries = newestFirst(selected.flatMap((v) => cardEntries(v, ctx)));
+  const ids = new Set(selected.map((v) => v.id));
+  const own = (ctx.siteEntries ?? []).filter((e) => (e.locale ?? config.locales.default) === w.locale && e.date <= ctx.today && (e.card ? ids.has(e.card) : kind === "all"));
+  const entries = newestFirst([...selected.flatMap((v) => cardEntries(v, ctx)), ...own]);
   const body = format === "atom" ? atomFeed(meta, entries, config, w) : rssFeed(meta, entries, config, w);
   return { path, kind, key, locale: w.locale, format, contentType: FEED_TYPES[format], body };
 }

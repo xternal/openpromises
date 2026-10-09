@@ -13,6 +13,7 @@ status_note:
   en: >-
     The Conservatives are not in government, so the card stays at Promised. Shadow Chancellor Andrew
     Griffith restated the pledge at the party's 2026 conference on 5 October 2026.
+responsible: null
 origin: manual
 sources:
   - title: >-
@@ -44,6 +45,9 @@ versions:
           is devolved in Scotland and Wales.
       cost:
         range: [8.1, 9, 9.9]
+        by:
+          kind: party
+          name: Conservative Party
         note:
           en: >-
             Year shown: 2029-30, the year the party costed. The party's own estimate is £9bn in

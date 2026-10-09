@@ -13,6 +13,8 @@ status_note:
   en: >-
     The Treasury says the Budget will set out how the fund is paid for, from savings found by the
     Department for Work and Pensions.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: >-
@@ -32,6 +34,9 @@ versions:
         en: Working people in England
       cost:
         range: [0.0135, 0.015, 0.0165]
+        by:
+          kind: official
+          name: HM Treasury
         note:
           en: >-
             The government's own figure: £15 million a year. No start date or independent costing

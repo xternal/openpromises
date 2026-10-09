@@ -4,7 +4,7 @@ Real and synthetic content the tests run on. Nothing here is published by OpenPr
 
 | Folder | What | Where it comes from |
 |---|---|---|
-| `public-ledger/source/` | 45 promise cards and 16 actors, in Public Ledger's own format | Copied unchanged from [Public Ledger](https://ledgergov.uk) (`content/promises/`, `content/actors/`), repository `xternal/public-ledger`, `main` at commit `228f8ec` (9 October 2026) |
+| `public-ledger/source/` | 54 promise cards and 19 actors, in Public Ledger's own format (with `costed_by`, `outcome_by` and `brought_about_by`, added on 9 October 2026) | Copied unchanged from [Public Ledger](https://ledgergov.uk) (`content/promises/`, `content/actors/`), repository `xternal/public-ledger`, `main` at commit `77a86b4` (9 October 2026) |
 | `borough-book/source/` | 18 promise cards, `parties.yaml` and `decision_links.yaml`, in Borough Book's own format | Copied unchanged from [Borough Book](https://boroughbook.uk) (`content/`), `main` at commit `bc91890` (9 October 2026) |
 | `borough-book/source/seats.yaml` | Seats per party on the council | Counted by us from Borough Book's councillor files; no councillor data is copied |
 | `synthetic-bilingual/source/` | Bilingual (Russian and English) cards in the third site's format | **Invented for tests.** Every actor, quote, figure and link is made up; none is a real promise |

@@ -16,6 +16,7 @@ status_note:
     Minister Andy Burnham promised free personal care for people over 65 through a National Care
     Service in the next parliament; it does not cover working-age adults, and no detailed plan,
     legislation or funding has been published, so the card stays at Promised.
+responsible: null
 origin: manual
 sources:
   - title: "Liberal Democrats: For a Fair Deal, 2024 manifesto (PDF), page 37"
@@ -55,6 +56,9 @@ versions:
           would still pay for their accommodation.
       cost:
         range: [2.7, 6, 6.6]
+        by:
+          kind: independent
+          name: Health Foundation
         note:
           en: >-
             Years shown: 2028-29 for the party's own figure and 2026/27 for the independent

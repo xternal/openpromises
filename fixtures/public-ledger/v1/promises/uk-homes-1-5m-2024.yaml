@@ -15,6 +15,8 @@ status_note:
     latest, published on 24 September 2026, puts net additional homes in England since 9 July 2024
     at 437,900, about 29% of 1.5 million, so the card sits at Delivering. The manifesto says "over
     the next parliament", taken here as by 1 July 2029.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "Labour Party: Change, 2024 manifesto (PDF), page 36"

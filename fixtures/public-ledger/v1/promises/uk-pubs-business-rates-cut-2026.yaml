@@ -14,6 +14,8 @@ status_note:
     The cut applies to bills from April 2027. The government says details of the exclusion for the
     very largest live music venues will be set out at the Budget, and the Chancellor told the
     Commons on 8 September 2026 that he would set out more details of business rates reform there.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: >-
@@ -40,6 +42,9 @@ versions:
           venues excluded)
       cost:
         range: [0.09, 0.1, 0.11]
+        by:
+          kind: official
+          name: No 10
         note:
           en: >-
             Year shown: 2027-28, the first year of the cut. The government says the package is worth

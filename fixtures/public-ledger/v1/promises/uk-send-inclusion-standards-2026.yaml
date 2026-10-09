@@ -16,6 +16,8 @@ status_note:
     "in due course". The schools white paper Every child achieving and thriving (23 February 2026)
     sets out National Inclusion Standards and says they should guide how schools meet children's
     needs by 2028.
+responsible:
+  actor_id: hm-government
 origin: llm_intake
 sources:
   - title: "Hansard, House of Commons, 9 Sep 2026: Education and Skills Reform"

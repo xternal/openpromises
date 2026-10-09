@@ -15,6 +15,15 @@ status_note:
     funded it, the Universal Credit (Removal of Two Child Limit) Act 2026 became law on 18 March
     2026, and the limit stopped applying from 6 April 2026. This card records that the change the
     SNP asked for happened, not who made it.
+brought_about_by:
+  actor_id: hm-government
+  note:
+    en: >-
+      The UK Government removed the limit; the SNP is not in government at Westminster.
+responsible:
+  actor_id: hm-government
+  note:
+    en: The UK Government removed the limit.
 origin: manual
 sources:
   - title: "SNP: A Future Made in Scotland, 2024 manifesto (PDF), page 5"
@@ -48,6 +57,9 @@ versions:
           Families with three or more children claiming Universal Credit or Child Tax Credit
       cost:
         range: [2.53, 2.815, 3.1]
+        by:
+          kind: official
+          name: HM Treasury
         note:
           en: >-
             The SNP did not publish a cost. The UK Government's Budget 2025 scorecard puts removing
@@ -108,8 +120,4 @@ reviews:
         Second check of every quote, date, evidence link, status, cost, wording and legal risk
         against the live sources; fixes applied as corrections.
 x:
-  outcome_by:
-    actor_id: hm-government
-    note: >-
-      The UK Government removed the limit; the SNP is not in government at Westminster.
   editor_check_required: true

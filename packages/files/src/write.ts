@@ -17,10 +17,12 @@ type Kind = "card" | "actor" | "editors";
 
 /** Field order per kind of object; fields not listed keep their order, after the listed ones. */
 const ORDER: Record<string, readonly string[]> = {
-  card: ["format", "id", "headline", "actor_id", "made_on", "venue", "venue_label", "area", "status", "status_note", "origin", "sources", "versions", "events", "replies", "corrections", "reviews", "links", "x"],
+  card: ["format", "id", "headline", "actor_id", "made_on", "venue", "venue_label", "area", "status", "status_note", "brought_about_by", "responsible", "origin", "sources", "versions", "events", "replies", "corrections", "reviews", "links", "x"],
   version: ["version", "text", "lang", "translations", "recorded_on", "source_url", "archived_url", "page", "quote_checked_on", "source_text", "parameters"],
   parameters: ["who", "cost", "capital_cost", "when", "deadline", "funded_by", "funding_verifiable", "metric"],
-  cost: ["range", "quality", "note", "sources"],
+  cost: ["range", "quality", "by", "note", "sources"],
+  costBy: ["kind", "name"],
+  ref: ["actor_id", "note"],
   source: ["title", "url", "archived_url", "kind", "designation"],
   event: ["date", "type", "subtype", "text", "evidence_url", "auto"],
   reply: ["from_actor_id", "from", "date", "text", "lang", "translations", "url", "editor_response"],
@@ -35,10 +37,10 @@ const ORDER: Record<string, readonly string[]> = {
 
 /** What kind of object sits under a field, so its fields can be ordered. Values inside was, now and x are left alone. */
 const CHILD: Record<string, Record<string, string>> = {
-  card: { sources: "source", versions: "version", events: "event", replies: "reply", corrections: "correction", reviews: "review", links: "links" },
+  card: { brought_about_by: "ref", responsible: "ref", sources: "source", versions: "version", events: "event", replies: "reply", corrections: "correction", reviews: "review", links: "links" },
   version: { parameters: "parameters" },
   parameters: { cost: "cost", capital_cost: "cost" },
-  cost: { sources: "source" },
+  cost: { by: "costBy", sources: "source" },
   actor: { roles: "role" },
   editors: { editors: "editor" },
 };

@@ -47,7 +47,7 @@ Everything goes to `.dry-run/<site>/`, which git ignores:
 ## The site's files
 
 - `ledgergov.config.ts`: the site's configuration as it would be on the day it moves, built on `fixtures/public-ledger/openpromises.config.ts`
-- `ledgergov.ts`: the site's own checks, as broken cards; and the differences already decided, each with its reason
+- `ledgergov.ts`: the site's own checks, as broken cards; what the site keeps making itself (`OWN`: its contract and figures entries, its contracts section), which the run takes from the live site and hands to the engine as the site's code would, by kind and title only, so nothing the engine should make can be filled in from the live copy; and the differences already decided, each with its reason
 - `ledgergov.dry.tsx`: the run
 
 A difference goes into the decided list only once it is decided, with the decision or document that says so.

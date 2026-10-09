@@ -62,6 +62,27 @@ export function parseCorrectionPath(path: string): ParsedPath | null {
 
 const HISTORY = ["versions", "events", "replies"] as const;
 
+/**
+ * Fields added to the format after cards were published (decision 13.1).
+ * Filling one in on a published entry that never had it is not a rewrite of
+ * history, so it needs no correction; once it has a value, changing it is a
+ * correction like any other. Listed in docs/FORMAT.md §9, with the date each
+ * was added.
+ */
+export const LATE_FIELDS: Readonly<Record<(typeof HISTORY)[number], readonly string[]>> = {
+  // Who made a cost's central figure (decision 14), added 9 October 2026.
+  versions: [".parameters.cost.by"],
+  events: [],
+  replies: [],
+};
+
+/** The entry as it stands, without any late field the published entry did not have. */
+function withoutLateFields(key: (typeof HISTORY)[number], published: unknown, now: unknown): unknown {
+  let out = now;
+  for (const tail of LATE_FIELDS[key]) if (fieldAt(published, tail) === null && fieldAt(out, tail) !== null) out = withField(out, tail, null);
+  return out;
+}
+
 const list = (o: Record<string, unknown>, k: string): unknown[] => (Array.isArray(o[k]) ? (o[k] as unknown[]) : []);
 
 /**
@@ -70,7 +91,8 @@ const list = (o: Record<string, unknown>, k: string): unknown[] => (Array.isArra
  * there, in the same place, and unchanged, unless corrections appended in this
  * change record exactly what changed: undoing them, newest first, must give
  * back the published entry. Corrections and reviews never change either.
- * Key order and YAML style never matter.
+ * A late field (LATE_FIELDS) may be filled in once where the published entry
+ * lacked it. Key order and YAML style never matter.
  */
 export function appendOnlyIssues(before: unknown, after: unknown): Issue[] {
   const b = (before ?? {}) as Record<string, unknown>;
@@ -94,7 +116,7 @@ export function appendOnlyIssues(before: unknown, after: unknown): Issue[] {
   const fresh = allCorrections.slice(oldCorrections.length) as { path?: unknown; was?: unknown }[];
   for (const key of HISTORY) {
     const was = list(b, key);
-    const now = list(a, key);
+    const now = list(a, key).map((entry, i) => (i < was.length && entry !== undefined ? withoutLateFields(key, was[i], entry) : entry));
     was.forEach((item, i) => {
       if (same(item, now[i])) return;
       if (now[i] === undefined) {

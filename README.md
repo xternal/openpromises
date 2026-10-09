@@ -8,7 +8,7 @@ A promise is a card: the speaker's exact words, what it would cost (a range, wit
 
 It is a library and a command-line tool, not a hosted service. It makes no network calls, collects nothing and needs no account.
 
-> **Version 0.1.** The card format is [docs/FORMAT.md](docs/FORMAT.md); publishing and pages are in [docs/PUBLISHING.md](docs/PUBLISHING.md); moving an existing tracker is [docs/MIGRATING.md](docs/MIGRATING.md); the design is [RFC-0001](docs/RFC-0001.md). Changes are in the [changelog](CHANGELOG.md).
+> **Version 0.1.** The card format is [docs/FORMAT.md](docs/FORMAT.md); publishing and pages are in [docs/PUBLISHING.md](docs/PUBLISHING.md); moving an existing tracker is [docs/MIGRATING.md](docs/MIGRATING.md); what an upgrade never breaks, and how to upgrade, is [docs/UPGRADING.md](docs/UPGRADING.md); the design is [RFC-0001](docs/RFC-0001.md). Changes are in the [changelog](CHANGELOG.md).
 
 ## What the engine enforces
 

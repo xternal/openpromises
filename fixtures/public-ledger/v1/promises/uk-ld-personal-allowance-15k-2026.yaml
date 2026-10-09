@@ -14,6 +14,7 @@ status_note:
     The Liberal Democrats are not in government, so the card stays at Promised. The release says 2.5
     million people would be taken out of income tax; the leader's speech the same day says 2 million
     more.
+responsible: null
 origin: manual
 sources:
   - title: >-
@@ -38,6 +39,9 @@ versions:
           £15,000 and the higher-rate threshold to £56,000 (outside Scotland).
       cost:
         range: [15.3, 17, 18.7]
+        by:
+          kind: party
+          name: Liberal Democrats
         note:
           en: >-
             The party's own figure, £17bn a year, covers the whole package (the allowance, the

@@ -79,6 +79,6 @@ While steps 4 and 5 are in progress, run `openpromises validate` in CI next to t
 
 | Site | When | What is left after converting |
 |---|---|---|
-| Public Ledger | After 28 October 2026 (decision 9) | Editors list kept private (decision 10). Approvals for 45 cards: import those given on pull requests, review the rest (decision 11). Quality labels on 23 costs. |
+| Public Ledger | After 28 October 2026 (decision 9) | Editors list kept private (decision 10). Approvals for 54 cards (main at 77a86b4): import those given on pull requests, review the rest (decision 11). Quality labels on 29 costs. The configuration to start from is `tools/dry-run/ledgergov.config.ts`: the site's own words, quote licences, its renamed reviewer, `money.costedBy: "required"` and `actors.responsibleRequired: true` (decision 14). Its contract and figures entries and its contracts section go to the engine through `publishFiles({ site })`. One check stays in the site's own `validate` script, which keeps running for its budget data: `submission_ref` and `credit` only on a reader submission. |
 | Borough Book | After Public Ledger (RFC §10, E3) | Approvals and headlines for 18 cards; record each quote check; untangle the timeline of `hf-free-home-care`; move two cards only on decisions taken after the pledge; give the parks cost a range and a source. |
 | Bilingual tracker | With its milestones M5/M7 (RFC §10, E4) | Correction reasons and review notes in both languages; quality labels on costs. |

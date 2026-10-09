@@ -46,15 +46,15 @@ export default defineConfig({
 | `content` | The content folder, relative to the configuration file | `"content"` |
 | `timezone` | The time zone "today" is taken in, for deadlines and reviews (an IANA name such as `"Europe/London"`) | `"UTC"` |
 | `locales` | `{ default, all }`: the languages every text we write must have. `default` is one of `all`. | `{ default: "en", all: ["en"] }` |
-| `money` | `{ currency, unit, period, qualities }`. Costs are written in `unit` of `currency` (for example `"bn"` of `"GBP"`), per `period` (`"year"`). `qualities` is the list of quality labels a cost may carry. | `qualities: ["sourced", "approx", "modelled"]`, `period: "year"` |
-| `actors` | `{ kinds, standing, levels?, ids? }`. (An `ids` entry may be a URL template with `{id}`, such as `"https://members.parliament.uk/member/{id}"`; structured data then names that page as the actor's official page.) `kinds`: the kinds of actor allowed (`party` is the kind the party check uses). `standing`: `"manual"` (each actor states it), `"fromSeats"` (worked out from the seats each party holds) or `"none"`. `levels`: allowed values of an actor's `level`, such as `["federal", "regional"]`. `ids`: the outside identifiers an actor may carry, such as a parliament's member id. | `kinds: ["person", "party", "government"]`, `standing: "none"` |
+| `money` | `{ currency, unit, period, qualities, costedBy }`. Costs are written in `unit` of `currency` (for example `"bn"` of `"GBP"`), per `period` (`"year"`). `qualities` is the list of quality labels a cost may carry. `costedBy: "required"` makes every yearly cost with a range say who made its central figure (`cost.by`, §5). With `unit: "bn"`, amounts under 0.1 read in millions ("£14m"). | `qualities: ["sourced", "approx", "modelled"]`, `period: "year"`, `costedBy: "optional"` |
+| `actors` | `{ kinds, standing, levels?, ids? }`. (An `ids` entry may be a URL template with `{id}`, such as `"https://members.parliament.uk/member/{id}"`; structured data then names that page as the actor's official page.) `kinds`: the kinds of actor allowed (`party` is the kind the party check uses). `standing`: `"manual"` (each actor states it), `"fromSeats"` (worked out from the seats each party holds) or `"none"`. `levels`: allowed values of an actor's `level`, such as `["federal", "regional"]`. `ids`: the outside identifiers an actor may carry, such as a parliament's member id. `responsible`: the kinds of actor a card's `responsible` may name (§4): bodies, never `person` or `party`. `responsibleRequired: true` makes every card say who must deliver it (or `null`). | `kinds: ["person", "party", "government"]`, `standing: "none"`, `responsible`: every kind but `person` and `party`, `responsibleRequired: false` |
 | `venues` | Where promises are made. A card's `venue` must be one of them. | any venue allowed |
 | `areas` | What a card's `area` may be: `{ kind: "enum", values: [...] }`, `{ kind: "codes", pattern: "^(0[1-9]\|1[0-4])$" }` or `{ kind: "text" }` (any short text). An enum or codes may add `labels` (`{ taxes: { en: "Taxes" } }`) and URL `slugs` (`{ economic_affairs: "transport-and-economy" }`); without a slug, the area is made into one. A slug is a URL: never change one once published. | `{ kind: "text" }` |
 | `ladder` | The status ladder: `"national"`, `"local"`, or `{ custom: [{ id, category }, ...] }` (§6). | `"national"` |
 | `labels` | Status labels per language: `{ en: { failed: "Not met" } }`. Neutral defaults exist in English and Russian (§6). | defaults |
 | `headline` | Headline limits per language: `{ en: { minWords: 3, maxWords: 8, maxChars: 70 } }`. | §11 |
-| `editorial` | `{ approvals, partyConflict, editorsFile }`: approvals needed to publish; whether an editor may approve a card about their own party (never, when `true`); where the editors list is. | `{ approvals: 2, partyConflict: true, editorsFile: "editors.yaml" }` |
-| `quotes` | `{ archive, require, minWords }`. `archive: "required"` means every version needs an `archived_url`. `require: "editor"` accepts an editor's confirmation (`quote_checked_on`) when no machine check exists; `"match"` needs a machine match for every version. `minWords`: the shortest quote a stored-source span may hold. | `{ archive: "optional", require: "editor", minWords: 6 }` |
+| `editorial` | `{ approvals, partyConflict, editorsFile, renamed }`: approvals needed to publish; whether an editor may approve a card about their own party (never, when `true`); where the editors list is; `renamed`, the name readers now see for a reviewer renamed since its reviews were recorded (`{ "Junior Editor": "AI Journalist" }`), since a review itself is history and never edited. | `{ approvals: 2, partyConflict: true, editorsFile: "editors.yaml" }` |
+| `quotes` | `{ archive, require, minWords }`. `archive: "required"` means every version needs an `archived_url`. `require: "editor"` accepts an editor's confirmation (`quote_checked_on`) when no machine check exists; `"match"` needs a machine match for every version. `minWords`: the shortest quote a stored-source span may hold. `licences`: the terms a quote may be reused on, by its source's address (`[{ hosts: ["parliament.uk"], name: "Open Parliament Licence v3.0" }]`; a host covers its subdomains), and `otherLicence` for every other source; Markdown names them beside each quote's source. | `{ archive: "optional", require: "editor", minWords: 6 }` |
 | `modules` | Optional parts a card may use (§10): `contracts`, `decisions`, `lever`, `metrics`, `designations`, `wards`. (`corrections` and `reviews` are accepted but always on.) | `[]` |
 | `legacy` | The older format that cards without a `format:` line are in: `"public-ledger"`, `"borough-book"` or `"russia-ledger"`. They are converted on read (§14). | none |
 | `deadlines` | `{ text: { en: "…" } }`: the words of the automatic `deadline_missed` event, per language. English and Russian are built in. | built in |
@@ -84,6 +84,7 @@ venue_label: { en: Government announcement }
 area: economic_affairs
 status: in_plan
 status_note: { en: "Funding was named when it was announced, but it is not yet in an Estimates line." }
+responsible: { actor_id: hm-government }
 origin: manual
 sources:
   - { title: "Written statement to Parliament: £2 bus fares from January 2027", url: "https://www.gov.uk/government/speeches/2-bus-fares-from-january-2027" }
@@ -98,6 +99,7 @@ versions:
       cost:
         range: [0.36, 0.4, 0.44]
         quality: sourced
+        by: { kind: official, name: Department for Transport }
         note: { en: "Year shown: 2027. Low–high is an editorial ±10% because the source gives a central figure only." }
         sources:
           - { title: "Written statement to Parliament", url: "https://www.gov.uk/government/speeches/2-bus-fares-from-january-2027" }
@@ -133,6 +135,8 @@ links:
 | `area` | per `areas` | yes | What the promise is about. |
 | `status` | a ladder status | yes | Where the promise stands now (§6). |
 | `status_note` | language map | no | Why it stands there. Describes the present, so it may be edited. |
+| `responsible` | `{ actor_id, note? }` or `null` | no; yes when `actors.responsibleRequired` | Who would have to act to deliver the promise as worded, as of now: a body named by its role (an actor of a kind in `actors.responsible`, such as `government`), never a party or a person. `null` when no body in power is committed, as with an opposition pledge. Describes the present, so it may be edited. Added 9 October 2026 (decision 14). |
+| `brought_about_by` | `{ actor_id, note? }` | no | Who brought the outcome about, when it was not the card's own actor (an opposition pledge a government carried out). Only from the third step of the ladder up (`legislated` and beyond on the national ladder). Added 9 October 2026 (decision 14). |
 | `origin` | `manual`, `reader_submission` or `llm_intake` | no | How the card started. Default `manual`. |
 | `sources` | list of sources | no | Further reading about the promise. Describes the present, so it may be edited. |
 | `versions` | list of versions | yes, at least one | The promise as worded, oldest first (§5). History. |
@@ -184,12 +188,15 @@ A **cost** is a range, never a single figure:
 cost:
   range: [36, 40, 44]          # low, central, high
   quality: sourced             # one of money.qualities
+  by: { kind: official, name: OBR }   # who made the central figure
   note: { en: "Low–high is an editorial ±10% because the OBR gives a central figure only." }
   sources:
     - { title: "OBR: Economic and fiscal outlook, March 2026", url: "https://obr.uk/…" }
 ```
 
 With a `range`, a cost needs a `quality` and at least one source, and low must be less than high. A single official figure becomes a range with a stated editorial margin, and the note says so. A cost with no `range` records why there is no figure: it needs a `note` (and may list the sources it read).
+
+`by` says who made the central figure: `kind` is `official` (a government department or an official forecaster such as the OBR), `party` (a party's own figure, including one a party now in government made in opposition) or `independent` (anyone else: a think tank, academics); `name` is the maker as a reader would say it. It goes only with a range. Added 9 October 2026 (decision 14), so it is a late field (§9).
 
 ## 6. Status ladder
 
@@ -293,6 +300,12 @@ corrections:
 
 Two checks hold every correction to account: the card's field must equal the `now` of its last correction, and undoing the new corrections, newest first, must give back exactly the published entry (§13).
 
+**Late fields.** A field added to the format after cards were published may be filled in once on a published version, event or reply that never had it, without a correction: that adds a fact, it does not rewrite one. Once it has a value, changing it is a correction like any other. The late fields so far:
+
+| Field | Added |
+|---|---|
+| `versions[n].parameters.cost.by` | 9 October 2026 (decision 14) |
+
 ## 10. Reviews, approvals and modules
 
 A **review** is a check of the whole card, shown on it.
@@ -390,20 +403,22 @@ error  content/promises/uk-bus-cap.yaml  events[1].evidence_url: an "in_plan" ev
 | `versions` | Versions are numbered 1, 2, 3…, and there is one `reworded` event for each version after the first. A `deadline_moved` subtype is only on a `reworded` event. |
 | `status-event` | The status has a matching event (except `off_ladder` statuses). |
 | `scoreable` | The current version has parameters, unless the card is `unscoreable`; an `unscoreable` card has none. |
-| `cost` | Every cost with a range has low less than high, the central figure between them, a quality label from `money.qualities` and at least one source; a cost without a range has a note. |
+| `cost` | Every cost with a range has low less than high, the central figure between them, a quality label from `money.qualities` and at least one source; a cost without a range has a note. `by` goes only with a range, and every yearly cost with a range has one when `money.costedBy` is `required`. |
 | `corrections` | Each correction names a field that exists, and the field equals the `now` of its last correction. |
 | `approvals` | A published card has enough approvals, from listed editors, made while they were editors, none from an editor about their own party; automated reviews never approve. |
 | `standing` | The `not_in_power` rule (§11). |
 | `quotes` | Every version of a published card has its words confirmed: a stored-source span that matches character for character, an archive check (`quotes.json`) that found them (`exact`, or `close` with `quote_checked_on`), or, when `quotes.require` is `editor`, `quote_checked_on`. A machine check that did not find the words is always an error. With `quotes.archive: required`, every version has an `archived_url`. |
+| `responsible` | `responsible` names an actor that exists and whose kind is in `actors.responsible`, or is `null`; with `actors.responsibleRequired`, every card has it (a warning in a draft). |
+| `brought-about-by` | `brought_about_by` names an actor that exists, and the card's status is the third step of the ladder or beyond. |
 | `references` | The actor, reply actors and parties exist; ids are unique across `promises/` and `drafts/` and match the file names; outside identifiers belong to one actor each. |
-| `modules` | Module data is used only when the module is on, and is well formed. |
+| `modules` | Module data is used only when the module is on, and is well formed. Lever settings need a label (a warning until 0.3.0, decision 13.2). |
 | `append-only` | Compared with the base branch, a published card's history only grew (below). |
 
 Drafts in `drafts/` pass the same rules except `approvals`; a missing headline or an unconfirmed quote is a warning there, not an error. A stored-source span that does not match is an error in a draft too.
 
 **Append-only.** In a change (a pull request), every card published on the base branch is compared with the card now:
 
-- every entry in `versions`, `events` and `replies` is still there, in the same place, and unchanged, unless corrections appended in this change record exactly what changed: undoing them, newest first, gives back the published entry;
+- every entry in `versions`, `events` and `replies` is still there, in the same place, and unchanged, unless corrections appended in this change record exactly what changed: undoing them, newest first, gives back the published entry (a late field, §9, may be filled in once);
 - every entry in `corrections` and `reviews` is unchanged;
 - the card was not deleted, renamed or moved back to `drafts/`.
 
@@ -414,6 +429,8 @@ The order of keys in a file never matters, and neither does YAML style. Anything
 Every file states its format: `format: openpromises/1`. A site moving to OpenPromises names its older format in the configuration (`legacy`), and cards without a `format:` line are converted on read. The append-only check compares converted forms, so moving to a new format never counts as rewriting history.
 
 `openpromises migrate` rewrites old-format cards in format v1, in place. Run it in a change of its own; the check then sees no difference in history.
+
+**What an upgrade never breaks** (decision 13). A card valid in format v1 stays valid in every later release: the format only grows, by optional fields, and whether a site requires one is the site's own setting. A new or stricter rule is a warning for one minor release first, and says when it becomes an error. If a format v2 is ever needed, the engine reads v1 cards by converting them on read, so no published card is ever rewritten. [UPGRADING.md](UPGRADING.md) says how a site upgrades.
 
 ## 15. JSON Schema
 

@@ -1,5 +1,5 @@
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { formatPath } from "@openpromises/core";
 import { checkFolder, folderSource, loadConfig, readContent, toYaml } from "@openpromises/files";
@@ -11,7 +11,7 @@ import { checkFolder, folderSource, loadConfig, readContent, toYaml } from "@ope
  * site's expected-issues.txt (and explained in docs/COMPARISON.md); this test
  * fails on any problem not listed, and on any listed problem that has gone.
  *
- * UPDATE_FIXTURES=1 pnpm test rewrites expected-issues.txt after a deliberate change.
+ * UPDATE_FIXTURES=1 pnpm test rewrites v1/ and expected-issues.txt after a deliberate change.
  */
 
 const SITES = ["public-ledger", "borough-book", "synthetic-bilingual"] as const;
@@ -31,6 +31,13 @@ describe.each(SITES)("%s", (name) => {
     const read = readContent(folderSource(s.source), s.config);
     expect(read.issues).toEqual([]);
     const written = new Map([...read.input.cards, ...read.input.actors].map((f) => [f.file, f]));
+    if (update) {
+      for (const dir of ["promises", "drafts", "actors"]) rmSync(join(s.v1, dir), { recursive: true, force: true });
+      for (const [file, f] of written) {
+        mkdirSync(dirname(join(s.v1, file)), { recursive: true });
+        writeFileSync(join(s.v1, file), toYaml(f.data, file.startsWith("actors/") ? "actor" : "card"));
+      }
+    }
     for (const [file, f] of written) {
       const kind = file.startsWith("actors/") ? "actor" : "card";
       expect(readFileSync(join(s.v1, file), "utf8"), file).toBe(toYaml(f.data, kind));
@@ -58,7 +65,7 @@ describe.each(SITES)("%s", (name) => {
 describe("the converted fixtures", () => {
   it("cover every card copied from Public Ledger and Borough Book", async () => {
     for (const [name, count] of [
-      ["public-ledger", 45],
+      ["public-ledger", 54],
       ["borough-book", 18],
     ] as const) {
       const s = await site(name);

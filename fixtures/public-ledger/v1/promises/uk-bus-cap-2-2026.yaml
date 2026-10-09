@@ -16,6 +16,8 @@ status_note:
     card stays at In plan. Earlier caps for context: a £2 cap ran in England outside London from
     January 2023 under the previous government; it rose to £3 in January 2025, and Spending Review
     2025 (11 June 2025) extended the £3 cap to March 2027 (sources below).
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: >-
@@ -46,6 +48,9 @@ versions:
         en: Bus passengers on participating services in England outside London
       cost:
         range: [0.36, 0.4, 0.44]
+        by:
+          kind: official
+          name: Department for Transport
         note:
           en: >-
             Year shown: 2027, the only year of the cap (1 January to 31 December 2027); central

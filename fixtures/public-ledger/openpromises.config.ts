@@ -10,10 +10,13 @@ export default defineConfig({
   content: "v1",
   timezone: "Europe/London",
   locales: { default: "en", all: ["en"] },
-  money: { currency: "GBP", unit: "bn", period: "year", qualities: ["sourced", "approx", "modelled"] },
+  // Every cost names who made its central figure, and every card who must deliver it (decision 14).
+  money: { currency: "GBP", unit: "bn", period: "year", qualities: ["sourced", "approx", "modelled"], costedBy: "required" },
   actors: {
     kinds: ["person", "party", "government"],
     standing: "manual",
+    responsible: ["government"],
+    responsibleRequired: true,
     ids: { parliament_member_id: "UK Parliament Members API member id", parliament_party_id: "UK Parliament Members API party id" },
   },
   venues: ["manifesto", "speech", "debate", "tv", "interview", "press_release", "parliament", "social"],

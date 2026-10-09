@@ -16,6 +16,8 @@ status_note:
     Investment Plan plans 2.6% in 2026-27 and 2.7% from 2027-28. Money is allocated to 2029-30; the
     card will move to Delivering when a source confirms spending at the higher level and to
     Delivered when 2027-28 outturn shows 2.5%.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "Hansard, House of Commons, 25 Feb 2025: Defence and Security (PM's statement)"
@@ -41,6 +43,9 @@ versions:
         en: The armed forces and defence budget; paid for by a cut to overseas aid
       cost:
         range: [6, 13.4, 13.4]
+        by:
+          kind: official
+          name: No 10
         note:
           en: >-
             Year shown: 2027-28, the first full year at the new level. The PM put it at £13.4bn more

@@ -17,7 +17,7 @@ writes, for every configured language (other languages under their prefix, such 
 
 | File | What it is |
 |---|---|
-| `feeds/all.xml` | Every change to every promise (Atom; or RSS, or both, by `publish.feeds`) |
+| `feeds/all.xml` | Every change to every promise: timeline events, rewordings, replies and cost changes (Atom; or RSS, or both, by `publish.feeds`) |
 | `feeds/promise/<id>.xml`, `feeds/actor/<id>.xml`, `feeds/area/<area>.xml` | One card, one actor (a party's includes its people's cards), one area |
 | `promise/<id>.md` | Each card in Markdown, beside its page |
 | `llms.txt`, `llms-full.txt` | A guide for AI assistants, and every card in full |
@@ -88,7 +88,26 @@ export async function GET() {
 }
 ```
 
-Or call `publishFiles({ config, views, today })` in a build step and write every file at once.
+Or call `publishFiles({ config, views, today, actors })` in a build step and write every file at once. Pass `actors` (every actor read) so each actor has a feed even before it has a card.
+
+## What the site adds of its own
+
+Some things on a promise page are the site's own: Public Ledger's contracts behind delivery and its editions of official figures, Borough Book's council decisions. The site keeps making them, and hands them to the engine, which puts them where readers expect them:
+
+```ts
+publishFiles({
+  config, views, today, actors,
+  site: {
+    // A feed entry with a card goes in every feed that card is in (the card's, its actor's and party's, its area's, everything);
+    // one without a card goes only in the feed of everything. Ids are the site's, as tag URIs (tagUri), and never change.
+    entries: [{ id: tagUri(config, "promise/uk-homes-1-5m-2024/contract/ocds-b5fd17-90d9/0"), card: "uk-homes-1-5m-2024", title: "Contract linked: …", date: "2025-09-26", link: "…", content: "…" }],
+    // Markdown sections for a card, after "About the cost", as PromiseCard places `children`.
+    sections: (view) => (contracts.has(view.id) ? [{ title: "Contracts behind delivery", lines: contractLines(view.id) }] : []),
+  },
+});
+```
+
+`buildFeed` takes the same entries as `siteEntries` in its context, and `cardMarkdown` the same sections as `sections`.
 
 ## The components
 
@@ -119,8 +138,8 @@ What changes when a site renders its promise pages and feeds with these packages
 | | Public Ledger | Borough Book |
 |---|---|---|
 | Feed addresses and entry ids | The same (`/feeds/…xml`, `tag:ledgergov.uk,2026:promise/<id>/event/<n>`) | The same (`<page>/feed.xml`, `tag:borough-ledger,2026:…`) |
-| Feed entry words | The same for timeline events, rewordings and replies. Not made yet: cost changes and the site's contract and figures entries (the dry run lists them) | Titles now name the event first ("In plan: …"), as Public Ledger's do; the one-off "new pledge card" item is no longer made (the "Promised" entry covers it) |
+| Feed entry words | The same: all 560 live entries identical in id, title, text, link and date (dry run of 9 October 2026), with the site's contract and figures entries handed in as its own (`site.entries`) | Titles now name the event first ("In plan: …"), as Public Ledger's do; the one-off "new pledge card" item is no longer made (the "Promised" entry covers it) |
 | Card structured data | `Article` with the `Quotation`, as RFC-0001 §6 asks (today `WebPage`); breadcrumbs unchanged | `Article` with the `Quotation`, as today; the FAQ block stays the site's own |
 | Markdown, `llms-full.txt` | The same layout and facts, with the site's own words set in `messages` (as in `tools/dry-run/ledgergov.config.ts`) | New |
 | Open data | New in this form (the site's `/api/v1` stays its own) | New |
-| Kept in the site | Deadline-window feeds and email and Telegram follows (`follow`, decision 8), contract entries, the sandbox link, the reviewer's display name | Payments and ward pages, council decision feeds |
+| Kept in the site | Deadline-window feeds, the figures feed (`updates.xml`) and email and Telegram follows (`follow`, decision 8); making contract and figures entries and the contracts section (handed to the engine, above); the sandbox link and per-household figures on the card page | Payments and ward pages, council decision feeds |

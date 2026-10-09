@@ -140,3 +140,43 @@ describe("append-only", () => {
     expect(messages(fromPublicLedger(legacy), written)).toHaveLength(1);
   });
 });
+
+describe("late fields (decision 13.1)", () => {
+  const by = { kind: "official", name: "Transport department" };
+  const withBy = card((c) => (c.versions[0]!.parameters!.cost!.by = by as never));
+
+  it("lets a field added to the format be filled in once on a published version, with no correction", () => {
+    expect(messages(BASE, withBy)).toEqual([]);
+  });
+
+  it("treats a change to it, once filled in, as history like the rest", () => {
+    const changed = card((c) => (c.versions[0]!.parameters!.cost!.by = { kind: "party", name: "Someone else" }));
+    expect(messages(withBy, changed)).toEqual(["versions.0: was changed; history is append-only (add a new entry, or record our own mistake as a correction)"]);
+    expect(messages(withBy, BASE)).toHaveLength(1);
+  });
+});
+
+describe("Public Ledger's fields of 9 October 2026 (decision 14)", () => {
+  const legacy = {
+    id: "uk-test-2026",
+    actor_id: "someone",
+    made_on: "2026-07-22",
+    policy_area: "economic_affairs",
+    status: "delivered",
+    outcome_by: { actor_id: "hm-government", note: "The government must act." },
+    brought_about_by: { actor_id: "hm-government" },
+    versions: [{ version: 1, text: "Words.", recorded_on: "2026-07-22", source_url: "https://example.org", parameters: { how_much_bn_per_year: [1, 2, 3], costed_by: { kind: "official", name: "OBR" } } }],
+    events: [{ date: "2026-07-22", type: "promised", text: "Promised" }],
+    corrections: [{ date: "2026-10-09", path: "versions[0].parameters.costed_by", was: null, now: { kind: "official", name: "OBR" }, reason: "Named the maker." }],
+  };
+
+  it("reads costed_by as cost.by, outcome_by as responsible and brought_about_by as brought_about_by", () => {
+    const v1 = fromPublicLedger(legacy) as Record<string, any>;
+    expect(v1.versions[0].parameters.cost).toEqual({ range: [1, 2, 3], by: { kind: "official", name: "OBR" } });
+    expect(v1.responsible).toEqual({ actor_id: "hm-government", note: { en: "The government must act." } });
+    expect(v1.brought_about_by).toEqual({ actor_id: "hm-government" });
+    expect(v1.x).toBeUndefined();
+    expect(v1.corrections[0].path).toBe("versions[0].parameters.cost.by");
+    expect((fromPublicLedger({ ...legacy, outcome_by: null }) as Record<string, unknown>).responsible).toBeNull();
+  });
+});

@@ -13,6 +13,7 @@ status_note:
     Reform UK is not in government, so the card stays at Promised. The VAT part overlaps with the
     government's own cut: domestic electricity has been zero-rated in Great Britain since 1 October
     2026 (see the card "Cut taxes on energy bills").
+responsible: null
 origin: manual
 sources:
   - title: "Reform UK: The First 100 Days: Our Pledges to You (PDF), September 2026"
@@ -37,6 +38,9 @@ versions:
           taxes, and four schemes now charged on bills would be paid by the Treasury instead.
       cost:
         range: [8.9, 9.9, 10.9]
+        by:
+          kind: party
+          name: Reform UK
         note:
           en: >-
             Year shown: the fifth year, the latest year Reform UK costed. The party's own figure is

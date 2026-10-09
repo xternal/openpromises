@@ -13,6 +13,8 @@ status_note:
   en: >-
     The government says the scheme will be confirmed at the Budget on 28 October 2026, with its
     costs, income and price caps and timetable.
+responsible:
+  actor_id: hm-government
 origin: manual
 sources:
   - title: "MHCLG: New first-time buyer scheme to be confirmed at Budget (26 Sep 2026)"

@@ -17,6 +17,8 @@ status_note:
     which creates the database, is not yet in force. The same release says HMRC’s Valuation Office
     will take over decisions on challenges to rent increases in England; until then renters apply to
     the First-tier Tribunal.
+responsible:
+  actor_id: hm-government
 origin: llm_intake
 sources:
   - title: >-

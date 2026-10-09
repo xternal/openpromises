@@ -19,6 +19,7 @@ import {
   ownerOf,
   paths,
   pick,
+  reviewerName,
   quoteIn,
   wordDiff,
   words,
@@ -144,9 +145,10 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
   const cost = params?.cost;
   const facts = cost?.range ? costFacts(w, config, cost.range) : null;
   const deadline = params?.deadline;
-  const when = pick(params?.when, L, config) ?? (deadline ? w.t("card.by_deadline", { date: longDate(w, deadline) }) : null);
+  const whenText = pick(params?.when, L, config);
+  const when = (whenText ? longDate(w, whenText) : undefined) ?? (deadline ? w.t("card.by_deadline", { date: longDate(w, deadline) }) : null);
   const funded = params ? pick(params.funded_by, L, config) : undefined;
-  const approvers = [...new Set((f.reviews ?? []).filter((r) => r.kind === "editor" && r.approves).map((r) => r.by))];
+  const approvers = [...new Set((f.reviews ?? []).filter((r) => r.kind === "editor" && r.approves).map((r) => reviewerName(config, r.by)))];
   const events = [
     ...f.events.map((e, i) => ({ key: `e${i}`, date: e.date, label: eventLabel(config, w, e.type, e.subtype), text: pick(e.text, L, config) ?? "", evidence: e.evidence_url, today: false })),
     ...(markToday ? [{ key: "today", date: today, label: w.t("card.today"), text: w.t("card.we_are_here"), evidence: undefined, today: true }] : []),
@@ -179,6 +181,11 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
         )}
         <p className="op-card__meta">
           <StatusPill status={f.status} config={config} locale={L} />
+          {view.broughtAboutBy && (
+            <span title={pick(f.brought_about_by?.note, L, config)}>
+              {w.t("card.credit", { who: actorName(view.broughtAboutBy, L, config) })}
+            </span>
+          )}
           <span>
             {venue ? `${venue}, ` : ""}
             <Time iso={f.made_on} w={w} />
@@ -198,6 +205,7 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
                   <>
                     <dd className="op-fact__figure">{facts.central}</dd>
                     <dd className="op-muted">{w.t("cost.range", { low: facts.low, high: facts.high })}</dd>
+                    {cost?.by && <dd className="op-muted">{w.t("cost.made_by", { name: cost.by.name, kind: w.t(`cost.by.${cost.by.kind}`) })}</dd>}
                   </>
                 ) : (
                   <dd>{costText(w, config, cost, { costable: params !== null })}</dd>
@@ -390,8 +398,8 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
                   {[...(f.reviews ?? [])].reverse().map((r, i) => (
                     <li key={`r${i}`}>
                       {r.kind === "editor" && r.approves
-                        ? `${w.t("card.approved_by", { by: r.by, date: longDate(w, r.on) })}${r.batch ? ` ${w.t("card.approved_batch")}` : ""}`
-                        : w.t("card.reviewed_by", { by: r.by, kind: w.t(`card.review_kind.${r.kind}`), date: longDate(w, r.on) })}
+                        ? `${w.t("card.approved_by", { by: reviewerName(config, r.by), date: longDate(w, r.on) })}${r.batch ? ` ${w.t("card.approved_batch")}` : ""}`
+                        : w.t("card.reviewed_by", { by: reviewerName(config, r.by), kind: w.t(`card.review_kind.${r.kind}`), date: longDate(w, r.on) })}
                       {r.note ? `: ${pick(r.note, L, config)}` : ""}
                     </li>
                   ))}

@@ -1,0 +1,18 @@
+format: openpromises/1
+id: bridget-phillipson
+kind: person
+name:
+  en: Bridget Phillipson
+party_id: labour
+roles:
+  - title:
+      en: Minister for Women and Equalities
+    from: "2024-07-08"
+  - title:
+      en: Secretary of State for Education
+    from: "2024-07-05"
+    to: "2026-07-20"
+identifiers:
+  parliament_member_id: 4046
+same_as:
+  - https://www.gov.uk/government/people/bridget-phillipson

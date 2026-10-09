@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { resolveConfig, type QuoteCheck } from "@openpromises/core";
-import { BASE, card, check, CONFIG_INPUT, ruleIssues } from "./helpers";
+import { resolveConfig, type Card, type QuoteCheck } from "@openpromises/core";
+import { actors, BASE, card, check, CONFIG_INPUT, ruleIssues } from "./helpers";
 
 describe("the base card", () => {
   it("passes every rule", () => {
@@ -493,5 +493,74 @@ describe("x", () => {
     expect(ruleIssues("x", card((c) => (c.x = { editor_nots: "typo" })), { config: withX })).toEqual([
       'x.editor_nots: "editor_nots" is not a field of format v1; check the spelling, or put the site\'s own fields in x',
     ]);
+  });
+});
+
+describe("cost maker (decision 14)", () => {
+  const by = { kind: "official" as const, name: "Transport department" };
+  const required = resolveConfig({ ...CONFIG_INPUT, money: { ...CONFIG_INPUT.money, costedBy: "required" } });
+
+  it("passes a cost that names who made its central figure, and one without when the site does not require it", () => {
+    expect(ruleIssues("cost", card((c) => (c.versions[0]!.parameters!.cost!.by = by)), { config: required })).toEqual([]);
+    expect(ruleIssues("cost", BASE)).toEqual([]);
+  });
+
+  it("fails a maker with no figure, and a figure with no maker when the site requires one", () => {
+    expect(ruleIssues("cost", card((c) => (c.versions[0]!.parameters!.cost = { by, note: { en: "No costing was published." } })))).toEqual([
+      "versions[0].parameters.cost.by: goes with a figure: this cost has no range, so there is no central figure for anyone to have made",
+    ]);
+    expect(ruleIssues("cost", BASE, { config: required })).toEqual([
+      "versions[0].parameters.cost.by: is missing: say who made the central figure (kind: official, party or independent; and a name), as the configuration asks (money.costedBy)",
+    ]);
+  });
+});
+
+describe("responsible (decision 14)", () => {
+  const withBodies = new Map([...actors, ["city-council", { format: "openpromises/1", id: "city-council", kind: "government", name: { en: "City Council" } }]] as const);
+  const required = resolveConfig({ ...CONFIG_INPUT, actors: { ...CONFIG_INPUT.actors, responsibleRequired: true } });
+
+  it("passes a body named by its role, null when no body in power is committed, and nothing when the site does not require it", () => {
+    expect(ruleIssues("responsible", card((c) => (c.responsible = { actor_id: "city-council" })), { actors: withBodies, config: required })).toEqual([]);
+    expect(ruleIssues("responsible", card((c) => (c.responsible = null)), { config: required })).toEqual([]);
+    expect(ruleIssues("responsible", BASE)).toEqual([]);
+  });
+
+  it("fails a missing one when required (a warning in a draft), an unknown actor, and a party or a person", () => {
+    expect(ruleIssues("responsible", BASE, { config: required })).toEqual([
+      "responsible: is missing: name the body that must act to deliver it (an actor of kind government), or write null when no body in power is committed",
+    ]);
+    expect(check(BASE, { config: required, where: "drafts" }).find((i) => i.rule === "responsible")?.severity).toBe("warning");
+    expect(ruleIssues("responsible", card((c) => (c.responsible = { actor_id: "no-such-body" })))).toEqual(['responsible.actor_id: there is no actor "no-such-body" (actors/no-such-body.yaml)']);
+    expect(ruleIssues("responsible", card((c) => (c.responsible = { actor_id: "blue-party" })))).toEqual(['responsible.actor_id: names a body by its role (an actor of kind government), not "blue-party", which is a party']);
+    expect(ruleIssues("responsible", card((c) => (c.responsible = { actor_id: "ada-lovelace" })))).toEqual(['responsible.actor_id: names a body by its role (an actor of kind government), not "ada-lovelace", which is a person']);
+  });
+
+  it("is a body in the configuration too, never a party or a person", () => {
+    expect(() => resolveConfig({ ...CONFIG_INPUT, actors: { ...CONFIG_INPUT.actors, responsible: ["party"] } })).toThrow('actors.responsible cannot include "party"');
+  });
+});
+
+describe("brought-about-by (decision 14)", () => {
+  const legislated = (c: Card) => {
+    c.status = "legislated";
+    c.events.push({ date: "2026-07-01", type: "legislated", text: { en: "The act passed" }, evidence_url: "https://example.org/act" });
+  };
+
+  it("passes an actor named once something has happened", () => {
+    expect(ruleIssues("brought-about-by", card((c) => (legislated(c), (c.brought_about_by = { actor_id: "blue-party", note: { en: "The governing party passed it." } }))))).toEqual([]);
+  });
+
+  it("fails an unknown actor, and credit before anything has happened", () => {
+    expect(ruleIssues("brought-about-by", card((c) => (legislated(c), (c.brought_about_by = { actor_id: "nobody-here" }))))).toEqual(['brought_about_by.actor_id: there is no actor "nobody-here" (actors/nobody-here.yaml)']);
+    expect(ruleIssues("brought-about-by", card((c) => (c.brought_about_by = { actor_id: "blue-party" })))).toEqual([
+      'brought_about_by: only applies once something has happened (legislated, funded, delivering, delivered); the status is "in_plan"',
+    ]);
+  });
+});
+
+describe("lever label (decision 13.2: a warning first)", () => {
+  it("warns about lever settings with no label, until it becomes an error in 0.3.0", () => {
+    const issues = check(card((c) => (c.links = { lever: { settings: { bus_cap: 1 } } }))).filter((i) => i.rule === "modules");
+    expect(issues.map((i) => [i.severity, i.message])).toEqual([["warning", 'is missing: lever settings need a label saying what they show, such as "£2 bus cap, as announced" (an error from version 0.3.0)']]);
   });
 });

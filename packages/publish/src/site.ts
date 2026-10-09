@@ -1,7 +1,7 @@
-import type { Config } from "@openpromises/core";
+import type { Actor, Config } from "@openpromises/core";
 import { openDataCsv, openDataJson } from "./data";
-import { buildFeed, tagUri, type EntryContext } from "./feeds";
-import { cardMarkdownFile, llmsFull, llmsTxt, MARKDOWN_TYPE } from "./markdown";
+import { buildFeed, tagUri, type EntryContext, type SiteEntry } from "./feeds";
+import { cardMarkdownFile, llmsFull, llmsTxt, MARKDOWN_TYPE, type MdContext } from "./markdown";
 import { words } from "./messages";
 import { sitemapEntries, sitemapXml } from "./sitemap";
 import { absolute, paths, type FeedFormat, type FeedKind } from "./urls";
@@ -27,11 +27,15 @@ export interface PublishInput {
   views: readonly CardView[];
   /** The build day, YYYY-MM-DD, in the site's time zone. */
   today: string;
+  /** Every actor, so each has a feed even before it has a card, and its address never breaks. */
+  actors?: ReadonlyMap<string, Actor>;
+  /** What the site adds of its own: feed entries (contracts linked, new figures) and Markdown sections (contracts behind delivery). */
+  site?: { entries?: readonly SiteEntry[]; sections?: MdContext["sections"] };
 }
 
 const XML = "application/xml; charset=utf-8";
 
-export function publishFiles({ config, views, today }: PublishInput): PublishedFile[] {
+export function publishFiles({ config, views, today, actors, site }: PublishInput): PublishedFile[] {
   // Everything is built on these two; say so before anything else.
   absolute(config, "/");
   tagUri(config, "feed/all");
@@ -39,21 +43,29 @@ export function publishFiles({ config, views, today }: PublishInput): PublishedF
   const p = paths(config);
   const published = views.filter((v) => v.where === "promises");
   const formats: FeedFormat[] = config.publish.feeds === "both" ? ["atom", "rss"] : [config.publish.feeds];
-  const actorIds = [...new Set(published.flatMap((v) => [v.actor.id, ...(v.party ? [v.party.id] : [])]))].sort();
-  const areas = [...new Set(published.map((v) => v.card.area))].sort();
+  // Every actor and every configured area has a feed, even with no cards yet, so a followed address never stops working.
+  const actorIds = [...new Set([...published.flatMap((v) => [v.actor.id, ...(v.party ? [v.party.id] : [])]), ...(actors?.keys() ?? [])])].sort();
+  const areas = [...new Set([...published.map((v) => v.card.area), ...(config.areas.kind === "enum" ? config.areas.values : [])])].sort();
   const wards = config.modules.has("wards") ? [...new Set(published.map((v) => v.card.links?.ward).filter((x): x is string => !!x))].sort() : [];
-  const names = new Map(views.flatMap((v) => [v.actor, ...(v.party ? [v.party] : [])]).map((a) => [a.id, a]));
+  const names = new Map([...(actors?.values() ?? []), ...views.flatMap((v) => [v.actor, ...(v.party ? [v.party] : [])])].map((a) => [a.id, a]));
 
   for (const locale of config.locales.all) {
     const w = words(config, locale);
-    const ctx: EntryContext = { config, w, today, actorName: (id) => (names.get(id) ? actorName(names.get(id)!, locale, config) : undefined) };
+    const ctx: EntryContext = {
+      config,
+      w,
+      today,
+      actorName: (id) => (names.get(id) ? actorName(names.get(id)!, locale, config) : undefined),
+      actors: names,
+      ...(site?.entries ? { siteEntries: site.entries } : {}),
+    };
     const feeds: [FeedKind, string][] = [["all", ""], ...published.map((v): [FeedKind, string] => ["promise", v.id]), ...actorIds.map((id): [FeedKind, string] => ["actor", id]), ...areas.map((a): [FeedKind, string] => ["area", a]), ...wards.map((x): [FeedKind, string] => ["ward", x])];
     for (const format of formats)
       for (const [kind, key] of feeds) {
         const f = buildFeed(views, kind, key, ctx, format);
         files.push({ path: f.path, contentType: f.contentType, body: f.body });
       }
-    const md = { config, w, today };
+    const md: MdContext = { config, w, today, ...(site?.sections ? { sections: site.sections } : {}) };
     for (const v of published) files.push({ path: p.markdown(v.id, locale), contentType: MARKDOWN_TYPE, body: cardMarkdownFile(v, md) });
     files.push({ path: p.llms(locale), contentType: "text/plain; charset=utf-8", body: llmsTxt(views, md) });
     files.push({ path: p.llmsFull(locale), contentType: "text/plain; charset=utf-8", body: llmsFull(views, md) });

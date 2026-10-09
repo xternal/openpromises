@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeAll, describe, expect, it } from "vitest";
 import { relatedCards } from "@openpromises/publish";
 import { Breadcrumbs, PromiseCard } from "@openpromises/react";
-import { ACCEPTED, MUTATIONS } from "./ledgergov";
+import { ACCEPTED, MUTATIONS, OWN } from "./ledgergov";
 import {
   accessibilityArea,
   cardPagesArea,
@@ -24,6 +24,7 @@ import { engineVersion, runEngine } from "./lib/engine";
 import { headCommit, replayHistory } from "./lib/history";
 import { Live } from "./lib/live";
 import { runMutations } from "./lib/mutations";
+import { siteParts } from "./lib/siteparts";
 import { applyAccepted, writeReport, type Finding } from "./lib/report";
 
 /**
@@ -60,7 +61,11 @@ describe.skipIf(!existsSync(CONTENT))(`dry run: Public Ledger (${LIVE})`, () => 
   beforeAll(async () => {
     const started = new Date();
     const live = new Live(LIVE, join(OUT, "cache"), OFFLINE);
-    const run = await runEngine(join(import.meta.dirname, "ledgergov.config.ts"), CONTENT);
+    const configFile = join(import.meta.dirname, "ledgergov.config.ts");
+    // What the site keeps making itself (contract and figures entries, contracts sections), handed to the engine as its own code would.
+    const first = await runEngine(configFile, CONTENT);
+    const own = await siteParts(live, "/feeds", (await fetchCards(first, live)).markdown, OWN);
+    const run = await runEngine(configFile, CONTENT, { site: { entries: own.entries, sections: (v) => own.sections.get(v.id) ?? [] } });
     const L = run.config.locales.default;
     const html = new Map(
       run.published.map((v) => [
@@ -85,7 +90,25 @@ describe.skipIf(!existsSync(CONTENT))(`dry run: Public Ledger (${LIVE})`, () => 
     };
     save("engine", [...[...run.files.values()].map((f): [string, string] => [f.path, f.body]), ...[...html].map(([id, h]): [string, string] => [`promise/${id}.html`, h])]);
     save("live", [...[...pages.markdown].map(([id, md]): [string, string] => [`promise/${id}.md`, md]), ...[...pages.card].map(([id, p]): [string, string] => [`promise/${id}.html`, p.mainHtml])]);
+    const kinds = new Map<string, number>();
+    for (const e of own.entries) {
+      const kind = /^tag:[^:]+:(?:promise\/[^/]+\/)?([a-z]+)\//.exec(e.id)?.[1] ?? "other";
+      kinds.set(kind, (kinds.get(kind) ?? 0) + 1);
+    }
+    const siteOwn: Finding[] = [
+      {
+        area: "Feeds",
+        verdict: "site",
+        what: `The site's own entries stay the site's to make: ${[...kinds].map(([k, n]) => `${n} "${k}"`).join(", ")}. The dry run handed them to the engine (PublishInput.site.entries) as the site's code would; the comparison below shows where they land.`,
+      },
+      {
+        area: "Markdown",
+        verdict: "site",
+        what: `The site's own sections stay the site's to make: ${[...own.sections.values()].flat().length} (${OWN.sections.join(", ")}), handed to the engine (PublishInput.site.sections); they follow "About the cost", as on the card page.`,
+      },
+    ];
     const all = [
+      ...siteOwn,
       ...(await readingArea(run, live)),
       ...checksArea(run, runMutations(CONTENT, run.config, MUTATIONS)),
       ...historyArea(replayHistory(CONTENT, run.config, "HEAD")),

@@ -2,7 +2,7 @@
 
 Three promise trackers wrote the same idea separately, and their formats drifted. This document maps each one's cards to [format v1](FORMAT.md), field by field, and says what each site gains and loses by moving. The converters that do it are `fromPublicLedger`, `fromBoroughBook` and `fromRussiaLedger` in `@openpromises/core`; `openpromises migrate` runs them.
 
-Read on 9 October 2026 from each site's `main` branch: Public Ledger (45 cards, 16 actors), Borough Book (18 cards, 2 parties, 3 decision links). The third site, [Russia Ledger](https://russialedger.com), in Russian and English, keeps its repository private: only its **format** is described here, never its content.
+Read on 9 October 2026 from each site's `main` branch: Public Ledger (54 cards, 19 actors, at commit 77a86b4), Borough Book (18 cards, 2 parties, 3 decision links). The third site, [Russia Ledger](https://russialedger.com), in Russian and English, keeps its repository private: only its **format** is described here, never its content.
 
 ## At a glance
 
@@ -41,18 +41,20 @@ Read on 9 October 2026 from each site's `main` branch: Public Ledger (45 cards, 
 | `contracts` | `links.contracts` | `contracts` module. |
 | `origin` | `origin` | |
 | `submission_ref`, `credit` | `x.submission_ref`, `x.credit` | Only Public Ledger has reader submissions so far. |
-| `outcome_by` | `x.outcome_by` | Only Public Ledger uses it (one card). |
+| `outcome_by` | `responsible` (`{ actor_id, note }`, or `null`) | Who must act to deliver it (decision 14). Until 9 October 2026 Public Ledger's `outcome_by` meant credit for an outcome someone else brought about; the converter reads the current meaning. |
+| `brought_about_by` | `brought_about_by` | Credit for an outcome someone other than the card's actor brought about (decision 14). |
 | `editor_check_required` | `x.editor_check_required` | Kept for the record; in v1, approvals in the card say whether a card has been checked. |
 | `sources` | `sources` | Same shape. |
 | `versions[].version`, `text`, `recorded_on`, `source_url`, `quote_checked_on` | the same | |
 | `parameters.who`, `when`, `funded_by` | the same, as `{ en }` (`funded_by: null` stays `null`) | |
 | `parameters.how_much_bn_per_year` | `parameters.cost.range` | The unit (£bn a year) moves into the configuration. |
 | `parameters.cost_note`, `cost_sources` | `parameters.cost.note.en`, `parameters.cost.sources` | A card with a note but no figure keeps the note: a cost without a range explains why. |
+| `parameters.costed_by` | `parameters.cost.by` | Who made the central figure (decision 14). |
 | (none) | `parameters.cost.quality` | **Public Ledger has no quality label on promise costs.** Editors add one per costed card. |
 | `events[].text` | `events[].text.en` | Date, type, evidence and `auto` unchanged. |
 | `replies[].editor_response` | `replies[].editor_response.en` | |
-| `corrections[]` | `corrections[]` | Paths and values follow the fields: `parameters.how_much_bn_per_year` → `parameters.cost.range`, `parameters.cost_note` → `parameters.cost.note`, `parameters.cost_sources` → `parameters.cost.sources`; text values become `{ en }`; `reason` becomes `{ en }`. |
-| `reviews[]` | `reviews[]` | `note` becomes `{ en }`. The 45 "AI Journalist" / "Junior Editor" reviews stay `kind: automated`. |
+| `corrections[]` | `corrections[]` | Paths and values follow the fields: `parameters.how_much_bn_per_year` → `parameters.cost.range`, `parameters.cost_note` → `parameters.cost.note`, `parameters.cost_sources` → `parameters.cost.sources`, `parameters.costed_by` → `parameters.cost.by`; text values become `{ en }`; `reason` becomes `{ en }`. |
+| `reviews[]` | `reviews[]` | `note` becomes `{ en }`. The "AI Journalist" / "Junior Editor" reviews stay `kind: automated`; `editorial.renamed` shows the old name as the new one. |
 | GitHub pull request reviews | `reviews[]` with `kind: editor, approves: true` | Decision 4. Approvals are not in the cards today, so the converter cannot add them. |
 
 ### Actors
@@ -142,15 +144,15 @@ Russia Ledger's format is the closest to v1: it was copied from Public Ledger an
 
 ## Problems found in the sites' data
 
-Every card copied from Public Ledger (45) and Borough Book (18) converts to format v1 with no loss and passes the format check. `openpromises validate`, run with each site's configuration (`fixtures/*/openpromises.config.ts`), then finds the problems below. Each is a real gap between a site's data and the standard in RFC-0001 §5, not a fault of the conversion. The tests expect exactly these: each site's list is in `fixtures/<site>/expected-issues.txt`, and a test fails if one appears or disappears without the list changing.
+Every card copied from Public Ledger (54) and Borough Book (18) converts to format v1 with no loss and passes the format check. `openpromises validate`, run with each site's configuration (`fixtures/*/openpromises.config.ts`), then finds the problems below. Each is a real gap between a site's data and the standard in RFC-0001 §5, not a fault of the conversion. The tests expect exactly these: each site's list is in `fixtures/<site>/expected-issues.txt`, and a test fails if one appears or disappears without the list changing.
 
 Nothing else fails. Every event that moves a status has its evidence, every status has its event, and every Public Ledger correction replays exactly. Borough Book's pledges by the party out of power are all `not_in_power`, and its decision links all match an event.
 
-### Public Ledger: 68 problems of two kinds
+### Public Ledger: 83 problems of two kinds
 
-**1. No approvals in the cards (all 45 cards; rule `approvals`).** Public Ledger publishes after two GitHub approvals or the owner's merge. All 45 cards still carry `editor_check_required: true`, so by the site's own flag none has had its full editor check. Format v1 needs two approvals recorded in the card from editors on a list (decision 4). Public Ledger has no editors list in its repository, because its guide promises editors that their declarations stay private. Decided on 9 October 2026 ([DECISIONS.md](DECISIONS.md) 10 and 11): the editors list stays private and reaches the checks privately, real approvals from pull requests are imported with their dates, and editors review the remaining cards one by one. The steps are in [MIGRATING.md](MIGRATING.md).
+**1. No approvals in the cards (all 54 cards; rule `approvals`).** Public Ledger publishes after two GitHub approvals or the owner's merge. All 54 cards still carry `editor_check_required: true`, so by the site's own flag none has had its full editor check. Format v1 needs two approvals recorded in the card from editors on a list (decision 4). Public Ledger has no editors list in its repository, because its guide promises editors that their declarations stay private. Decided on 9 October 2026 ([DECISIONS.md](DECISIONS.md) 10 and 11): the editors list stays private and reaches the checks privately, real approvals from pull requests are imported with their dates, and editors review the remaining cards one by one. The steps are in [MIGRATING.md](MIGRATING.md).
 
-**2. Costs without a quality label (23 cards; rule `cost`).** Public Ledger's promise costs have a range, a note and sources, but no quality label. An editor adds one per card (`sourced`, `approx` or `modelled`): uk-abolish-non-dom-2024, uk-bics-electricity-2026, uk-bus-cap-2-2026, uk-con-iht-family-home-2026, uk-con-stamp-duty-abolition-2025, uk-defence-25-2027, uk-electricity-vat-2026, uk-great-british-energy-2024, uk-green-bank-windfall-tax-2026, uk-green-wealth-tax-2024, uk-ld-free-personal-care-2024, uk-ld-personal-allowance-15k-2026, uk-nato-5pc-2035-2025, uk-neighbourhood-police-2024, uk-nhs-40000-appointments-2024, uk-plaid-childcare-20-hours-2026, uk-pubs-business-rates-cut-2026, uk-reform-energy-bills-250-2026, uk-reform-personal-allowance-15k-2026, uk-snp-two-child-cap-2024, uk-two-child-limit-2025, uk-union-learning-fund-2026, uk-vat-private-schools-2024.
+**2. Costs without a quality label (29 cards; rule `cost`).** Public Ledger's promise costs have a range, a note, sources and (since 9 October 2026) who made the central figure, but no quality label. An editor adds one per card (`sourced`, `approx` or `modelled`): uk-abolish-non-dom-2024, uk-awaabs-law-hazards-2026, uk-bics-electricity-2026, uk-bus-cap-2-2026, uk-carried-interest-2024, uk-con-iht-family-home-2026, uk-con-landlord-cgt-relief-2024, uk-con-stamp-duty-abolition-2025, uk-defence-25-2027, uk-electricity-vat-2026, uk-great-british-energy-2024, uk-green-bank-windfall-tax-2026, uk-green-cgt-align-2024, uk-green-wealth-tax-2024, uk-ld-cgt-reform-2024, uk-ld-free-personal-care-2024, uk-ld-personal-allowance-15k-2026, uk-nato-5pc-2035-2025, uk-neighbourhood-police-2024, uk-nhs-40000-appointments-2024, uk-plaid-cgt-equalise-2024, uk-plaid-childcare-20-hours-2026, uk-pubs-business-rates-cut-2026, uk-reform-energy-bills-250-2026, uk-reform-personal-allowance-15k-2026, uk-snp-two-child-cap-2024, uk-two-child-limit-2025, uk-union-learning-fund-2026, uk-vat-private-schools-2024.
 
 One habit to note rather than fix: 20 cards have a `deadline` event dated in the future. Format v1 lets these markers sit out of date order, along with automatic events; otherwise the first event added after one would break the order.
 

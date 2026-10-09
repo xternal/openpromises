@@ -1,5 +1,5 @@
 import { checkSpan, matchQuote } from "@openpromises/quotes";
-import { categoryOf, hasStatus, type Config } from "./config";
+import { categoryOf, climb, hasStatus, type Config } from "./config";
 import { same, fieldAt, parseCorrectionPath } from "./history";
 import { issue, type Issue, type Path, type Severity } from "./issues";
 import { EVENT_TYPES, NOT_IN_POWER, PROMISED, UNSCOREABLE } from "./ladder";
@@ -257,9 +257,10 @@ const scoreable: Rule = {
 
 // ---------------------------------------------------------------- cost
 
-function costIssues(cost: Cost, path: Path, config: Config): Issue[] {
+function costIssues(cost: Cost, path: Path, config: Config, yearly: boolean): Issue[] {
   const out: Issue[] = [];
   const add = (p: Path, m: string) => out.push(issue("cost", [...path, ...p], m));
+  if (cost.by && !cost.range) add(["by"], "goes with a figure: this cost has no range, so there is no central figure for anyone to have made");
   if (!cost.range) {
     if (!cost.note) add([], "has no range, so its note says why there is no figure");
     return out;
@@ -271,16 +272,19 @@ function costIssues(cost: Cost, path: Path, config: Config): Issue[] {
   if (!cost.quality) add(["quality"], `is missing: a cost carries a quality label (${list(config.money.qualities)})`);
   else if (!config.money.qualities.includes(cost.quality)) add(["quality"], `"${cost.quality}" is not a quality label in the configuration (${list(config.money.qualities)})`);
   if (!cost.sources?.length) add(["sources"], "are missing: a cost names at least one source");
+  if (yearly && config.money.costedBy === "required" && !cost.by)
+    add(["by"], "is missing: say who made the central figure (kind: official, party or independent; and a name), as the configuration asks (money.costedBy)");
   return out;
 }
 
 const cost: Rule = {
   id: "cost",
-  summary: "A cost is a range (low below high) with a quality label and a source, or explains in a note why there is no figure.",
+  summary:
+    "A cost is a range (low below high) with a quality label and a source, or explains in a note why there is no figure. Who made the central figure (by) goes only with a range, and is required when the configuration says so.",
   check: (card, { config }) =>
     card.versions.flatMap((v, i) => [
-      ...(v.parameters?.cost ? costIssues(v.parameters.cost, ["versions", i, "parameters", "cost"], config) : []),
-      ...(v.parameters?.capital_cost ? costIssues(v.parameters.capital_cost, ["versions", i, "parameters", "capital_cost"], config) : []),
+      ...(v.parameters?.cost ? costIssues(v.parameters.cost, ["versions", i, "parameters", "cost"], config, true) : []),
+      ...(v.parameters?.capital_cost ? costIssues(v.parameters.capital_cost, ["versions", i, "parameters", "capital_cost"], config, false) : []),
     ]),
 };
 
@@ -469,6 +473,9 @@ const modules: Rule = {
     card.versions.forEach((v, i) => {
       if (v.parameters?.metric && !on.has("metrics")) off("metrics", ["versions", i, "parameters", "metric"]);
     });
+    // Decision 13.2: a stricter rule is a warning for one minor release first.
+    if (on.has("lever") && links.lever && typeof links.lever === "object" && links.lever.settings && !links.lever.label)
+      add(["links", "lever", "label"], "is missing: lever settings need a label saying what they show, such as \"£2 bus cap, as announced\" (an error from version 0.3.0)", "warning");
     if (links.measurement && on.has("metrics") && !card.versions.some((v) => v.parameters?.metric))
       add(["links", "measurement"], "belongs to a card with an indicator target (parameters.metric)");
 
@@ -496,6 +503,41 @@ const modules: Rule = {
         if (s.designation?.status === "unchecked") add([...path, "designation", "status"], "is still unchecked", "warning");
       }
     }
+    return out;
+  },
+};
+
+// ---------------------------------------------------------------- who must deliver, and who brought it about
+
+const responsible: Rule = {
+  id: "responsible",
+  summary: "Who must deliver the promise (responsible) names a body by its role, never a party or a person, or is null when no body in power is committed; the configuration may require it.",
+  check: (card, ctx) => {
+    const { config, actors } = ctx;
+    const kinds = config.actors.responsible;
+    if (card.responsible === undefined)
+      return config.actors.responsibleRequired
+        ? [issue("responsible", ["responsible"], `is missing: name the body that must act to deliver it (an actor of kind ${list(kinds)}), or write null when no body in power is committed`, toPublish(ctx))]
+        : [];
+    if (card.responsible === null) return [];
+    const id = card.responsible.actor_id;
+    const a = actors.get(id);
+    if (!a) return [issue("responsible", ["responsible", "actor_id"], `there is no actor "${id}" (actors/${id}.yaml)`)];
+    if (!kinds.includes(a.kind)) return [issue("responsible", ["responsible", "actor_id"], `names a body by its role (an actor of kind ${list(kinds)}), not "${id}", which is a ${a.kind}`)];
+    return [];
+  },
+};
+
+const broughtAboutBy: Rule = {
+  id: "brought-about-by",
+  summary: "Who brought the outcome about (brought_about_by) is an actor, named only once something has happened: from the third step of the ladder up.",
+  check: (card, { config, actors }) => {
+    const by = card.brought_about_by;
+    if (!by) return [];
+    const out: Issue[] = [];
+    if (!actors.has(by.actor_id)) out.push(issue("brought-about-by", ["brought_about_by", "actor_id"], `there is no actor "${by.actor_id}" (actors/${by.actor_id}.yaml)`));
+    const steps = climb(config);
+    if (steps.indexOf(card.status) < 2) out.push(issue("brought-about-by", ["brought_about_by"], `only applies once something has happened (${list(steps.slice(2))}); the status is "${card.status}"`));
     return out;
   },
 };
@@ -532,6 +574,8 @@ export const RULES: readonly Rule[] = [
   standing,
   quotes,
   modules,
+  responsible,
+  broughtAboutBy,
   references,
 ];
 

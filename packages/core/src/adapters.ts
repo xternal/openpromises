@@ -75,6 +75,7 @@ const PL_CARD = [
   "events",
   "replies",
   "outcome_by",
+  "brought_about_by",
   "corrections",
   "reviews",
   "contracts",
@@ -82,9 +83,12 @@ const PL_CARD = [
 
 function plParameters(p: unknown, en: (v: unknown) => unknown): unknown {
   if (!isObj(p)) return p;
-  const { who, how_much_bn_per_year, cost_note, cost_sources, when, funded_by, ...rest } = p;
+  const { who, how_much_bn_per_year, costed_by, cost_note, cost_sources, when, funded_by, ...rest } = p;
   const range = how_much_bn_per_year ?? undefined;
-  const cost = range !== undefined || cost_note !== undefined || cost_sources !== undefined ? clean({ range, note: en(cost_note), sources: cost_sources }) : undefined;
+  const cost =
+    range !== undefined || costed_by !== undefined || cost_note !== undefined || cost_sources !== undefined
+      ? clean({ range, by: costed_by, note: en(cost_note), sources: cost_sources })
+      : undefined;
   return clean({ who: en(who), cost, when: en(when), funded_by: en(funded_by), ...rest });
 }
 
@@ -92,6 +96,7 @@ function plField(en: (v: unknown) => unknown) {
   return (list: string, tail: string): FieldMap => {
     if (list === "versions") {
       if (tail === ".parameters.how_much_bn_per_year") return same(".parameters.cost.range");
+      if (tail === ".parameters.costed_by") return same(".parameters.cost.by");
       if (tail === ".parameters.cost_note") return { tail: ".parameters.cost.note", value: en };
       if (tail === ".parameters.cost_sources") return same(".parameters.cost.sources");
       if ([".parameters.who", ".parameters.when", ".parameters.funded_by"].includes(tail)) return { tail, value: en };
@@ -102,6 +107,8 @@ function plField(en: (v: unknown) => unknown) {
     return same(tail);
   };
 }
+
+const plRef = (v: unknown, en: (v: unknown) => unknown) => (isObj(v) ? clean({ ...v, note: en(v.note) }) : v);
 
 /** A Public Ledger card (content/promises/<id>.yaml) in format v1. */
 export function fromPublicLedger(raw: unknown, opts: { locale?: string } = {}): Raw {
@@ -123,6 +130,9 @@ export function fromPublicLedger(raw: unknown, opts: { locale?: string } = {}): 
     area: c.policy_area,
     status: c.status,
     status_note: en(c.status_note),
+    // Since 9 October 2026 Public Ledger's outcome_by says who must deliver (decision 14); credit moved to brought_about_by.
+    brought_about_by: plRef(c.brought_about_by, en),
+    responsible: c.outcome_by === null ? null : plRef(c.outcome_by, en),
     origin: c.origin,
     sources: c.sources,
     versions: versions.map((v, i) => {
@@ -146,7 +156,7 @@ export function fromPublicLedger(raw: unknown, opts: { locale?: string } = {}): 
     ),
     x: undefined as Raw | undefined,
   });
-  Object.assign(x, clean({ outcome_by: c.outcome_by, submission_ref: c.submission_ref, credit: c.credit, editor_check_required: c.editor_check_required }), unknown);
+  Object.assign(x, clean({ submission_ref: c.submission_ref, credit: c.credit, editor_check_required: c.editor_check_required }), unknown);
   if (Object.keys(x).length) out.x = x;
   return out;
 }

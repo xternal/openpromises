@@ -15,9 +15,15 @@ describe("PromiseCard", () => {
     const order = ["Cap bus fares at £2", "“I’ve done it before", "At a glance", "Where it stands", "What has happened", "About the cost", "More detail", "Related promises"].map((t) => out.indexOf(t));
     expect(order.every((x, i) => x >= 0 && (i === 0 || x > order[i - 1]!))).toBe(true);
     expect(out).toContain('<li aria-current="step"><span class="op-ladder__bar" aria-hidden="true"></span><span class="op-ladder__label">In plan</span></li>');
-    expect(out).toContain('<dd class="op-fact__figure">£0.4bn</dd><dd class="op-muted">range £0.36bn to £0.44bn</dd>');
+    expect(out).toContain('<dd class="op-fact__figure">£0.4bn</dd><dd class="op-muted">range £0.36bn to £0.44bn</dd><dd class="op-muted">Central figure: Department for Transport (official)</dd>');
     expect(out).toContain("(to come)");
     expect(out).toContain('<details class="op-fold"><summary>Sources (6)</summary>');
+  });
+
+  it("says who brought the outcome about, beside the status", async () => {
+    const s = await site("public-ledger");
+    const out = html(<PromiseCard view={s.views.find((x) => x.id === "uk-snp-two-child-cap-2024")!} config={s.config} today={s.today} />);
+    expect(out).toContain('<span title="The UK Government removed the limit; the SNP is not in government at Westminster.">Brought about by HM Government</span>');
   });
 
   it("shows corrections in words, with the old and new values", async () => {
