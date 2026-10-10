@@ -30,7 +30,7 @@ Version 1.0 comes once Public Ledger and Borough Book run on the engine. Node 22
 1. Move every `@openpromises/*` package to the new version in one change:
 
    ```bash
-   pnpm up "@openpromises/*@0.2.0"
+   pnpm up "@openpromises/*@0.3.0"
    ```
 
    On pnpm 12, run it a day after the release: pnpm waits 1,440 minutes before installing a new version by default. If the setting is not written down, check that `pnpm-workspace.yaml` gained no `minimumReleaseAgeExclude` entries; remove any it did.
