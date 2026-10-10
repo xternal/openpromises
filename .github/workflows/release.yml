@@ -1,0 +1,97 @@
+name: Release
+
+# Publishes all six packages to npm when a version tag (v0.4.0) is pushed, with
+# npm trusted publishing: npm checks that the upload comes from this workflow,
+# so no npm token or login is needed, and each package gets provenance (a
+# signed record of the commit and workflow that built it). Publishing waits
+# for the owner's approval in the "npm" environment. Run by hand (Actions,
+# Release, Run workflow), it checks and packs everything and publishes nothing.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      # Node 22's bundled Corepack cannot run pnpm 12; this version can.
+      - run: npm install -g corepack@0.34.5 && corepack enable pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - name: The client component keeps its "use client" line
+        run: head -c 13 packages/react/dist/client.js | grep -qx '"use client";'
+      - name: The tag is every package's version, and the changelog names it
+        if: github.event_name == 'push'
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          for p in packages/*/package.json; do
+            test "$(node -p "require('./$p').version")" = "$v" || { echo "::error::$p is not version $v"; exit 1; }
+          done
+          grep -q "^## $v " CHANGELOG.md || { echo "::error::CHANGELOG.md has no section for $v"; exit 1; }
+      # pnpm pack writes each workspace link as the real version, as npm needs.
+      - name: Pack every package
+        run: |
+          mkdir -p "$RUNNER_TEMP/packed"
+          for p in quotes core files publish react cli; do
+            (cd "packages/$p" && pnpm pack --pack-destination "$RUNNER_TEMP/packed")
+          done
+          ls -l "$RUNNER_TEMP/packed"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packed
+          path: ${{ runner.temp }}/packed/*.tgz
+          if-no-files-found: error
+
+  publish:
+    needs: check
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    # The owner approves each release here before anything reaches npm.
+    environment: npm
+    permissions:
+      contents: write # the GitHub release
+      id-token: write # npm trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm 11.5.1 or later; Node 22 bundles npm 10.
+      - run: npm install -g npm@11.5.1
+      - uses: actions/download-artifact@v4
+        with:
+          name: packed
+          path: packed
+      - name: Publish to npm, in dependency order
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          for p in quotes core files publish react cli; do
+            if npm view "@openpromises/$p@$v" version >/dev/null 2>&1; then
+              echo "@openpromises/$p@$v is already on npm"
+            else
+              npm publish "packed/openpromises-$p-$v.tgz" --access public
+            fi
+          done
+      - name: GitHub release, from the changelog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk -v v="$v" '$0 ~ "^## "v" " {f=1; next} /^## [0-9]/ {f=0} f' CHANGELOG.md > notes.md
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "OpenPromises $v" --notes-file notes.md --latest
