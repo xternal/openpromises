@@ -1,6 +1,6 @@
 # Moving a site onto OpenPromises
 
-This guide is for a site that already has promise cards in its own format (Public Ledger, Borough Book or the bilingual tracker). The move is a handful of changes, made in this order. None of them changes a published page: the site keeps building from its cards as before, and only the checks move.
+This guide is for a site that already has promise cards in its own format (Public Ledger, Borough Book or the bilingual tracker). The move is a handful of changes, made in this order. Steps 1 and 2 change nothing readers see, and step 6 can start at once as a check that reports without blocking. Step 3 is the switch: once the cards are in format v1, the site reads them through the engine (`@openpromises/files` and `cardViews`), so it goes in a change of its own, at a quiet time, with the dry run passing ([tools/dry-run](../tools/dry-run/README.md)). The site's pages can stay its own.
 
 [docs/COMPARISON.md](COMPARISON.md) says how each site's fields map to format v1, and lists the problems each site must fix.
 
@@ -77,7 +77,7 @@ Work through the site's list in COMPARISON.md: headlines, quality labels on cost
 
 ## 6. Switch the check
 
-While steps 4 and 5 are in progress, run `openpromises validate` in CI next to the site's own check, as a step that reports without blocking (`continue-on-error: true`), so everyone can see what is left. When it passes, make it blocking, remove the old check, and remove `legacy` from the configuration.
+While steps 4 and 5 are in progress, run `openpromises validate` in CI next to the site's own check, as a step that reports without blocking (`continue-on-error: true`), so everyone can see what is left. When it passes, make it blocking and remove the old check. Keep `legacy` in the configuration (decision 15).
 
 ## Per site
 
