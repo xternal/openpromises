@@ -2,6 +2,10 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
+## Unreleased
+
+- **The quote's source on the card page**: `PromiseCard` links the source of the speaker's words, and its archived copy when there is one, beside the date; the structured data cites the archived copy too. Borough Book's dry run found the card never linked them for a card with no separate sources list.
+
 ## 0.4.0 (11 October 2026)
 
 - **Standing** (decision 18): with `actors.standing: manual`, a party without a standing is now an error, as the 0.3.0 warning said. A person still takes their party's.

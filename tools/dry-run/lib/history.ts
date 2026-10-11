@@ -31,12 +31,14 @@ export function replayHistory(contentDir: string, config: Config, ref: string): 
   const log = git(top, ["log", "--first-parent", "--format=%H%x09%cs%x09%s", ref, "--", promises]).trim();
   const commits = log ? log.split("\n").map((l) => l.split("\t") as [string, string, string]).reverse() : [];
 
-  // Many commits share a tree of cards; read each tree once.
+  // Many commits share the same content; read each version of the content folder once. The whole
+  // folder, not only promises/: a converter also reads other files (Borough Book's parties.yaml).
   const byTree = new Map<string, Map<string, unknown>>();
   const cardsAt = (commit: string): Map<string, unknown> => {
     let tree: string;
     try {
-      tree = git(top, ["rev-parse", `${commit}:${promises}`]).trim();
+      git(top, ["rev-parse", `${commit}:${promises}`]);
+      tree = git(top, ["rev-parse", `${commit}:${prefix || "."}`]).trim();
     } catch {
       return new Map();
     }

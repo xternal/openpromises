@@ -141,7 +141,9 @@ export function checksArea(run: EngineRun, caught: readonly Caught[]): Finding[]
     const m = c.mutation;
     const how = `${c.rules.join(", ") || "nothing"}${c.message ? `: "${c.message}"` : ""}`;
     if (m.allowed) {
-      if (c.engine === "error") out.push({ area, verdict: "worse", what: `The site allows it, the engine refuses it: ${m.check}`, items: [`${m.card}: ${how}`] });
+      // A harmless change: the engine must let it through. A site that refuses it is wrong there, so the engine is better.
+      if (c.engine === "error") out.push({ area, verdict: "worse", what: `A harmless change, and the engine refuses it: ${m.check}`, items: [`${m.card}: ${how}`] });
+      else if (m.site === "error") out.push({ area, verdict: "better", what: `The site refuses a harmless change; the engine allows it: ${m.check}` });
       else same.push(`allowed by both: ${m.check}`);
       continue;
     }
@@ -183,11 +185,27 @@ export function historyArea(replayed: readonly Replayed[]): Finding[] {
 
 // ---------------------------------------------------------------- feeds
 
-export async function feedsArea(run: EngineRun, live: Live, feedsPage: string): Promise<Finding[]> {
+/**
+ * The feeds the live site serves: from a page that links them all, when it has one, or else from
+ * what its pages announce and the engine's own feed addresses that answer.
+ */
+export async function liveFeedPaths(run: EngineRun, live: Live, pages: LivePages, index?: string): Promise<string[]> {
+  if (index) {
+    const page = await live.get(index);
+    return [...new Set([...page.body.matchAll(/href="([^"]+\.(?:xml|rss))"/g)].map((m) => new URL(m[1]!, page.url).pathname))].sort();
+  }
+  const found = new Set([...pages.card.values()].flatMap((p) => p.feeds));
+  const list = await live.get(paths(run.config).promises(run.config.locales.default));
+  if (list.status === 200) for (const f of parsePage(list.body, list.url).feeds) found.add(f);
+  const engine = [...run.files.values()].filter((f) => /atom|rss/.test(f.contentType)).map((f) => f.path);
+  const answers = await Promise.all(engine.filter((p) => !found.has(p)).map(async (p) => [p, (await live.get(p)).status] as const));
+  for (const [p, status] of answers) if (status === 200) found.add(p);
+  return [...found].sort();
+}
+
+export async function feedsArea(run: EngineRun, live: Live, livePaths: readonly string[]): Promise<Finding[]> {
   const area = "Feeds";
   const out: Finding[] = [];
-  const index = await live.get(feedsPage);
-  const livePaths = [...new Set([...index.body.matchAll(/href="([^"]+\.(?:xml|rss))"/g)].map((m) => new URL(m[1]!, index.url).pathname))].sort();
   const engineFeeds = [...run.files.values()].filter((f) => /atom|rss/.test(f.contentType));
   const enginePaths = new Set(engineFeeds.map((f) => f.path));
 
@@ -243,7 +261,7 @@ export async function feedsArea(run: EngineRun, live: Live, feedsPage: string): 
   };
   add("worse", ids, "{n} feeds would change their id, so feed readers would treat them as new feeds");
   // Missing entries by kind ("cost/correction", "contract", "edition"), so each kind can be judged on its own.
-  const kindOf = (item: string) => /: promise\/[^/]+\/([a-z]+(?:\/[a-z]+)?)\//.exec(item)?.[1]?.replace(/\/\d+$/, "") ?? /: ([a-z]+)\//.exec(item)?.[1] ?? "other";
+  const kindOf = (item: string) => /: promise\/[^/]+\/([a-z]+(?:\/[a-z]+)?)(?:\/|\s)/.exec(item)?.[1]?.replace(/\/\d+$/, "") ?? /: ([a-z]+)\//.exec(item)?.[1] ?? "other";
   const byKind = new Map<string, string[]>();
   for (const m of uniq(missing)) byKind.set(kindOf(m), [...(byKind.get(kindOf(m)) ?? []), m]);
   for (const [kind, list] of byKind) add("worse", list, `{n} live feed entries of kind "${kind}" the engine would not make: followers would stop getting them`);
@@ -262,6 +280,8 @@ export async function feedsArea(run: EngineRun, live: Live, feedsPage: string): 
 export function markdownArea(run: EngineRun, pages: LivePages): Finding[] {
   const area = "Markdown";
   const out: Finding[] = [];
+  if (!pages.markdown.size)
+    return [{ area, verdict: "better", what: `The site serves no Markdown for its cards; the engine adds one file per card (${plural(run.published.length, "card")}), beside each page` }];
   const p = paths(run.config);
   const L = run.config.locales.default;
   const lostFacts: string[] = [];
@@ -626,17 +646,21 @@ export function titlesArea(run: EngineRun, pages: LivePages): Finding[] {
 
 // ---------------------------------------------------------------- open data
 
-export async function openDataArea(run: EngineRun, live: Live, apiPath: string): Promise<Finding[]> {
+export async function openDataArea(run: EngineRun, live: Live, apiPath?: string): Promise<Finding[]> {
   const area = "Open data";
-  const api = await live.get(apiPath);
+  const api = apiPath ? await live.get(apiPath) : undefined;
   const json = run.files.get(paths(run.config).data("json"));
   const csv = run.files.get(paths(run.config).data("csv"));
   return [
-    {
-      area,
-      verdict: "site",
-      what: `The site's own API (${apiPath}, answered ${api.status}) stays the site's: the engine does not replace it`,
-    },
+    ...(apiPath && api
+      ? [
+          {
+            area,
+            verdict: "site" as const,
+            what: `The site's own API (${apiPath}, answered ${api.status}) stays the site's: the engine does not replace it`,
+          },
+        ]
+      : []),
     {
       area,
       verdict: "better",

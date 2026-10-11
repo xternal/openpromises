@@ -8,11 +8,11 @@ It reads the site's content from its checkout and fetches its live pages. It cha
 pnpm dry-run
 ```
 
-Today there is one, for Public Ledger (ledgergov.uk). It expects the site's checkout at `../public-gov-ledger/open-pnl`; set `PUBLIC_LEDGER_DIR` to read it from somewhere else. When the checkout is missing, the dry run is skipped.
+There are two: Public Ledger (ledgergov.uk) and Borough Book (boroughbook.uk). `pnpm dry-run` runs both; `pnpm dry-run ledgergov` or `pnpm dry-run boroughbook` runs one. Each expects the site's checkout beside this repository (`../public-gov-ledger/open-pnl`, `../borough-ledger`); a setting below points elsewhere. When a checkout is missing, its dry run is skipped.
 
 | Setting | What it does |
 |---|---|
-| `PUBLIC_LEDGER_DIR` | Where Public Ledger's checkout is |
+| `PUBLIC_LEDGER_DIR`, `BOROUGH_BOOK_DIR` | Where each site's checkout is |
 | `DRY_RUN_LIVE` | Compare with another copy of the site, such as a preview deploy (default `https://ledgergov.uk`) |
 | `DRY_RUN_OFFLINE=1` | Use the pages fetched by the last run instead of fetching again |
 
@@ -44,10 +44,13 @@ Everything goes to `.dry-run/<site>/`, which git ignores:
 - `live/`: the site's Markdown and the main part of each card page, as fetched, to diff against `engine/`
 - `cache/`: the fetched pages, for `DRY_RUN_OFFLINE=1`
 
-## The site's files
+## Each site's files
+
+The run itself is `lib/run.tsx`, the same for every site. A site adds a profile and a configuration:
 
 - `ledgergov.config.ts`: the site's configuration as it would be on the day it moves, built on `fixtures/public-ledger/openpromises.config.ts`
 - `ledgergov.ts`: the site's own checks, as broken cards; what the site keeps making itself (`OWN`: its contract and figures entries, its contracts section), which the run takes from the live site and hands to the engine as the site's code would, by kind and title only, so nothing the engine should make can be filled in from the live copy; and the differences already decided, each with its reason
 - `ledgergov.dry.tsx`: the run
+- `boroughbook.ts`, `boroughbook.config.ts`, `boroughbook.dry.tsx`: the same for Borough Book. Its own checks come from borough-ledger `packages/schema/src/content.ts` and `append-only.ts`; it has no page listing its feeds, so they are found on its pages and at the engine's own feed addresses
 
 A difference goes into the decided list only once it is decided, with the decision or document that says so.

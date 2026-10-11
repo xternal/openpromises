@@ -108,6 +108,8 @@ export interface Page {
   mainLinks: string[];
   /** The main content's HTML. */
   mainHtml: string;
+  /** The feeds the page announces in its head (link rel="alternate"), as paths. */
+  feeds: string[];
 }
 
 export const squash = (s: string) => s.replace(/\s+/g, " ").trim();
@@ -140,6 +142,7 @@ export function parsePage(html: string, url: string): Page {
     mainText: squash(main.textContent ?? ""),
     mainLinks: [...new Set([...main.querySelectorAll("a[href]")].map((a) => (a as HTMLAnchorElement).href))],
     mainHtml: main.outerHTML,
+    feeds: [...document.querySelectorAll('link[rel="alternate"][type*="rss"], link[rel="alternate"][type*="atom"]')].map((l) => new URL(l.getAttribute("href") ?? "", url).pathname),
   };
 }
 

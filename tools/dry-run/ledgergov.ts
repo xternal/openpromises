@@ -1,6 +1,8 @@
+import { join } from "node:path";
 import { fromPublicLedger } from "@openpromises/core";
 import type { Mutation } from "./lib/mutations";
 import type { Accepted } from "./lib/report";
+import type { SiteProfile } from "./lib/run";
 
 /**
  * Public Ledger (ledgergov.uk): its own checks, as its validator words them
@@ -203,3 +205,16 @@ export const ACCEPTED: Accepted[] = [
     reason: "The engine lists promise pages only.",
   },
 ];
+
+export const LEDGERGOV: SiteProfile = {
+  name: "Public Ledger",
+  slug: "ledgergov",
+  live: "https://ledgergov.uk",
+  repo: { env: "PUBLIC_LEDGER_DIR", default: "../public-gov-ledger/open-pnl" },
+  config: join(import.meta.dirname, "ledgergov.config.ts"),
+  mutations: MUTATIONS,
+  accepted: ACCEPTED,
+  own: OWN,
+  feedsIndex: "/feeds",
+  api: "/api/v1",
+};

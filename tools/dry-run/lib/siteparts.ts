@@ -22,9 +22,7 @@ export function entryKind(id: string): { kind: string; card?: string } {
   return m ? { kind: m[2]!, card: m[1]! } : { kind: path.split("/")[0]! };
 }
 
-export async function siteParts(live: Live, feedsPage: string, markdown: ReadonlyMap<string, string>, own: { entries: readonly string[]; sections: readonly string[] }): Promise<SiteParts> {
-  const index = await live.get(feedsPage);
-  const feeds = [...new Set([...index.body.matchAll(/href="([^"]+\.(?:xml|rss))"/g)].map((m) => new URL(m[1]!, index.url).pathname))];
+export async function siteParts(live: Live, feeds: readonly string[], markdown: ReadonlyMap<string, string>, own: { entries: readonly string[]; sections: readonly string[] }): Promise<SiteParts> {
   const entries = new Map<string, SiteEntry>();
   for (const path of feeds) {
     const got = await live.get(path);
