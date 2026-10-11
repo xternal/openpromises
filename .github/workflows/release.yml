@@ -85,7 +85,8 @@ jobs:
             if npm view "@openpromises/$p@$v" version >/dev/null 2>&1; then
               echo "@openpromises/$p@$v is already on npm"
             else
-              npm publish "packed/openpromises-$p-$v.tgz" --access public
+              # "./" matters: without it npm reads "packed/…" as a GitHub repository.
+              npm publish "./packed/openpromises-$p-$v.tgz" --access public
             fi
           done
       - name: GitHub release, from the changelog
