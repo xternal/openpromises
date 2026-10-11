@@ -339,6 +339,15 @@ describe("publishing a whole site", () => {
   });
 });
 
+describe("what Borough Book's dry run showed was missing", () => {
+  it("cites the archived copy of the quote's source in the structured data", async () => {
+    const s = await site("borough-book");
+    const v = s.views.find((x) => x.id === "lab-2026-affordable-homes")!;
+    const quotation = (cardJsonLd(v, { config: s.config, w: words(s.config, "en"), today: s.today })[0] as { mainEntity: { citation?: string[] } }).mainEntity;
+    expect(quotation.citation).toContain(v.current.archived_url);
+  });
+});
+
 describe("what Public Ledger showed the dry run was missing", () => {
   it("writes an amount under £0.1bn in millions, so a small range stays a range", async () => {
     const gbp = resolveConfig({ site: { name: "T" }, money: { currency: "GBP", unit: "bn" } });

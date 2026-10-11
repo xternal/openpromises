@@ -20,6 +20,15 @@ describe("PromiseCard", () => {
     expect(out).toContain('<details class="op-fold"><summary>Sources (6)</summary>');
   });
 
+  it("links the quote's source and its archived copy", async () => {
+    const s = await site("borough-book");
+    const v = s.views.find((x) => x.id === "lab-2026-affordable-homes")!;
+    const out = html(<PromiseCard view={v} config={s.config} today={s.today} />);
+    expect(out).toContain(`<a href="${v.current.source_url}" rel="noopener noreferrer">source</a>`);
+    expect(v.current.archived_url).toBeTruthy();
+    expect(out).toContain(`<a href="${v.current.archived_url}" rel="noopener noreferrer">archived copy</a>`);
+  });
+
   it("says who brought the outcome about, beside the status", async () => {
     const s = await site("public-ledger");
     const out = html(<PromiseCard view={s.views.find((x) => x.id === "uk-snp-two-child-cap-2024")!} config={s.config} today={s.today} />);

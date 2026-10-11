@@ -114,7 +114,11 @@ export function cardJsonLd(v: CardView, ctx: LdContext): JsonLd[] {
         dateCreated: v.card.made_on,
         about: area,
         isBasedOn: said.source_url,
-        ...(v.card.sources?.length ? { citation: v.card.sources.map((s) => s.url) } : {}),
+        ...(() => {
+          // The sources, and the archived copy of the quote's own source, so a reader can still find the words if the page moves.
+          const cites = [...(v.current.archived_url ? [v.current.archived_url] : []), ...(v.card.sources ?? []).map((s) => s.url)];
+          return cites.length ? { citation: cites } : {};
+        })(),
       },
     },
     crumbs(

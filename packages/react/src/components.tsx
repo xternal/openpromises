@@ -190,6 +190,20 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
             {venue ? `${venue}, ` : ""}
             <Time iso={f.made_on} w={w} />
           </span>
+          {/* Where the words come from, and the archived copy that keeps them if the page moves. */}
+          <span>
+            <a href={view.current.source_url} rel="noopener noreferrer">
+              {w.t("card.source")}
+            </a>
+            {view.current.archived_url && (
+              <>
+                {" · "}
+                <a href={view.current.archived_url} rel="noopener noreferrer">
+                  {w.t("card.archive")}
+                </a>
+              </>
+            )}
+          </span>
           {!view.current.quote_checked_on && <span>{w.t("card.quote_not_checked")}</span>}
         </p>
         <Ladder view={view} config={config} locale={L} />
