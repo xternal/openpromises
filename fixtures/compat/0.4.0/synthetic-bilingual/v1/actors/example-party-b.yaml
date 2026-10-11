@@ -1,0 +1,8 @@
+format: openpromises/1
+id: example-party-b
+kind: party
+name:
+  ru: Партия «Пример Б»
+  en: Party Example B
+level: federal
+roles: []

@@ -569,9 +569,9 @@ describe("standing (decision 18)", () => {
   const manual = resolveConfig({ ...CONFIG_INPUT, actors: { ...CONFIG_INPUT.actors, standing: "manual" } });
   const actor = (a: Record<string, unknown>) => validateActor({ format: "openpromises/1", name: { en: "Someone" }, ...a }, manual).issues.filter((i) => i.path[0] === "standing");
 
-  it("asks a party for its standing, as a warning until 0.4.0, and lets a person take their party's", () => {
+  it("refuses a party without its standing (a warning in 0.3.0, an error from 0.4.0), and lets a person take their party's", () => {
     expect(actor({ id: "red-party", kind: "party" }).map((i) => [i.severity, i.message])).toEqual([
-      ["warning", "is missing: on this site every party states where it stands (in_power, opposition or public_body); a person takes their party's (an error from version 0.4.0)"],
+      ["error", "is missing: on this site every party states where it stands (in_power, opposition or public_body); a person takes their party's"],
     ]);
     expect(actor({ id: "red-party", kind: "party", standing: "opposition" })).toEqual([]);
     expect(actor({ id: "sam-doe", kind: "person", party_id: "red-party" })).toEqual([]);

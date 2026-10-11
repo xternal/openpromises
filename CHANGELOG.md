@@ -2,6 +2,16 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
+## 0.4.0 (11 October 2026)
+
+- **Standing** (decision 18): with `actors.standing: manual`, a party without a standing is now an error, as the 0.3.0 warning said. A person still takes their party's.
+- **Published from GitHub**: the first release made by the Release workflow, with npm trusted publishing. Every package carries provenance: a signed record of the commit and workflow that built it, shown on its npm page.
+- Documentation since 0.3.0: Public Ledger converts not before 1 December 2026 (decision 20); a site on pnpm 12 adds a release a day after it comes out; the migration guide says plainly that converting the cards is the switch.
+
+### Upgrading from 0.3.0
+
+- A party without a `standing`, on a site with `actors.standing: manual`, is now an error. Give each party its standing (`in_power`, `opposition` or `public_body`).
+
 ## 0.3.0 (9 October 2026)
 
 Decisions 15 to 19, from Public Ledger's migration plan.

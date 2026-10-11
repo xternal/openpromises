@@ -416,7 +416,7 @@ error  content/promises/uk-bus-cap.yaml  events[1].evidence_url: an "in_plan" ev
 | `corrections` | Each correction names a field that exists, and the field equals the `now` of its last correction. |
 | `approvals` | A published card has enough approvals, from listed editors, made while they were editors, none from an editor about their own party; automated reviews never approve. |
 | `standing` | The `not_in_power` rule (§11). |
-| `actors` | Actors use the configured kinds, levels and identifiers, and their parties exist. Standing and seats fit `actors.standing`; with `standing: manual`, every party states its standing (a warning until 0.4.0, decision 18). |
+| `actors` | Actors use the configured kinds, levels and identifiers, and their parties exist. Standing and seats fit `actors.standing`; with `standing: manual`, every party states its standing (decision 18; a warning in 0.3.0). |
 | `quotes` | Every version of a published card has its words confirmed: a stored-source span that matches character for character, an archive check (`quotes.json`) that found them (`exact`, or `close` with `quote_checked_on`), or, when `quotes.require` is `editor`, `quote_checked_on`. A machine check that did not find the words is always an error. With `quotes.archive: required`, every version has an `archived_url`. |
 | `responsible` | `responsible` names an actor that exists and whose kind is in `actors.responsible`, or is `null`; with `actors.responsibleRequired`, every card has it (a warning in a draft). |
 | `brought-about-by` | `brought_about_by` names an actor that exists, and the card's status is the third step of the ladder or beyond. |
