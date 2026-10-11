@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: A security problem
+    url: https://github.com/xternal/openpromises/security/advisories/new
+    about: Report it privately, never in a public issue (SECURITY.md).
+  - name: How to write a card, or move a site
+    url: https://github.com/xternal/openpromises/blob/main/docs/FORMAT.md
+    about: The card format, the configuration and every rule; docs/MIGRATING.md for moving an existing tracker.

@@ -11,5 +11,8 @@ export default defineConfig({
   },
   test: {
     include: ["packages/*/test/**/*.test.ts", "packages/*/test/**/*.test.tsx", "fixtures/**/*.test.ts"],
+    // The slowest tests (axe in jsdom, git in temporary folders, the TypeScript export report) can pass 5 seconds on a busy machine.
+    testTimeout: 20_000,
+    hookTimeout: 20_000,
   },
 });

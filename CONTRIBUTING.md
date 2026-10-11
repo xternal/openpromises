@@ -1,6 +1,6 @@
 # Contributing to OpenPromises
 
-Thank you for helping. OpenPromises holds the rules that make a promise tracker trustworthy, so every change is held to the same standard as the cards it checks.
+Thank you for helping. OpenPromises holds the rules that make a promise tracker trustworthy, so every change is held to the same standard as the cards it checks. Everyone here follows the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## Ground rules
 
