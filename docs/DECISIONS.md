@@ -22,7 +22,7 @@ Pavel Guzhikov accepted every recommendation in RFC-0001 §12 on 9 October 2026.
 
 Notes made while building, so a reader can see how each decision was read. None of them changes a decision; anything that would is proposed below and waits for the owner.
 
-- **Decision 9 and this repository.** The engine is built in its own repository from 9 October 2026, as the owner asked when he started it. The three sites are only read: nothing in them changes, and no site moves onto the engine before 29 October. Public Ledger moves first, after 17 November (decision 19).
+- **Decision 9 and this repository.** The engine is built in its own repository from 9 October 2026, as the owner asked when he started it. The three sites are only read: nothing in them changes, and no site moves onto the engine before 29 October. Public Ledger moves first, not before 1 December (decision 20).
 - **Decision 4 and private declarations.** The editors list is a file the configuration points to (`editorial.editorsFile`, default `editors.yaml`), and `openpromises validate --editors <path>` can read it from somewhere else. A site that has promised its editors to keep their declarations private can therefore keep the list out of its public repository and give it to its checks privately; a site that publishes its list keeps it beside the cards.
 - **Corrections and reviews are not optional.** RFC §7 lists `corrections` and `reviews` among Public Ledger's modules. Because principles 3 (public corrections) and 4 (two editors, recorded in the card) are rules for every site, both are always on. The names are still accepted in `modules`, so the RFC's example configuration works unchanged.
 
@@ -79,6 +79,10 @@ Four of the plan's questions were already settled that evening, by decisions 13 
 **18. `standing` is required for parties, not for everyone.** FORMAT.md says an actor needs `standing` when the site sets `standing: manual`, but the engine never checks it. On Public Ledger, ten of 19 actors have none: eight people, who take their party's, and two governments. Decided: FORMAT.md says what is meant, that with `standing: manual` every party states its standing and a person takes their party's. A check for parties arrives as a warning in 0.3.0 and becomes an error in 0.4.0 (decision 13.2). Public Ledger's parties all pass it already. Cost: a sentence and a small check.
 
 **19. Public Ledger moves after 17 November 2026.** Decision 9 says nothing moves before 29 October. Public Ledger's own plan now moves it after its 30-day build series, ending 17 November. Decided: keep decision 9 as the earliest date, and record 17 November as Public Ledger's planned start. Cost: none; Borough Book's move (E3) follows later.
+
+## Accepted on 11 October 2026
+
+**20. Public Ledger converts after the AI Journalist's first two public weeks: not before 1 December 2026.** Decision 19 set "after 17 November", the day after the AI Journalist's planned public launch (its RFC, Amendment 1). The AI Journalist reads Public Ledger's published feeds and API, which the conversion keeps identical, but its first public fortnight is when readers decide whether to trust it, so the data under it stays still. Accepted by Pavel Guzhikov as recommended on 11 October 2026. Why: two editors need the time for 108 reviews (two on each of 54 cards) anyway, and two more weeks on the old code cost little while Public Ledger's report-only check catches any drift. Decision 9 (nothing before 29 October) still holds.
 
 ## Proposed, waiting for the owner
 
