@@ -5,6 +5,7 @@ All notable changes to OpenPromises. The packages share one version and follow [
 ## Unreleased
 
 - Documentation: the sites are called by their domain, LedgerGov.UK, BoroughBook.UK and RussiaLedger.com (decision 25). Names in code are unchanged.
+- Documentation: the engine never holds or asks for an AI key; a site that uses a model brings its own (decision 26). The README's principles now say what decision 22 changed for a site that publishes by checks.
 
 ## 0.6.0 (12 October 2026)
 

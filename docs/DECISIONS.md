@@ -102,6 +102,8 @@ Four of the plan's questions were already settled that evening, by decisions 13 
 
 **25. Products are called by their domain.** LedgerGov.UK (earlier entries say Public Ledger), BoroughBook.UK (Borough Book) and RussiaLedger.com (Russia Ledger, or the bilingual tracker). Decided by Pavel Guzhikov on 12 October 2026: a product is easier to name by its domain, where it has one. The documentation and comments use them from now on. Earlier entries here and released versions in CHANGELOG.md keep the names they were written with, as history. Names in code stay as they are, since sites use them: `fromPublicLedger`, `fromBoroughBook`, `legacy: "public-ledger"`, `fixtures/public-ledger`, `PUBLIC_LEDGER_DIR`. So do the fixtures, which are copies of each site's data, site name included.
 
+**26. The engine never holds or asks for an AI key.** No package of OpenPromises contains, reads or requires a key for an AI model, or for any other paid service. Today none of them calls a model at all, and the engine makes no network calls (principle 8). When the intake or reviewer package is built (RFC §10, E4), it takes a model the site passes in, with the site's own provider and key, and works with none. A site that uses a model brings its own key, and nothing in this repository, its CI or its releases ever uses the owner's. Decided by Pavel Guzhikov at 20:05 BST on 12 October 2026: he does not want his key used for any setup of the SDK. His own sites each keep their own key in their own repository, which is theirs to manage.
+
 ## Proposed, waiting for the owner
 
 None.
