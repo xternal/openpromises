@@ -6,4 +6,8 @@ import base from "../../fixtures/borough-book/openpromises.config.ts";
  * fixture's configuration as it stands. The site's own words and settings are
  * added here as its dry run finds them (docs/MIGRATING.md).
  */
-export default defineConfig({ ...base });
+export default defineConfig({
+  ...base,
+  // The fixture keeps the name the site had when it was copied; the site is BoroughBook.UK since 12 October 2026 (decision 25).
+  site: { ...base.site, name: "BoroughBook.UK" },
+});
