@@ -53,7 +53,7 @@ export default defineConfig({
 | `ladder` | The status ladder: `"national"`, `"local"`, or `{ custom: [{ id, category }, ...] }` (§6). | `"national"` |
 | `labels` | Status labels per language: `{ en: { failed: "Not met" } }`. Neutral defaults exist in English and Russian (§6). | defaults |
 | `headline` | Headline limits per language: `{ en: { minWords: 3, maxWords: 8, maxChars: 70 } }`. | §11 |
-| `editorial` | `{ approvals, partyConflict, editorsFile, renamed }`: approvals needed to publish; whether an editor may approve a card about their own party (never, when `true`); where the editors list is; `renamed`, the name readers now see for a reviewer renamed since its reviews were recorded (`{ "Junior Editor": "AI Journalist" }`), since a review itself is history and never edited. | `{ approvals: 2, partyConflict: true, editorsFile: "editors.yaml" }` |
+| `editorial` | `{ approvals, publish, partyConflict, editorsFile, renamed }`: approvals needed to publish; `publish`, `"approved"` (every published card has them) or `"checked"` (a card is published once its checks pass, and only a reader's submission waits for the approvals: decision 22, §10); whether an editor may approve a card about their own party (never, when `true`); where the editors list is; `renamed`, the name readers now see for a reviewer renamed since its reviews were recorded (`{ "Junior Editor": "AI Journalist" }`), since a review itself is history and never edited. | `{ approvals: 2, publish: "approved", partyConflict: true, editorsFile: "editors.yaml" }` |
 | `quotes` | `{ archive, require, minWords }`. `archive: "required"` means every version needs an `archived_url`. `require: "editor"` accepts an editor's confirmation (`quote_checked_on`) when no machine check exists; `"match"` needs a machine match for every version. `minWords`: the shortest quote a stored-source span may hold. `licences`: the terms a quote may be reused on, by its source's address (`[{ hosts: ["parliament.uk"], name: "Open Parliament Licence v3.0" }]`; a host covers its subdomains), and `otherLicence` for every other source; Markdown names them beside each quote's source. | `{ archive: "optional", require: "editor", minWords: 6 }` |
 | `modules` | Optional parts a card may use (§10): `contracts`, `decisions`, `lever`, `metrics`, `designations`, `wards`. (`corrections` and `reviews` are accepted but always on.) | `[]` |
 | `legacy` | The older format that cards without a `format:` line are in: `"public-ledger"`, `"borough-book"` or `"russia-ledger"`. They are converted on read (§14). | none |
@@ -329,6 +329,10 @@ A **review** is a check of the whole card, shown on it.
 
 **Approvals.** A card in `promises/` needs `editorial.approvals` approvals (default 2): reviews with `kind: editor` and `approves: true`, by different editors in the editors list, each made while they were an editor. An approval given before a site moved to OpenPromises (on a pull request, say) is recorded with the day it was given and a note saying where (`openpromises review --on`). When `editorial.partyConflict` is on, an editor never approves a card about their own party: the card's actor, or the actor's party. An automated review never approves.
 
+**Publishing by checks** (decision 22). With `editorial.publish: "checked"`, a card in `promises/` needs no approvals when its `origin` is `manual` or `llm_intake`: it is published once every other rule passes. Its words must then be matched at their source by a machine (a stored-source span, or an `exact` archive check): an editor's `quote_checked_on`, or a `close` match, counts only once the editors have approved it. A card whose `origin` is `reader_submission`, or that has no `origin`, still needs the approvals, since anyone can submit one. The approvals that are given are checked as always.
+
+**Verification** (decision 23). Every card says how far it has been verified, worked out by `verification(card, { actors, editors })` in `@openpromises/core`: `none` (no review), `automated` (only automated reviews), `editor` (one valid approval) or `editors` (two or more), with the editors who chose to be named (`named: true` in the editors list) and a count of the rest. Approvals count as in the approvals rule. Without the editors list it is `null`, since approvals cannot then be checked. Pages, feeds, Markdown and open data show it in words ([PUBLISHING.md](PUBLISHING.md)).
+
 **Modules** add optional data. A card may use a module only when the configuration lists it.
 
 | Module | Where | Data |
@@ -384,11 +388,14 @@ editors:
   - handle: Sam              # shown on cards: a real name or a pen name, as the editor chooses
     since: "2026-10-01"
     party: null              # declared party membership: an actor id, or null for none
+    named: true              # named on the cards they verify; without it, counted ("1 independent editor")
   - handle: Alex
     since: "2026-10-01"
     until: "2027-03-31"      # no longer an editor after this day
     party: riverside-greens
 ```
+
+`named` (decision 23) decides only what pages, feeds and open data say: the handle is in each review the editor records, in the card itself, so an editor who must not be known by name uses a pen name.
 
 A site that has promised its editors to keep their declarations private can keep this file outside its public repository and pass it to the commands with `--editors /path/to/editors.yaml`, or with the `OPENPROMISES_EDITORS` environment variable (in CI, from a secret: see [MIGRATING.md](MIGRATING.md)). No message the engine prints names an editor's declared party.
 
@@ -414,10 +421,10 @@ error  content/promises/uk-bus-cap.yaml  events[1].evidence_url: an "in_plan" ev
 | `scoreable` | The current version has parameters, unless the card is `unscoreable`; an `unscoreable` card has none. |
 | `cost` | Every cost with a range has low less than high, the central figure between them, a quality label from `money.qualities` and at least one source; a cost without a range has a note. `by` goes only with a range, and every yearly cost with a range has one when `money.costedBy` is `required`. |
 | `corrections` | Each correction names a field that exists, and the field equals the `now` of its last correction. |
-| `approvals` | A published card has enough approvals, from listed editors, made while they were editors, none from an editor about their own party; automated reviews never approve. |
+| `approvals` | A published card has enough approvals, from listed editors, made while they were editors, none from an editor about their own party; automated reviews never approve. With `editorial.publish: checked`, only a reader's submission or a card with no `origin` needs them (decision 22). |
 | `standing` | The `not_in_power` rule (§11). |
 | `actors` | Actors use the configured kinds, levels and identifiers, and their parties exist. Standing and seats fit `actors.standing`; with `standing: manual`, every party states its standing (decision 18; a warning in 0.3.0). |
-| `quotes` | Every version of a published card has its words confirmed: a stored-source span that matches character for character, an archive check (`quotes.json`) that found them (`exact`, or `close` with `quote_checked_on`), or, when `quotes.require` is `editor`, `quote_checked_on`. A machine check that did not find the words is always an error. With `quotes.archive: required`, every version has an `archived_url`. |
+| `quotes` | Every version of a published card has its words confirmed: a stored-source span that matches character for character, an archive check (`quotes.json`) that found them (`exact`, or `close` with `quote_checked_on`), or, when `quotes.require` is `editor`, `quote_checked_on`. On a card published by its checks with no editors' approvals (decision 22), only a stored-source span or an `exact` archive check will do. A machine check that did not find the words is always an error. With `quotes.archive: required`, every version has an `archived_url`. |
 | `responsible` | `responsible` names an actor that exists and whose kind is in `actors.responsible`, or is `null`; with `actors.responsibleRequired`, every card has it (a warning in a draft). |
 | `brought-about-by` | `brought_about_by` names an actor that exists, and the card's status is the third step of the ladder or beyond. |
 | `references` | The actor, reply actors and parties exist; ids are unique across `promises/` and `drafts/` and match the file names; outside identifiers belong to one actor each. |

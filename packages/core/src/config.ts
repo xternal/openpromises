@@ -98,6 +98,8 @@ export const ConfigInput = z.strictObject({
   editorial: z
     .strictObject({
       approvals: z.number().int().min(2, "should be 2 or more: publishing needs two editors (principle 4)").optional(),
+      /** "approved": every published card has the editors' approvals; "checked": a card is published once its checks pass, and a reader's submission still needs the approvals (decision 22). */
+      publish: z.enum(["approved", "checked"]).optional(),
       partyConflict: z.literal(true, { error: "cannot be turned off: an editor never approves a card about their own party (principle 4)" }).optional(),
       editorsFile: z.string().min(1).optional(),
       /** A reviewer's name as readers see it now, for one renamed since its reviews were recorded: { "Junior Editor": "AI Journalist" }. */
@@ -169,7 +171,7 @@ export interface Config {
   labels: Record<string, Record<string, string>>;
   /** Headline limits per configured language. */
   headline: Record<string, HeadlineLimits>;
-  editorial: { approvals: number; partyConflict: true; editorsFile: string; renamed: Record<string, string> };
+  editorial: { approvals: number; publish: "approved" | "checked"; partyConflict: true; editorsFile: string; renamed: Record<string, string> };
   quotes: { archive: "required" | "optional"; require: "editor" | "match"; normalise?: string; minWords: number; licences: { hosts: string[]; name: string }[]; otherLicence?: string };
   modules: Set<Module>;
   legacy?: LegacyFormat;
@@ -321,7 +323,7 @@ export function resolveConfig(input: unknown): Config {
     ladder: { name: ladderName, statuses },
     labels,
     headline,
-    editorial: { approvals: c.editorial?.approvals ?? 2, partyConflict: true, editorsFile: c.editorial?.editorsFile ?? "editors.yaml", renamed: c.editorial?.renamed ?? {} },
+    editorial: { approvals: c.editorial?.approvals ?? 2, publish: c.editorial?.publish ?? "approved", partyConflict: true, editorsFile: c.editorial?.editorsFile ?? "editors.yaml", renamed: c.editorial?.renamed ?? {} },
     quotes: {
       archive: c.quotes?.archive ?? "optional",
       require: c.quotes?.require ?? "editor",

@@ -166,6 +166,12 @@
   font-size: 0.875rem;
   color: var(--op-muted);
 }
+
+/* Decision 23: a card no editor has verified says so where readers look first. */
+.op-verified--none,
+.op-verified--automated {
+  color: var(--op-warn);
+}
 .op-card__draft {
   margin: 0;
   padding: 10px 14px;

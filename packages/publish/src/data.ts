@@ -1,7 +1,8 @@
-import { categoryOf, statusLabel, type Actor, type Config } from "@openpromises/core";
+import { categoryOf, statusLabel, type Actor, type Config, type VerificationLevel } from "@openpromises/core";
 import type { Words } from "./messages";
 import { absolute, paths } from "./urls";
-import { actorName, areaLabel, headline, lastUpdated, type CardView } from "./view";
+import { actorName, areaLabel, headline, lastUpdated, reviewerName, verificationText, type CardView } from "./view";
+import { words } from "./messages";
 
 /**
  * Open data: every published card as JSON (the cards themselves, in format v1)
@@ -16,6 +17,8 @@ export interface OpenData {
   licence?: { name: string; url: string };
   cards: unknown[];
   actors: Actor[];
+  /** Each card's verification by id (decision 23), with its words in every language of the site; absent when built without the editors list. */
+  verification?: Record<string, { level: VerificationLevel; named: string[]; counted: number; automated: string[]; text: Record<string, string> }>;
 }
 
 export function openDataJson(views: readonly CardView[], config: Config, today: string): OpenData {
@@ -32,7 +35,25 @@ export function openDataJson(views: readonly CardView[], config: Config, today: 
     ...(config.publish.licence ? { licence: config.publish.licence } : {}),
     cards: published.map((v) => v.card),
     actors: [...actors.values()].sort((a, b) => (a.id < b.id ? -1 : 1)),
+    ...(published.some((v) => v.verification) ? { verification: verificationData(published, config) } : {}),
   };
+}
+
+function verificationData(views: readonly CardView[], config: Config): NonNullable<OpenData["verification"]> {
+  const ws = config.locales.all.map((l) => words(config, l));
+  const out: NonNullable<OpenData["verification"]> = {};
+  for (const v of views) {
+    if (!v.verification) continue;
+    const { level, named, counted, automated } = v.verification;
+    out[v.id] = {
+      level,
+      named: named.map((by) => reviewerName(config, by)),
+      counted,
+      automated: automated.map((by) => reviewerName(config, by)),
+      text: Object.fromEntries(ws.map((w) => [w.locale, verificationText(v, config, w)!])),
+    };
+  }
+  return out;
 }
 
 /** A CSV field: quoted when it holds a comma, quote or line break; a leading = + - @ is defused so spreadsheets do not run it. */
@@ -75,6 +96,9 @@ export const CSV_COLUMNS = [
   "cost_by_name",
   "responsible_id",
   "brought_about_by_id",
+  // Added in 0.6.0 (decision 23); empty when built without the editors list.
+  "verification_level",
+  "verification",
 ] as const;
 
 /** Every published card as CSV, one row each, in the language of `w` for headlines and labels. */
@@ -117,6 +141,8 @@ export function openDataCsv(views: readonly CardView[], config: Config, w: Words
         // "none" when the card says no body in power is committed; empty when it does not say.
         responsible_id: v.card.responsible === null ? "none" : (v.card.responsible?.actor_id ?? ""),
         brought_about_by_id: v.card.brought_about_by?.actor_id ?? "",
+        verification_level: v.verification?.level ?? "",
+        verification: verificationText(v, config, w) ?? "",
       };
       return CSV_COLUMNS.map((c) => csvField(row[c])).join(",");
     });

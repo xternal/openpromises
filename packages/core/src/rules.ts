@@ -331,9 +331,58 @@ export function approvers(card: Card, ctx: Pick<CardContext, "actors" | "editors
   return out;
 }
 
+/**
+ * Whether a card waits for the editors' approvals before it is published
+ * (decision 22): always under editorial.publish "approved"; under "checked",
+ * only a reader's submission, or a card that does not say where it came from.
+ */
+export function needsApprovals(card: Pick<Card, "origin">, config: Pick<Config, "editorial">): boolean {
+  return config.editorial.publish === "approved" || !card.origin || card.origin === "reader_submission";
+}
+
+/** A published card that stands on its automatic checks alone: the site publishes by checks, and the editors have not (yet) approved it. */
+export function publishedByChecks(card: Card, ctx: CardContext): boolean {
+  return published(ctx) && !needsApprovals(card, ctx.config) && approvers(card, ctx).size < ctx.config.editorial.approvals;
+}
+
+/** How far a card has been verified (decision 23): by editors, only by machines, or not yet. */
+export type VerificationLevel = "none" | "automated" | "editor" | "editors";
+
+export interface Verification {
+  level: VerificationLevel;
+  /** Editors who approved and chose to be named, in the order they approved. */
+  named: string[];
+  /** Editors who approved and chose to be counted, not named. */
+  counted: number;
+  /** The automated reviewers, as recorded in the reviews (a site shows them by their current names, editorial.renamed). */
+  automated: string[];
+}
+
+/**
+ * A card's verification, counted as the approvals rule counts: editors on the
+ * list, approving while editors, never about their own party, each once. Null
+ * without the editors list, since approvals cannot then be checked.
+ */
+export function verification(card: Card, ctx: Pick<CardContext, "actors" | "editors">): Verification | null {
+  if (!ctx.editors) return null;
+  const valid = approvers(card, ctx);
+  const named: string[] = [];
+  let counted = 0;
+  for (const r of card.reviews ?? []) {
+    if (r.kind !== "editor" || !valid.delete(r.by)) continue;
+    if (ctx.editors.find((e) => e.handle === r.by)?.named) named.push(r.by);
+    else counted++;
+  }
+  const automated = [...new Set((card.reviews ?? []).filter((r) => r.kind === "automated").map((r) => r.by))];
+  const editors = named.length + counted;
+  const level: VerificationLevel = editors >= 2 ? "editors" : editors === 1 ? "editor" : automated.length ? "automated" : "none";
+  return { level, named, counted, automated };
+}
+
 const approvals: Rule = {
   id: "approvals",
-  summary: "A published card has enough approvals from listed editors, none about their own party; machines never approve.",
+  summary:
+    "A published card has enough approvals from listed editors, none about their own party; machines never approve. A site that publishes by checks (editorial.publish: checked) needs them only on a reader's submission, or a card that does not say its origin.",
   check: (card, ctx) => {
     const out: Issue[] = [];
     const add = (path: Path, m: string) => out.push(issue("approvals", path, m));
@@ -351,12 +400,12 @@ const approvals: Rule = {
       if (seen.has(r.by)) return add(["reviews", i, "by"], `${r.by} has already approved this card; a second approval must come from a different editor`);
       seen.add(r.by);
     });
-    if (published(ctx)) {
+    if (published(ctx) && needsApprovals(card, ctx.config)) {
       const need = ctx.config.editorial.approvals;
       const have = approvers(card, ctx).size;
-      if (!ctx.editors) add(["reviews"], "a published card needs editors' approvals, but the site has no editors list");
-      else if (have < need)
-        add(["reviews"], `a published card needs ${plural(need, "editor")}' approvals; it has ${have}. Keep it in drafts/ until editors approve it (openpromises review)`);
+      const which = ctx.config.editorial.publish === "checked" ? (card.origin ? "a reader's submission" : "a card that does not say its origin") : "a published card";
+      if (!ctx.editors) add(["reviews"], `${which} needs editors' approvals, but the site has no editors list`);
+      else if (have < need) add(["reviews"], `${which} needs ${plural(need, "editor")}' approvals; it has ${have}. Keep it in drafts/ until editors approve it (openpromises review)`);
     }
     return out;
   },
@@ -401,6 +450,8 @@ const quotes: Rule = {
   check: (card, ctx) => {
     const out: Issue[] = [];
     const { config } = ctx;
+    // Decision 22: with no editor's approval, an editor's check by eye cannot stand in for the machine's.
+    const byChecks = publishedByChecks(card, ctx);
     card.versions.forEach((v, i) => {
       const at: Path = ["versions", i];
       if (config.quotes.archive === "required" && !v.archived_url)
@@ -428,12 +479,21 @@ const quotes: Rule = {
       if (check?.match === "none") report([...at, "text"], `the words were not found in the archived copy ${check.url}${check.checked_on ? ` (checked on ${check.checked_on})` : ""}`);
       else if (check?.match === "exact") confirmed = true;
       else if (check?.match === "close") {
-        if (v.quote_checked_on) confirmed = true;
+        if (byChecks) report([...at, "text"], `the words only nearly match the archived copy ${check.url}; a card published by its checks needs them word for word (or the editors' approvals)`);
+        else if (v.quote_checked_on) confirmed = true;
         else report([...at, "quote_checked_on"], `the words only nearly match the archived copy ${check.url}; an editor confirms them against it by eye and records quote_checked_on`, toPublish(ctx));
       }
 
       if (!confirmed && !reported) {
-        if (config.quotes.require === "editor" && v.quote_checked_on) confirmed = true;
+        if (config.quotes.require === "editor" && v.quote_checked_on && !byChecks) confirmed = true;
+        else if (byChecks)
+          out.push(
+            issue(
+              "quotes",
+              [...at, "text"],
+              "a card published by its checks needs its words matched at their source by a machine: add a stored-source span or an archive check (openpromises check-quote), or the editors' approvals",
+            ),
+          );
         else
           out.push(
             issue(

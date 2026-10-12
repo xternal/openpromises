@@ -8,7 +8,7 @@ describe("configuration", () => {
     const c = resolveConfig({ site });
     expect(c.locales).toEqual({ default: "en", all: ["en"] });
     expect(c.ladder.name).toBe("national");
-    expect(c.editorial).toEqual({ approvals: 2, partyConflict: true, editorsFile: "editors.yaml", renamed: {} });
+    expect(c.editorial).toEqual({ approvals: 2, publish: "approved", partyConflict: true, editorsFile: "editors.yaml", renamed: {} });
     expect(c.quotes).toEqual({ archive: "optional", require: "editor", minWords: 6, licences: [] });
     expect(c.money.costedBy).toBe("optional");
     expect(c.actors).toMatchObject({ responsible: ["government"], responsibleRequired: false });

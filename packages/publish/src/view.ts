@@ -1,4 +1,4 @@
-import { categoryOf, climb, statusLabel, type Actor, type Card, type Config, type LangMap, type ValidCard, type Version } from "@openpromises/core";
+import { categoryOf, climb, statusLabel, verification, type Actor, type Card, type Config, type Editor, type LangMap, type ValidCard, type Verification, type Version } from "@openpromises/core";
 import { costText, longDate } from "./format";
 import type { Words } from "./messages";
 
@@ -21,10 +21,17 @@ export interface CardView {
   broughtAboutBy?: Actor;
   /** The body that must act to deliver it (decision 14); null when no body in power is committed, absent when the card does not say. */
   responsible?: Actor | null;
+  /** How far the card has been verified (decision 23); absent when the views were made without the editors list. */
+  verification?: Verification;
 }
 
-/** Cards as views, newest promise first (ties by id, so the order never wobbles). Cards whose actor is missing are left out. */
-export function cardViews(cards: readonly (ValidCard | Card)[], actors: ReadonlyMap<string, Actor>): CardView[] {
+/**
+ * Cards as views, newest promise first (ties by id, so the order never
+ * wobbles). Cards whose actor is missing are left out. With the editors list,
+ * each view carries its verification (decision 23); without it, none, since
+ * approvals cannot then be checked.
+ */
+export function cardViews(cards: readonly (ValidCard | Card)[], actors: ReadonlyMap<string, Actor>, editors?: readonly Editor[] | null): CardView[] {
   const out: CardView[] = [];
   for (const c of cards) {
     const card = "card" in c ? c.card : c;
@@ -35,6 +42,7 @@ export function cardViews(cards: readonly (ValidCard | Card)[], actors: Readonly
     const role = actor.roles?.find((r) => (!r.from || r.from <= card.made_on) && (!r.to || r.to >= card.made_on))?.title ?? null;
     const broughtAboutBy = card.brought_about_by ? actors.get(card.brought_about_by.actor_id) : undefined;
     const responsible = card.responsible === null ? null : card.responsible ? actors.get(card.responsible.actor_id) : undefined;
+    const verified = editors ? verification(card, { actors, editors }) : null;
     out.push({
       id: card.id,
       card,
@@ -45,6 +53,7 @@ export function cardViews(cards: readonly (ValidCard | Card)[], actors: Readonly
       role,
       ...(broughtAboutBy ? { broughtAboutBy } : {}),
       ...(responsible !== undefined ? { responsible } : {}),
+      ...(verified ? { verification: verified } : {}),
     });
   }
   return out.sort((a, b) => b.card.made_on.localeCompare(a.card.made_on) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
@@ -171,6 +180,27 @@ export function quoteLicence(config: Pick<Config, "quotes">, url: string): strin
 
 /** A reviewer's name as readers see it now (editorial.renamed). */
 export const reviewerName = (config: Pick<Config, "editorial">, by: string) => config.editorial.renamed[by] ?? by;
+
+/** Whether an approving editor is counted, not named, on this card (decision 23): only known with the editors list. */
+export const countedEditor = (v: Pick<CardView, "verification">, by: string) => !!v.verification && !v.verification.named.includes(by);
+
+/** Names joined as the language joins them: "A, B and C". */
+export const listOf = (w: Words, items: readonly string[]) => new Intl.ListFormat(w.m.intl ?? "en-GB", { style: "long", type: "conjunction" }).format(items);
+
+/**
+ * The card's verification in words (decision 23): "Not yet verified by an
+ * editor", "Checked automatically by …, not yet verified by an editor", or
+ * "Verified by …", naming the editors who chose to be named and counting the
+ * rest. Undefined when the view has no verification (no editors list).
+ */
+export function verificationText(v: Pick<CardView, "verification">, config: Pick<Config, "editorial">, w: Words): string | undefined {
+  const ver = v.verification;
+  if (!ver) return undefined;
+  if (ver.level === "none") return w.t("verify.none");
+  if (ver.level === "automated") return w.t("verify.automated", { reviewers: listOf(w, ver.automated.map((by) => reviewerName(config, by))) });
+  const editors = [...ver.named.map((by) => reviewerName(config, by)), ...(ver.counted ? [w.n("verify.counted", ver.counted)] : [])];
+  return w.t("verify.by", { editors: listOf(w, editors) });
+}
 
 /** The finished statuses that are not the top of the ladder: not met, undone. */
 export const endings = (config: Config) => config.ladder.statuses.filter((s) => s.category === "finished" && !climb(config).includes(s.id)).map((s) => s.id);

@@ -29,6 +29,22 @@ describe("PromiseCard", () => {
     expect(out).toContain(`<a href="${v.current.archived_url}" rel="noopener noreferrer">archived copy</a>`);
   });
 
+  it("says how far the card has been verified, naming only the editors who chose it (decision 23)", async () => {
+    const s = await site("public-ledger");
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const reviews = [...(v.card.reviews ?? []), { by: "Ada", kind: "editor" as const, on: "2026-10-12", approves: true }, { by: "Ben", kind: "editor" as const, on: "2026-10-12", approves: true }];
+    const shown = { ...v, card: { ...v.card, reviews }, verification: { level: "editors" as const, named: ["Ada"], counted: 1, automated: ["Junior Editor"] } };
+    const out = html(<PromiseCard view={shown} config={s.config} today={s.today} />);
+    expect(out).toContain('<span class="op-verified op-verified--editors">Verified by Ada and 1 independent editor</span>');
+    expect(out).toContain("Approved by Ada, editor, on 12 October 2026");
+    expect(out).toContain("Approved by an independent editor on 12 October 2026");
+    expect(out).not.toContain("Ben");
+    const unchecked = { ...v, verification: { level: "none" as const, named: [], counted: 0, automated: [] } };
+    expect(html(<PromiseCard view={unchecked} config={s.config} today={s.today} />)).toContain('<span class="op-verified op-verified--none">Not yet verified by an editor</span>');
+    expect(html(<PromiseCard view={unchecked} config={s.config} today={s.today} verification={false} />)).not.toContain("op-verified");
+    expect(html(<PromiseCard view={v} config={s.config} today={s.today} />)).not.toContain("op-verified");
+  });
+
   it("says who brought the outcome about, beside the status", async () => {
     const s = await site("public-ledger");
     const out = html(<PromiseCard view={s.views.find((x) => x.id === "uk-snp-two-child-cap-2024")!} config={s.config} today={s.today} />);

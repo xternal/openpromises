@@ -408,6 +408,6 @@ describe("what Public Ledger showed the dry run was missing", () => {
   it("adds the new open-data columns at the end, so no column moves", async () => {
     const s = await site("public-ledger");
     const header = openDataCsv(s.views, s.config, words(s.config, "en"), s.today).split("\r\n")[0]!.split(",");
-    expect(header.slice(-5)).toEqual(["last_updated", "cost_by_kind", "cost_by_name", "responsible_id", "brought_about_by_id"]);
+    expect(header.slice(-7)).toEqual(["last_updated", "cost_by_kind", "cost_by_name", "responsible_id", "brought_about_by_id", "verification_level", "verification"]);
   });
 });

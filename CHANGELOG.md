@@ -2,6 +2,21 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
+## Unreleased
+
+Decisions 22 to 24.
+
+- **Publishing by checks** (decision 22): a new setting, `editorial.publish`. `"approved"`, the default, changes nothing. `"checked"` publishes a card once its checks pass, with no approvals needed unless it is a reader's submission (`origin: reader_submission`) or does not say its origin. On a card no editor has approved, the words must be matched by a machine (a stored-source span or an exact archive check); an editor's `quote_checked_on` counts once editors approve. New in `@openpromises/core`: `needsApprovals`, `publishedByChecks`.
+- **How far a card has been verified** (decision 23): `verification(card, { actors, editors })` in `@openpromises/core` gives the level (`none`, `automated`, `editor`, `editors`), counting approvals as the approvals rule does. `verificationText` in `@openpromises/publish` puts it in words, and every output shows it: `PromiseCard` (beside the source; `verification={false}` to leave it out) and a new `Verification` component, the card's Markdown, the card's own feed subtitle, and the open data (`verification` in `promises.json`; CSV columns `verification_level` and `verification`, at the end). An editor is named with `named: true` in the editors list, and counted otherwise. `cardViews` takes the editors list as a third argument; `openpromises publish` takes `--editors`.
+- **How a feature reaches the sites** (decision 24): CONTRIBUTING.md.
+
+### Upgrading from 0.5.0
+
+Nothing changes until a site asks for it: without the editors list in `cardViews`, no label is shown, and `editorial.publish` stays `"approved"`.
+
+- **Public Ledger:** set `editorial: { publish: "checked" }`. Pass the editors list to `cardViews` (its build needs `OPENPROMISES_EDITORS` too), and use `verificationText` in place of its own checked-by words, in its pages, `/api/v1` and share images. Move its named editors into the editors list (`named: true`). Its words through `messages`: the defaults are its own. New cards published without editors need an archive check (`openpromises check-quote`) or a stored-source span; its reader-submission rule stays as it is.
+- **Borough Book and the bilingual tracker:** nothing to do. To show the label, pass the editors list to `cardViews`; to publish by checks, decide first (decision 22).
+
 ## 0.5.0 (12 October 2026)
 
 - **The quote's source on the card page**: `PromiseCard` links the source of the speaker's words, and its archived copy when there is one, beside the date; the structured data cites the archived copy too. Borough Book's dry run found the card never linked them for a card with no separate sources list.

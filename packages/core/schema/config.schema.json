@@ -419,6 +419,13 @@
           "minimum": 2,
           "maximum": 9007199254740991
         },
+        "publish": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "checked"
+          ]
+        },
         "partyConflict": {
           "type": "boolean",
           "const": true

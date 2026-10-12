@@ -26,7 +26,26 @@ writes, for every configured language (other languages under their prefix, such 
 
 With `site.paths.feeds: "{page}/feed.xml"`, each feed sits beside its page instead (`/promise/<id>/feed.xml`, `/promises/feed.xml`), as Borough Book has them.
 
-The command refuses while a published card has an error, so a broken card is never published. It needs `site.url` and `publish.tag` in the configuration.
+The command refuses while a published card has an error, so a broken card is never published. It needs `site.url` and `publish.tag` in the configuration. Give it the editors list (`--editors`, or `OPENPROMISES_EDITORS`) when it is kept outside the content folder, so every card can say how far it has been verified (below).
+
+## How far a card has been verified
+
+Decision 23. Every card says so in words, from one function, so the page, the feeds, the Markdown and the open data always agree:
+
+| Level | Words (English default) |
+|---|---|
+| `none` | Not yet verified by an editor |
+| `automated` | Checked automatically by AI Journalist, not yet verified by an editor (the reviewer's name as readers see it, `editorial.renamed`) |
+| `editor`, `editors` | Verified by Pavel Guzhikov and 1 independent editor (editors with `named: true` in the editors list by name, the rest counted) |
+
+"Verified" is kept for people. Change the words with `messages`: `verify.none`, `verify.automated` (`{reviewers}`), `verify.by` (`{editors}`) and `verify.counted` (plural forms; English `.one` and `.other`, Russian also `.few` and `.many`).
+
+Make the views with the editors list, `cardViews(cards, actors, editors)`, and each view carries `verification`; `verificationText(view, config, words)` gives its words. Without the list, approvals cannot be checked, so the views carry none and nothing is shown. Where it appears:
+
+- `PromiseCard`: beside the quote's source, unless `verification={false}`; place `<Verification view={…} config={…} />` anywhere else. On the card, an editor who chose to be counted reads "an independent editor" in the list of checks too.
+- Markdown: a "Verification" fact.
+- The card's own feed: at the end of its subtitle. Entries are not changed, so followers are not sent old entries again.
+- Open data: `verification` in `promises.json`, by card id, with the level, the named editors, the count and the words in every language; the CSV columns `verification_level` and `verification`.
 
 ## Feed entry ids never change
 
@@ -45,7 +64,7 @@ import { cardViews } from "@openpromises/publish";
 export async function promises() {
   const { config, contentDir } = await loadConfig(findConfig(process.cwd())!);
   const r = validateContent(readContent(folderSource(contentDir), config).input);
-  return { config, views: cardViews(r.cards, r.actors), actors: r.actors, today: todayIn(config.timezone) };
+  return { config, views: cardViews(r.cards, r.actors, r.editors), actors: r.actors, today: todayIn(config.timezone) };
 }
 ```
 
@@ -119,6 +138,7 @@ publishFiles({
 | `Ladder`, `StatusPill` | The status ladder with the current step marked, and a status as a labelled pill |
 | `Breadcrumbs`, `ActorIndex`, `AreaIndex` | Where the reader is (`aria-current="page"` on the current page) |
 | `JsonLd` | Structured data in a safe `<script type="application/ld+json">` |
+| `Verification` | How far the card has been verified, in words, for a site that places it outside `PromiseCard` |
 | `PromiseFilter` (`@openpromises/react/client`) | The only client part: filters a `PromiseList` by status, area and actor once the script runs. Without a script the whole list shows. Build its options with `filterOptions` and its words with `filterWords` |
 
 Every component takes `config` and `locale` (the site's default when left out). Words come from the catalogues in `@openpromises/publish` (`MESSAGES`, English and Russian built in); change any of them with `messages` in the configuration.

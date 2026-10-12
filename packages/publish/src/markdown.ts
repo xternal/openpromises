@@ -3,7 +3,7 @@ import { correctionTarget, correctionValue } from "./corrections";
 import { costFacts, costText, longDate } from "./format";
 import type { Words } from "./messages";
 import { absolute, paths } from "./urls";
-import { actorName, areaLabel, cardCostText, climb, eventLabel, headline, lastUpdated, metricText, pick, quoteIn, quoteLicence, reviewerName, statusMix, type CardView } from "./view";
+import { actorName, areaLabel, cardCostText, climb, countedEditor, eventLabel, headline, lastUpdated, metricText, pick, quoteIn, quoteLicence, reviewerName, statusMix, verificationText, type CardView } from "./view";
 
 /**
  * Promise cards as Markdown, for AI assistants and anyone who reads plain
@@ -75,6 +75,7 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
         ? `${w.t("card.brought_about_by", { status: statusLabel(config, f.status, L), who: actorName(v.broughtAboutBy, L, config) })}${f.brought_about_by?.note ? ` (${pick(f.brought_about_by.note, L, config)})` : ""}`
         : statusLabel(config, f.status, L),
     ],
+    ["card.verification", verificationText(v, config, w) ?? null],
     ["card.status_ladder", offLadder ? null : ladder.join(" → ")],
     ["card.area", link(areaLabel(config, f.area, L), absolute(config, p.area(f.area, L)))],
     ["card.speaker", link(actorName(v.actor, L, config), absolute(config, p.actor(v.actor.id, L))) + (role ? `, ${role}` : "")],
@@ -153,7 +154,7 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
     w.t("card.checks"),
     [...(f.reviews ?? [])].reverse().map((r) =>
       r.kind === "editor" && r.approves
-        ? `- ${w.t("card.approved_by", { by: reviewerName(config, r.by), date: longDate(w, r.on) })}${r.batch ? ` ${w.t("card.approved_batch")}` : ""}.`
+        ? `- ${countedEditor(v, r.by) ? w.t("card.approved_by_counted", { date: longDate(w, r.on) }) : w.t("card.approved_by", { by: reviewerName(config, r.by), date: longDate(w, r.on) })}${r.batch ? ` ${w.t("card.approved_batch")}` : ""}.`
         : `- ${w.t("card.reviewed_by", { by: reviewerName(config, r.by), kind: w.t(`card.review_kind.${r.kind}`), date: longDate(w, r.on) })}.`,
     ),
   );

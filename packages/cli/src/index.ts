@@ -442,11 +442,12 @@ async function migrate(args: Args, io: Io): Promise<number> {
 // ---------------------------------------------------------------- publish
 
 async function publish(args: Args, io: Io): Promise<number> {
-  onlyFlags(args, ["config", "content", "out", "today", "dry-run"], "publish");
+  onlyFlags(args, ["config", "content", "out", "today", "editors", "dry-run"], "publish");
   const out = text(args, "out");
-  if (!out) throw new UsageError("usage: openpromises publish --out <folder> [--today YYYY-MM-DD] [--dry-run]");
+  if (!out) throw new UsageError("usage: openpromises publish --out <folder> [--editors <file>] [--today YYYY-MM-DD] [--dry-run]");
   const site = await loadSite(args, io);
-  const read = readContent(folderSource(site.contentDir), site.config);
+  const editors = editorsOverride(args, io);
+  const read = readContent(folderSource(site.contentDir), site.config, editors ? { editors } : {});
   const r = validateContent(read.input);
   const errors = [...read.issues, ...r.issues].filter((i) => i.severity === "error" && i.file.startsWith("promises/"));
   if (errors.length) {
@@ -454,7 +455,8 @@ async function publish(args: Args, io: Io): Promise<number> {
     return 1;
   }
   const day = today(io, site.config, args);
-  const files = publishFiles({ config: site.config, views: cardViews(r.cards, r.actors), today: day, actors: r.actors });
+  const files = publishFiles({ config: site.config, views: cardViews(r.cards, r.actors, r.editors), today: day, actors: r.actors });
+  if (!r.editors) io.err("note: there is no editors list, so the cards carry no verification label (decision 23)");
   const dir = resolve(io.cwd, out);
   const shown = `${relative(io.cwd, dir) || "."}/`;
   if (args.flags["dry-run"]) {

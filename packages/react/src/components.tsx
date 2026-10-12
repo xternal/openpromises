@@ -8,6 +8,7 @@ import {
   correctionTarget,
   correctionValue,
   costFacts,
+  countedEditor,
   costText,
   eventLabel,
   headline,
@@ -21,6 +22,7 @@ import {
   pick,
   reviewerName,
   quoteIn,
+  verificationText,
   wordDiff,
   words,
   type CardView,
@@ -126,6 +128,15 @@ export interface PromiseCardProps extends Base {
   actions?: ReactNode;
   /** Sections for the site's modules (contracts, decisions), shown after the cost. */
   children?: ReactNode;
+  /** Show how far the card has been verified (decision 23) beside the source; false to place <Verification> elsewhere. */
+  verification?: boolean;
+}
+
+/** How far a card has been verified, in words (decision 23): nothing when the views were made without the editors list. */
+export function Verification({ view, ...b }: Base & { view: CardView }) {
+  const { config, w } = ctx(b);
+  const text = verificationText(view, config, w);
+  return text ? <span className={`op-verified op-verified--${view.verification!.level}`}>{text}</span> : null;
 }
 
 /**
@@ -134,7 +145,7 @@ export interface PromiseCardProps extends Base {
  * stands, timeline, cost, the site's own sections, replies); detail folded
  * last (sources, earlier wording, corrections, checks); then related cards.
  */
-export function PromiseCard({ view, today, markToday, related = [], actions, children, ...b }: PromiseCardProps) {
+export function PromiseCard({ view, today, markToday, related = [], actions, children, verification = true, ...b }: PromiseCardProps) {
   const { config, L, w } = ctx(b);
   const p = paths(config);
   const f = view.card;
@@ -205,6 +216,7 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
             )}
           </span>
           {!view.current.quote_checked_on && <span>{w.t("card.quote_not_checked")}</span>}
+          {verification && <Verification view={view} {...b} />}
         </p>
         <Ladder view={view} config={config} locale={L} />
       </header>
@@ -260,7 +272,7 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
             </dl>
             {actions}
           </div>
-          {approvers.length > 0 && <p className="op-card__small">{w.t("card.approvals", { names: approvers.join(", ") })}</p>}
+          {!view.verification && approvers.length > 0 && <p className="op-card__small">{w.t("card.approvals", { names: approvers.join(", ") })}</p>}
           {updated && (
             <p className="op-card__small">
               {w.t("card.updated")} <Time iso={updated} w={w} />
@@ -412,7 +424,7 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
                   {[...(f.reviews ?? [])].reverse().map((r, i) => (
                     <li key={`r${i}`}>
                       {r.kind === "editor" && r.approves
-                        ? `${w.t("card.approved_by", { by: reviewerName(config, r.by), date: longDate(w, r.on) })}${r.batch ? ` ${w.t("card.approved_batch")}` : ""}`
+                        ? `${countedEditor(view, r.by) ? w.t("card.approved_by_counted", { date: longDate(w, r.on) }) : w.t("card.approved_by", { by: reviewerName(config, r.by), date: longDate(w, r.on) })}${r.batch ? ` ${w.t("card.approved_batch")}` : ""}`
                         : w.t("card.reviewed_by", { by: reviewerName(config, r.by), kind: w.t(`card.review_kind.${r.kind}`), date: longDate(w, r.on) })}
                       {r.note ? `: ${pick(r.note, L, config)}` : ""}
                     </li>

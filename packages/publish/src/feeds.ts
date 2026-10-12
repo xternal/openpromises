@@ -2,7 +2,7 @@ import { same, statusLabel, type Actor, type Config } from "@openpromises/core";
 import { costText, longDate, lowerFirst } from "./format";
 import type { Words } from "./messages";
 import { absolute, paths, type FeedFormat, type FeedKind } from "./urls";
-import { actorName, areaLabel, eventLabel, headline, pick, quoteIn, truncate, type CardView } from "./view";
+import { actorName, areaLabel, eventLabel, headline, pick, quoteIn, truncate, verificationText, type CardView } from "./view";
 
 /**
  * Feeds (Atom 1.0, RFC 4287, and RSS 2.0), built from cards: one entry per
@@ -318,7 +318,7 @@ export function buildFeed(views: readonly CardView[], kind: FeedKind, key: strin
       kind === "all"
         ? w.t("feed.sub.all")
         : kind === "promise"
-          ? w.t("feed.sub.card")
+          ? [w.t("feed.sub.card"), ...[selected[0] && verificationText(selected[0], config, w)].filter((x): x is string => !!x).map((x) => `${x}.`)].join(" ")
           : kind === "actor"
             ? w.t(actor?.kind === "party" ? "feed.sub.party" : "feed.sub.actor", { who })
             : kind === "area"

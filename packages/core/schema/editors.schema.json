@@ -34,6 +34,9 @@
                 "type": "null"
               }
             ]
+          },
+          "named": {
+            "type": "boolean"
           }
         },
         "required": [

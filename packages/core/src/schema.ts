@@ -280,6 +280,8 @@ export const Editor = z.strictObject({
   until: IsoDate.optional(),
   /** Declared party membership: the party's actor id, or null for none. */
   party: Slug.nullable(),
+  /** Named on the cards the editor verifies; without it the editor is counted, not named (decision 23). */
+  named: z.boolean().optional(),
 });
 export type Editor = z.infer<typeof Editor>;
 
