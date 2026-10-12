@@ -48,7 +48,7 @@ Read on 9 October 2026 from each site's `main` branch: Public Ledger (54 cards, 
 | `sources` | `sources` | Same shape. |
 | `versions[].version`, `text`, `recorded_on`, `source_url`, `quote_checked_on` | the same | |
 | `parameters.who`, `when`, `funded_by` | the same, as `{ en }` (`funded_by: null` stays `null`) | |
-| `parameters.how_much_bn_per_year` | `parameters.cost.range` | The unit (£bn a year) moves into the configuration. |
+| `parameters.how_much_bn_per_year` | `parameters.cost.range` | The unit (£bn a year) moves into the configuration. A figure written as `null` and one left out both become no cost: Public Ledger reads them the same, so a converter back to its shape cannot tell which was written (17 cards had `null` on 12 October 2026). |
 | `parameters.cost_note`, `cost_sources` | `parameters.cost.note.en`, `parameters.cost.sources` | A card with a note but no figure keeps the note: a cost without a range explains why. |
 | `parameters.costed_by` | `parameters.cost.by` | Who made the central figure (decision 14). |
 | (none) | `parameters.cost.quality` | **Public Ledger has no quality label on promise costs.** Editors add one per costed card. |
