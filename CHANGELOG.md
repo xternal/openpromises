@@ -5,6 +5,7 @@ All notable changes to OpenPromises. The packages share one version and follow [
 ## Unreleased
 
 - **The quote's source on the card page**: `PromiseCard` links the source of the speaker's words, and its archived copy when there is one, beside the date; the structured data cites the archived copy too. Borough Book's dry run found the card never linked them for a card with no separate sources list.
+- Documentation: Public Ledger switches now, done by 21 October 2026 (decision 21, replacing decision 20).
 
 ## 0.4.0 (11 October 2026)
 

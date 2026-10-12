@@ -22,7 +22,7 @@ Pavel Guzhikov accepted every recommendation in RFC-0001 §12 on 9 October 2026.
 
 Notes made while building, so a reader can see how each decision was read. None of them changes a decision; anything that would is proposed below and waits for the owner.
 
-- **Decision 9 and this repository.** The engine is built in its own repository from 9 October 2026, as the owner asked when he started it. The three sites are only read: nothing in them changes, and no site moves onto the engine before 29 October. Public Ledger moves first, not before 1 December (decision 20).
+- **Decision 9 and this repository.** The engine is built in its own repository from 9 October 2026, as the owner asked when he started it. This repository only reads the three sites and never changes them; each site moves in its own repository. Public Ledger moves first, from 12 October and done by 21 October 2026 (decision 21); the others not before 29 October.
 - **Decision 4 and private declarations.** The editors list is a file the configuration points to (`editorial.editorsFile`, default `editors.yaml`), and `openpromises validate --editors <path>` can read it from somewhere else. A site that has promised its editors to keep their declarations private can therefore keep the list out of its public repository and give it to its checks privately; a site that publishes its list keeps it beside the cards.
 - **Corrections and reviews are not optional.** RFC §7 lists `corrections` and `reviews` among Public Ledger's modules. Because principles 3 (public corrections) and 4 (two editors, recorded in the card) are rules for every site, both are always on. The names are still accepted in `modules`, so the RFC's example configuration works unchanged.
 
@@ -83,6 +83,10 @@ Four of the plan's questions were already settled that evening, by decisions 13 
 ## Accepted on 11 October 2026
 
 **20. Public Ledger converts after the AI Journalist's first two public weeks: not before 1 December 2026.** Decision 19 set "after 17 November", the day after the AI Journalist's planned public launch (its RFC, Amendment 1). The AI Journalist reads Public Ledger's published feeds and API, which the conversion keeps identical, but its first public fortnight is when readers decide whether to trust it, so the data under it stays still. Accepted by Pavel Guzhikov as recommended on 11 October 2026. Why: two editors need the time for 108 reviews (two on each of 54 cards) anyway, and two more weeks on the old code cost little while Public Ledger's report-only check catches any drift. Decision 9 (nothing before 29 October) still holds.
+
+## Accepted on 12 October 2026
+
+**21. Public Ledger switches now: from 12 October 2026, done by 21 October.** Replaces decision 20 (not before 1 December) and, for Public Ledger, decision 9's start on 29 October. What decision 20 waited for is already done: every published card has two editors' approvals (xternal/public-ledger#77, #78), Public Ledger runs 0.4.0 (#80) and its report-only check lists only the 29 cost quality labels, and the dry run is good or better. Done by 21 October leaves a quiet week before the Budget-day launch on 28 October to fix anything the switch brings up, and the AI Journalist's first public weeks from 17 November then rest on settled data, which was decision 20's aim. The switch goes in its own pull requests: a converter back to Public Ledger's shape with round-trip tests; `openpromises migrate`, checked by `openpromises validate --base`, the site's parity check and screenshots; then the quality labels and the blocking check. Decided by Pavel Guzhikov on 12 October 2026 (about 13:10 BST, in Public Ledger's session) and confirmed here at 13:47 BST, with the 21 October date.
 
 ## Proposed, waiting for the owner
 
