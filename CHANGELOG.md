@@ -2,10 +2,14 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
-## Unreleased
+## 0.5.0 (12 October 2026)
 
 - **The quote's source on the card page**: `PromiseCard` links the source of the speaker's words, and its archived copy when there is one, beside the date; the structured data cites the archived copy too. Borough Book's dry run found the card never linked them for a card with no separate sources list.
 - Documentation: Public Ledger switched to format v1 on 12 October 2026 (decision 21, replacing decision 20). Its dry run now breaks cards in format v1, so it runs before and after a site's switch.
+
+### Upgrading from 0.4.0
+
+- Nothing to change. A card page rendered with `PromiseCard` gains the two links beside the date, and its structured data one more citation where a version has an archived copy.
 
 ## 0.4.0 (11 October 2026)
 
