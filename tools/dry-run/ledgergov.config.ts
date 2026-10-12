@@ -11,6 +11,8 @@ import base from "../../fixtures/public-ledger/openpromises.config.ts";
 
 export default defineConfig({
   ...base,
+  // The fixture keeps the name the site had when it was copied; the site is LedgerGov.UK since 12 October 2026 (decision 25).
+  site: { ...base.site, name: "LedgerGov.UK" },
   actors: {
     ...base.actors,
     ids: { parliament_member_id: "https://members.parliament.uk/member/{id}", parliament_party_id: "UK Parliament Members API party id" },
@@ -30,6 +32,8 @@ export default defineConfig({
   messages: {
     en: {
       "card.area": "Policy area",
+      // The site says this whether a version has no cost at all or a cost with no figure (open-pnl packages/server/src/seo/markdown.ts costLine).
+      "cost.not_stated": "No costing published",
       "card.timeline": "Timeline",
       "card.corrections": "Corrections",
       "card.corrected_on": "{date}, {target}",
