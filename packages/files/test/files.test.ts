@@ -266,7 +266,7 @@ describe("comments on migration (decision 16)", () => {
     expect(placed.report.map((r) => r.outcome)).toEqual(["not placed", "not placed"]);
   });
 
-  it("moves a Public Ledger role source into its field", () => {
+  it("moves a LedgerGov.UK role source into its field", () => {
     const placed = placeComments("public-ledger", "actor", text, data, config);
     expect((placed.data as { roles: { source?: unknown }[] }).roles[0]!.source).toEqual({ url: "https://example.org/mayor", quote: "Someone became mayor in May." });
     expect(placed.report.map((r) => r.outcome)).toEqual(["not placed", "moved"]);

@@ -7,7 +7,7 @@ import { site } from "../../publish/test/helpers";
 const html = (node: React.ReactNode) => renderToStaticMarkup(<>{node}</>);
 
 describe("PromiseCard", () => {
-  it("renders a Public Ledger card in its reading order, with no script", async () => {
+  it("renders a LedgerGov.UK card in its reading order, with no script", async () => {
     const s = await site("public-ledger");
     const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
     const out = html(<PromiseCard view={v} config={s.config} today={s.today} related={relatedCards(v, s.views)} />);
@@ -125,7 +125,7 @@ describe("lists and indexes", () => {
     const s = await site("public-ledger");
     expect(html(<ActorIndex views={s.views} config={s.config} current="labour" />)).toContain('<a href="/actor/labour" aria-current="page">Labour Party</a>');
     expect(html(<AreaIndex views={s.views} config={s.config} current="health" />)).toContain('aria-current="page">Health</a>');
-    expect(html(<Breadcrumbs config={s.config} items={[{ name: "Public Ledger", href: "/" }, { name: "Promises", href: "/promises" }]} />)).toContain('<span aria-current="page">Promises</span>');
+    expect(html(<Breadcrumbs config={s.config} items={[{ name: "LedgerGov.UK", href: "/" }, { name: "Promises", href: "/promises" }]} />)).toContain('<span aria-current="page">Promises</span>');
   });
 
   it("render the ladder for an unscoreable card as a note, and pills with words", async () => {

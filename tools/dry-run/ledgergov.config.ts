@@ -3,7 +3,7 @@ import { defineConfig } from "@openpromises/core";
 import base from "../../fixtures/public-ledger/openpromises.config.ts";
 
 /**
- * Public Ledger as it would be configured on the day it moves: the fixture's
+ * LedgerGov.UK as it would be configured on the day it moves: the fixture's
  * configuration, plus the site's own words, its links to UK Parliament's
  * member pages, and a schema for the fields it keeps in x. A draft for the
  * move (docs/MIGRATING.md); the dry run reads it.
@@ -44,7 +44,7 @@ export default defineConfig({
         "{site}'s own writing (headlines, status notes, cost notes, summaries) is licensed under {licence}: reuse it, crediting {site} with a link to the card. Official figures are under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/) unless their source says otherwise; quotes from Parliament under the [Open Parliament Licence v3.0](https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/); other quotes are short extracts whose rights stay with the speaker. How the numbers and statuses are made: https://ledgergov.uk/method.",
     },
   },
-  // The fields Public Ledger keeps beyond format v1 (open-pnl packages/schema/src/content.ts). Who must deliver and
+  // The fields LedgerGov.UK keeps beyond format v1 (open-pnl packages/schema/src/content.ts). Who must deliver and
   // who brought it about are format fields since decision 14 (responsible, brought_about_by).
   x: {
     card: z.strictObject({

@@ -27,7 +27,7 @@ One file at the root of the site, `openpromises.config.ts` (or `.mts`, `.js`, `.
 import { defineConfig } from "@openpromises/core";
 
 export default defineConfig({
-  site: { name: "Public Ledger", url: "https://ledgergov.uk" },
+  site: { name: "LedgerGov.UK", url: "https://ledgergov.uk" },
   locales: { default: "en", all: ["en"] },
   money: { currency: "GBP", unit: "bn", period: "year" },
   actors: { kinds: ["person", "party", "government"], standing: "manual", ids: { parliament_member_id: "UK Parliament member" } },

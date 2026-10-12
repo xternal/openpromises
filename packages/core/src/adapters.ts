@@ -51,7 +51,7 @@ function mapCorrection(c: Raw, field: (list: string, tail: string) => FieldMap, 
 
 const same = (tail: string): FieldMap => ({ tail, value: (v) => v });
 
-// ---------------------------------------------------------------- Public Ledger
+// ---------------------------------------------------------------- LedgerGov.UK
 
 const PL_CARD = [
   "id",
@@ -110,7 +110,7 @@ function plField(en: (v: unknown) => unknown) {
 
 const plRef = (v: unknown, en: (v: unknown) => unknown) => (isObj(v) ? clean({ ...v, note: en(v.note) }) : v);
 
-/** A Public Ledger card (content/promises/<id>.yaml) in format v1. */
+/** A LedgerGov.UK card (content/promises/<id>.yaml) in format v1. */
 export function fromPublicLedger(raw: unknown, opts: { locale?: string } = {}): Raw {
   const locale = opts.locale ?? "en";
   const en = inLang(locale);
@@ -130,7 +130,7 @@ export function fromPublicLedger(raw: unknown, opts: { locale?: string } = {}): 
     area: c.policy_area,
     status: c.status,
     status_note: en(c.status_note),
-    // Since 9 October 2026 Public Ledger's outcome_by says who must deliver (decision 14); credit moved to brought_about_by.
+    // Since 9 October 2026 LedgerGov.UK's outcome_by says who must deliver (decision 14); credit moved to brought_about_by.
     brought_about_by: plRef(c.brought_about_by, en),
     responsible: c.outcome_by === null ? null : plRef(c.outcome_by, en),
     origin: c.origin,
@@ -163,7 +163,7 @@ export function fromPublicLedger(raw: unknown, opts: { locale?: string } = {}): 
 
 const PL_STANDING: Record<string, string> = { government: "in_power", opposition: "opposition", public_body: "public_body" };
 
-/** A Public Ledger actor (content/actors/<id>.yaml) in format v1. */
+/** A LedgerGov.UK actor (content/actors/<id>.yaml) in format v1. */
 export function fromPublicLedgerActor(raw: unknown, opts: { locale?: string } = {}): Raw {
   const en = inLang(opts.locale ?? "en");
   if (!isObj(raw)) return { format: FORMAT };
@@ -183,7 +183,7 @@ export function fromPublicLedgerActor(raw: unknown, opts: { locale?: string } = 
   });
 }
 
-// ---------------------------------------------------------------- Borough Book
+// ---------------------------------------------------------------- BoroughBook.UK
 
 export interface BoroughBookContext {
   /** content/parties.yaml `parties`. */
@@ -212,7 +212,7 @@ const BB_CARD = [
   "editor_note",
 ] as const;
 
-/** A Borough Book card (content/promises/<id>.yaml) in format v1. Parties give archive copies of manifestos; decision links move into the card. */
+/** A BoroughBook.UK card (content/promises/<id>.yaml) in format v1. Parties give archive copies of manifestos; decision links move into the card. */
 export function fromBoroughBook(raw: unknown, ctx: BoroughBookContext = {}, opts: { locale?: string } = {}): Raw {
   const en = inLang(opts.locale ?? "en");
   if (!isObj(raw)) return { format: FORMAT };
@@ -265,7 +265,7 @@ export function fromBoroughBook(raw: unknown, ctx: BoroughBookContext = {}, opts
   });
 }
 
-/** A Borough Book party (an entry of content/parties.yaml) as a v1 actor, with the seats it holds. */
+/** A BoroughBook.UK party (an entry of content/parties.yaml) as a v1 actor, with the seats it holds. */
 export function fromBoroughBookParty(raw: unknown, seats?: number, opts: { locale?: string } = {}): Raw {
   const en = inLang(opts.locale ?? "en");
   if (!isObj(raw)) return { format: FORMAT };
@@ -273,7 +273,7 @@ export function fromBoroughBookParty(raw: unknown, seats?: number, opts: { local
   return clean({ format: FORMAT, id, kind: "party", name: en(name), short_name: en(short), seats, x: nonEmpty(clean({ manifesto, ...rest })) });
 }
 
-/** A Borough Book councillor (content/councillors/<id>.yaml) as a v1 actor. */
+/** A BoroughBook.UK councillor (content/councillors/<id>.yaml) as a v1 actor. */
 export function fromBoroughBookCouncillor(raw: unknown, opts: { locale?: string } = {}): Raw {
   const en = inLang(opts.locale ?? "en");
   if (!isObj(raw)) return { format: FORMAT };
@@ -289,14 +289,14 @@ export function fromBoroughBookCouncillor(raw: unknown, opts: { locale?: string 
   });
 }
 
-/** Seats per party, counted from Borough Book's councillor files. */
+/** Seats per party, counted from BoroughBook.UK's councillor files. */
 export function seatsFromCouncillors(councillors: readonly unknown[]): Record<string, number> {
   const seats: Record<string, number> = {};
   for (const c of councillors) if (isObj(c) && typeof c.party === "string") seats[c.party] = (seats[c.party] ?? 0) + 1;
   return seats;
 }
 
-// ---------------------------------------------------------------- Russia Ledger
+// ---------------------------------------------------------------- RussiaLedger.com
 
 const RL_CARD = [
   "id",
@@ -407,7 +407,7 @@ export function fromRussiaLedgerActor(raw: unknown): Raw {
 
 // ---------------------------------------------------------------- by format name
 
-/** What a legacy card may need besides itself: Borough Book's parties and decision links. */
+/** What a legacy card may need besides itself: BoroughBook.UK's parties and decision links. */
 export type LegacyContext = BoroughBookContext;
 
 /** A card in a legacy format (config `legacy`), in format v1. */
@@ -422,7 +422,7 @@ export function migrateCard(format: "public-ledger" | "borough-book" | "russia-l
   }
 }
 
-/** An actor file in a legacy format, in format v1. Borough Book keeps its parties in one file instead (fromBoroughBookParty). */
+/** An actor file in a legacy format, in format v1. BoroughBook.UK keeps its parties in one file instead (fromBoroughBookParty). */
 export function migrateActor(format: "public-ledger" | "borough-book" | "russia-ledger", raw: unknown): Raw {
   switch (format) {
     case "public-ledger":

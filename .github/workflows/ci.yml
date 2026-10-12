@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      # Node 22's bundled Corepack cannot run pnpm 12; this version can (as in Public Ledger's CI).
+      # Node 22's bundled Corepack cannot run pnpm 12; this version can (as in LedgerGov.UK's CI).
       - run: npm install -g corepack@0.34.5 && corepack enable pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck

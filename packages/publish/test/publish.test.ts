@@ -77,7 +77,7 @@ describe("money and dates", () => {
     expect(money(words(rub, "ru"), rub, 520.5)).toBe("521 млрд ₽");
   });
 
-  it("say a cost as Public Ledger does, and money coming in as raised", () => {
+  it("say a cost as LedgerGov.UK does, and money coming in as raised", () => {
     expect(costText(en, gbp, { range: [0.36, 0.4, 0.44] })).toBe("Costs £0.36bn to £0.44bn a year");
     expect(costText(en, gbp, { range: [-15, -12, -10] })).toBe("Raises £10bn to £15bn a year");
     expect(costText(en, gbp, undefined)).toBe("Cost not stated");
@@ -100,7 +100,7 @@ describe("views and paths", () => {
     expect(s.views[0]!.card.made_on >= s.views.at(-1)!.card.made_on).toBe(true);
   });
 
-  it("keep Public Ledger's page and feed addresses", async () => {
+  it("keep LedgerGov.UK's page and feed addresses", async () => {
     const { config } = await site("public-ledger");
     const p = paths(config);
     expect([p.card("uk-bus-cap-2-2026", "en"), p.actor("labour", "en"), p.area("economic_affairs", "en"), p.markdown("uk-bus-cap-2-2026", "en")]).toEqual([
@@ -116,7 +116,7 @@ describe("views and paths", () => {
     ]);
   });
 
-  it("keep Borough Book's addresses: party pages, topic slugs and a feed beside each page", async () => {
+  it("keep BoroughBook.UK's addresses: party pages, topic slugs and a feed beside each page", async () => {
     const { config } = await site("borough-book");
     const p = paths(config);
     expect(p.area("Care for older and disabled adults", "en")).toBe("/topic/care-for-older-and-disabled-adults");
@@ -158,7 +158,7 @@ describe("views and paths", () => {
 });
 
 describe("feeds", () => {
-  it("keep Public Ledger's entry ids and words", async () => {
+  it("keep LedgerGov.UK's entry ids and words", async () => {
     const s = await site("public-ledger");
     const f = buildFeed(s.views, "promise", "uk-nato-5pc-2035-2025", { config: s.config, w: words(s.config, "en"), today: s.today }, "atom");
     expect(xmlOk(f.body)).toBe(true);
@@ -167,7 +167,7 @@ describe("feeds", () => {
       "tag:ledgergov.uk,2026:promise/uk-nato-5pc-2035-2025/event/1",
       "tag:ledgergov.uk,2026:promise/uk-nato-5pc-2035-2025/event/0",
     ]);
-    // A cost correction, as Public Ledger's feeds word it since 9 October 2026.
+    // A cost correction, as LedgerGov.UK's feeds word it since 9 October 2026.
     expect(f.body).toContain("<title type=\"text\">Cost changed: now costs £36bn to £44bn a year, was costs £32.4bn to £39.6bn a year (Keir Starmer)</title>");
     expect(f.body).toContain(
       "<title type=\"text\">In plan: Defence Investment Plan restates the 3.5% of GDP core defence commitment for 2035; funding set out to 2029-30 at 2.7% (Keir Starmer)</title>",
@@ -177,7 +177,7 @@ describe("feeds", () => {
     expect(f.body).not.toContain("event/2");
   });
 
-  it("keep Borough Book's RSS item ids", async () => {
+  it("keep BoroughBook.UK's RSS item ids", async () => {
     const s = await site("borough-book");
     const f = buildFeed(s.views, "all", "", { config: s.config, w: words(s.config, "en"), today: s.today }, "rss");
     expect(xmlOk(f.body)).toBe(true);
@@ -234,7 +234,7 @@ describe("structured data", () => {
 });
 
 describe("Markdown", () => {
-  it("lays a card out facts first, as Public Ledger does", async () => {
+  it("lays a card out facts first, as LedgerGov.UK does", async () => {
     const s = await site("public-ledger");
     const md = cardMarkdown(s.views.find((x) => x.id === "uk-bus-cap-2-2026")!, { config: s.config, w: words(s.config, "en"), today: s.today });
     expect(md.split("\n").slice(0, 8)).toEqual([
@@ -268,7 +268,7 @@ describe("Markdown", () => {
   it("lists every published card in llms.txt", async () => {
     const s = await site("public-ledger");
     const text = llmsTxt(s.views, { config: s.config, w: words(s.config, "en"), today: s.today });
-    expect(text.startsWith("# Public Ledger\n\n> What UK governments")).toBe(true);
+    expect(text.startsWith("# Public Ledger\n\n> What UK governments")).toBe(true); // the fixture's site name, as the site had it
     expect(text.match(/^- \[.*\]\(https:\/\/ledgergov\.uk\/promise\//gm)).toHaveLength(54);
   });
 });
@@ -339,7 +339,7 @@ describe("publishing a whole site", () => {
   });
 });
 
-describe("what Borough Book's dry run showed was missing", () => {
+describe("what BoroughBook.UK's dry run showed was missing", () => {
   it("cites the archived copy of the quote's source in the structured data", async () => {
     const s = await site("borough-book");
     const v = s.views.find((x) => x.id === "lab-2026-affordable-homes")!;
@@ -348,7 +348,7 @@ describe("what Borough Book's dry run showed was missing", () => {
   });
 });
 
-describe("what Public Ledger showed the dry run was missing", () => {
+describe("what LedgerGov.UK showed the dry run was missing", () => {
   it("writes an amount under £0.1bn in millions, so a small range stays a range", async () => {
     const gbp = resolveConfig({ site: { name: "T" }, money: { currency: "GBP", unit: "bn" } });
     const en = words(gbp, "en");
@@ -373,7 +373,7 @@ describe("what Public Ledger showed the dry run was missing", () => {
     expect(feeds).toContain("/feeds/actor/welsh-government.xml");
     expect(feeds).toContain("/feeds/area/culture.xml");
     const empty = files.find((f) => f.path === "/feeds/actor/welsh-government.xml")!.body;
-    expect(empty).toContain("<title type=\"text\">Public Ledger: promises by Welsh Government</title>");
+    expect(empty).toContain("<title type=\"text\">Public Ledger: promises by Welsh Government</title>"); // the fixture's site name
     expect(empty).not.toContain("<entry>");
   });
 

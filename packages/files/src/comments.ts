@@ -83,7 +83,7 @@ const isObj = (v: unknown): v is Raw => !!v && typeof v === "object" && !Array.i
 
 /**
  * Move a converted file's comments into their fields. Only formats whose
- * comments are known are placed (Public Ledger's); in any other, every
+ * comments are known are placed (LedgerGov.UK's); in any other, every
  * comment is reported for an editor. `data` is the file already in format v1.
  */
 export function placeComments(format: string, kind: "card" | "actor", text: string, data: unknown, config: Pick<Config, "actors" | "locales">): { data: unknown; report: CommentReport[] } {

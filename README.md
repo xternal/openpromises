@@ -144,10 +144,10 @@ Run `openpromises help <command>` for the options, and `openpromises help rules`
 
 ## Who uses it
 
-OpenPromises is extracted from three promise trackers that wrote the same rules separately: [Public Ledger](https://ledgergov.uk) (UK government and parties), [Borough Book](https://boroughbook.uk) (a London council) and [Russia Ledger](https://russialedger.com) (the Russian state, in Russian and English). [docs/COMPARISON.md](docs/COMPARISON.md) shows how each one's cards map to format v1, and [docs/MIGRATING.md](docs/MIGRATING.md) how a site moves.
+OpenPromises is extracted from three promise trackers that wrote the same rules separately: [LedgerGov.UK](https://ledgergov.uk) (UK government and parties), [BoroughBook.UK](https://boroughbook.uk) (a London council) and [RussiaLedger.com](https://russialedger.com) (the Russian state, in Russian and English). [docs/COMPARISON.md](docs/COMPARISON.md) shows how each one's cards map to format v1, and [docs/MIGRATING.md](docs/MIGRATING.md) how a site moves.
 
 ## Licence
 
-[Apache License 2.0](LICENSE). The test fixtures copied from Public Ledger and Borough Book are under CC BY 4.0 ([fixtures/README.md](fixtures/README.md)).
+[Apache License 2.0](LICENSE). The test fixtures copied from LedgerGov.UK and BoroughBook.UK are under CC BY 4.0 ([fixtures/README.md](fixtures/README.md)).
 
 Made by [Pavel Guzhikov](https://guzh.uk) · [Buy me a coffee](https://ko-fi.com/pavelg)

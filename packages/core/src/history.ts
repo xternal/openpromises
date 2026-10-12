@@ -5,7 +5,7 @@ import { issue, type Issue } from "./issues";
  * Nothing is rewritten (RFC-0001 principle 3). Versions, events and replies
  * only grow; our own mistakes are fixed with a recorded correction, and
  * undoing the corrections must give back what was published. Ported from
- * Public Ledger's corrections and append-only check, with Russia Ledger's
+ * LedgerGov.UK's corrections and append-only check, with RussiaLedger.com's
  * guard against unsafe paths.
  */
 
@@ -86,10 +86,10 @@ export type LateFields = Partial<Record<(typeof HISTORY)[number], readonly strin
  * editable.
  */
 export const LEGACY_LATE_FIELDS: Readonly<Record<string, LateFields>> = {
-  // A cost's quality label: Public Ledger's and Russia Ledger's costs had none.
+  // A cost's quality label: LedgerGov.UK's and RussiaLedger.com's costs had none.
   "public-ledger": { versions: [".parameters.cost.quality"] },
   "russia-ledger": { versions: [".parameters.cost.quality"] },
-  // A cost's sources: Borough Book's costs had none.
+  // A cost's sources: BoroughBook.UK's costs had none.
   "borough-book": { versions: [".parameters.cost.sources"] },
 };
 

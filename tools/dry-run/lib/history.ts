@@ -32,7 +32,7 @@ export function replayHistory(contentDir: string, config: Config, ref: string): 
   const commits = log ? log.split("\n").map((l) => l.split("\t") as [string, string, string]).reverse() : [];
 
   // Many commits share the same content; read each version of the content folder once. The whole
-  // folder, not only promises/: a converter also reads other files (Borough Book's parties.yaml).
+  // folder, not only promises/: a converter also reads other files (BoroughBook.UK's parties.yaml).
   const byTree = new Map<string, Map<string, unknown>>();
   const cardsAt = (commit: string): Map<string, unknown> => {
     let tree: string;

@@ -10,7 +10,7 @@ import { actorName, areaLabel, eventLabel, headline, pick, quoteIn, truncate, ve
  * to the current cost, plus any entries the site adds of its own. Entry
  * ids are tag URIs (RFC 4151) that depend only on the card id and the entry's
  * place in its append-only history, so they never change: a feed reader never
- * shows an entry twice. Ported from Public Ledger's feeds, whose ids they keep.
+ * shows an entry twice. Ported from LedgerGov.UK's feeds, whose ids they keep.
  */
 
 export interface FeedEntry {

@@ -156,7 +156,7 @@ describe("late fields (decision 13.1)", () => {
   });
 });
 
-describe("Public Ledger's fields of 9 October 2026 (decision 14)", () => {
+describe("LedgerGov.UK's fields of 9 October 2026 (decision 14)", () => {
   const legacy = {
     id: "uk-test-2026",
     actor_id: "someone",
@@ -185,7 +185,7 @@ describe("fields an older format had no place for (decision 15)", () => {
   const unlabelled = card((c) => delete c.versions[0]!.parameters!.cost!.quality);
   const labelled = card((c) => (c.versions[0]!.parameters!.cost!.quality = "sourced"));
 
-  it("lets a site converted from Public Ledger add a cost's quality label once, with no correction", () => {
+  it("lets a site converted from LedgerGov.UK add a cost's quality label once, with no correction", () => {
     expect(messages(unlabelled, labelled)).toHaveLength(1);
     expect(appendOnlyIssues(unlabelled, labelled, { legacy: "public-ledger" })).toEqual([]);
   });

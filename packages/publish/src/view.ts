@@ -227,7 +227,7 @@ export const TITLE_MAX = 75;
 export const DESCRIPTION_MAX = 160;
 
 /**
- * "Cap bus fares at £2 – Andy Burnham promise, In plan | Public Ledger". The
+ * "Cap bus fares at £2 – Andy Burnham promise, In plan | LedgerGov.UK". The
  * site name is dropped when it would push the title past TITLE_MAX; who made
  * the promise and where it stands never are. `social` has no site name.
  */

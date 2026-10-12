@@ -35,7 +35,7 @@ import { siteParts } from "./siteparts";
  */
 
 export interface SiteProfile {
-  /** "Public Ledger" */
+  /** "LedgerGov.UK" */
   name: string;
   /** The folder under .dry-run/: "ledgergov". */
   slug: string;
@@ -49,7 +49,7 @@ export interface SiteProfile {
   accepted: readonly Accepted[];
   /** What the site keeps making itself: feed entries by kind, Markdown sections by title. */
   own: { entries: readonly string[]; sections: readonly string[] };
-  /** A page that links every feed (Public Ledger's /feeds). Without one, feeds are found on the pages and at the engine's own feed addresses. */
+  /** A page that links every feed (LedgerGov.UK's /feeds). Without one, feeds are found on the pages and at the engine's own feed addresses. */
   feedsIndex?: string;
   /** The site's own data API, if it has one. */
   api?: string;

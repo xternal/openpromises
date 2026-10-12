@@ -100,6 +100,8 @@ Four of the plan's questions were already settled that evening, by decisions 13 
 
 **24. How a feature reaches the sites.** What belongs in the engine, and the four steps from a decision to a site enforcing it, are in [CONTRIBUTING.md](../CONTRIBUTING.md#how-a-feature-reaches-the-sites), for every session to follow. In short: the format, checks, publishing rules, labels, feed and API shapes, reusable components and intake go in the engine, and so does anything two sites need; a site's own features stay in the site. A site never edits the engine's code; it asks for the change. Decided and confirmed with decision 22.
 
+**25. Products are called by their domain.** LedgerGov.UK (earlier entries say Public Ledger), BoroughBook.UK (Borough Book) and RussiaLedger.com (Russia Ledger, or the bilingual tracker). Decided by Pavel Guzhikov on 12 October 2026: a product is easier to name by its domain, where it has one. The documentation and comments use them from now on. Earlier entries here and released versions in CHANGELOG.md keep the names they were written with, as history. Names in code stay as they are, since sites use them: `fromPublicLedger`, `fromBoroughBook`, `legacy: "public-ledger"`, `fixtures/public-ledger`, `PUBLIC_LEDGER_DIR`. So do the fixtures, which are copies of each site's data, site name included.
+
 ## Proposed, waiting for the owner
 
 None.

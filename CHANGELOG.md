@@ -2,6 +2,10 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
+## Unreleased
+
+- Documentation: the sites are called by their domain, LedgerGov.UK, BoroughBook.UK and RussiaLedger.com (decision 25). Names in code are unchanged.
+
 ## 0.6.0 (12 October 2026)
 
 Decisions 22 to 24.

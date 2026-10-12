@@ -5,7 +5,7 @@ import { formatPath } from "@openpromises/core";
 import { checkFolder, folderSource, loadConfig, readContent, toYaml } from "@openpromises/files";
 
 /**
- * The real cards copied from Public Ledger and Borough Book, and the invented
+ * The real cards copied from LedgerGov.UK and BoroughBook.UK, and the invented
  * bilingual set, converted to format v1 and validated with each site's own
  * configuration. Every problem v1 finds in a site's data is listed in that
  * site's expected-issues.txt (and explained in docs/COMPARISON.md); this test
@@ -63,7 +63,7 @@ describe.each(SITES)("%s", (name) => {
 });
 
 describe("the converted fixtures", () => {
-  it("cover every card copied from Public Ledger and Borough Book", async () => {
+  it("cover every card copied from LedgerGov.UK and BoroughBook.UK", async () => {
     for (const [name, count] of [
       ["public-ledger", 54],
       ["borough-book", 18],

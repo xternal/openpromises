@@ -38,9 +38,9 @@ The JSON Schema files in `packages/core/schema/` are generated from the Zod sche
 
 ## How a feature reaches the sites
 
-Decision 24. Public Ledger, Borough Book and the bilingual tracker each have their own repository and their own working session; the engine is built here, and every one of them follows these steps.
+Decision 24. LedgerGov.UK, BoroughBook.UK and RussiaLedger.com each have their own repository and their own working session; the engine is built here, and every one of them follows these steps.
 
-**What goes in the engine:** anything in the card format, the checks, the rules for publishing, the labels a card shows, the shapes of feeds and open data, reusable components and intake, and anything two sites would need. **What stays in a site:** features only that site has, such as Public Ledger's Statement, sandbox, MP and Budget pages, or Borough Book's council pages.
+**What goes in the engine:** anything in the card format, the checks, the rules for publishing, the labels a card shows, the shapes of feeds and open data, reusable components and intake, and anything two sites would need. **What stays in a site:** features only that site has, such as LedgerGov.UK's Statement, sandbox, MP and Budget pages, or BoroughBook.UK's council pages.
 
 1. **The owner decides,** and the decision is recorded in [docs/DECISIONS.md](docs/DECISIONS.md).
 2. **The engine builds it here,** releases a version, and says in [CHANGELOG.md](CHANGELOG.md) what each site does to upgrade.

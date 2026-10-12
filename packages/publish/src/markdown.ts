@@ -9,7 +9,7 @@ import { actorName, areaLabel, cardCostText, climb, countedEditor, eventLabel, h
  * Promise cards as Markdown, for AI assistants and anyone who reads plain
  * text: <card>.md (one card), llms.txt (a guide) and llms-full.txt (every
  * card, the method in short and the licence). The same facts as the page, in
- * the same order, numbers first. Ported from Public Ledger's.
+ * the same order, numbers first. Ported from LedgerGov.UK's.
  */
 
 export const MARKDOWN_TYPE = "text/markdown; charset=utf-8";

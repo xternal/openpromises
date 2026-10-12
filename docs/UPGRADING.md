@@ -23,7 +23,7 @@ The six packages share one version number and are released together, so move the
 | Minor (0.2 → 0.3) | Adds fields, checks (as warnings first), settings and words. While the version is 0.x, a minor may also break something, but only with the steps to take under "Upgrading" in the changelog. |
 | Major (1.x → 2.0) | Breaking changes, from version 1.0 on, with the old way still working, with a warning, for one major more. |
 
-Version 1.0 comes once Public Ledger and Borough Book run on the engine. Node 22 is supported until its end of life (30 April 2027).
+Version 1.0 comes once LedgerGov.UK and BoroughBook.UK run on the engine. Node 22 is supported until its end of life (30 April 2027).
 
 ## How to upgrade
 

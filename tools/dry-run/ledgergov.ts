@@ -5,7 +5,7 @@ import type { Accepted } from "./lib/report";
 import type { SiteProfile } from "./lib/run";
 
 /**
- * Public Ledger (ledgergov.uk): its own checks, as its validator words them
+ * LedgerGov.UK: its own checks, as its validator words them
  * (open-pnl packages/schema/src/content.ts and seed.ts, scripts/validate.ts),
  * each made into a broken card; and the differences already decided, with
  * where they were decided.
@@ -40,7 +40,7 @@ function del(c: Raw, ...paths: string[]): Raw {
 const correct = (c: Raw, correction: Raw) => ({ ...copy(c), corrections: [...(c.corrections ?? []), correction] });
 const en = (text: string) => ({ en: text });
 
-/** A card in format v1: Public Ledger's cards are since its switch (xternal/public-ledger#82), and converted when read from before it. */
+/** A card in format v1: LedgerGov.UK's cards are since its switch (xternal/public-ledger#82), and converted when read from before it. */
 const v1 = (c: Raw): Raw => (c.format === "openpromises/1" ? c : (fromPublicLedger(c) as Raw));
 
 /**
@@ -123,7 +123,7 @@ const CHECKS: Mutation[] = [
       }),
   },
   {
-    check: "a quality label added to a published cost, which Public Ledger's format had no place for (decision 15)",
+    check: "a quality label added to a published cost, which LedgerGov.UK's format had no place for (decision 15)",
     site: null,
     allowed: true,
     card: BUS,
@@ -157,13 +157,13 @@ export const ACCEPTED: Accepted[] = [
     area: "Checks",
     match: /`approvals` rule/,
     verdict: "accepted",
-    reason: "Public Ledger's editors list is private (decision 10, docs/DECISIONS.md): its CI reads it from OPENPROMISES_EDITORS, which the dry run does not have, so no approval can count here. Every published card has two editors' approvals (xternal/public-ledger#77, #78), and the site's own check, with the list, finds none missing.",
+    reason: "LedgerGov.UK's editors list is private (decision 10, docs/DECISIONS.md): its CI reads it from OPENPROMISES_EDITORS, which the dry run does not have, so no approval can count here. Every published card has two editors' approvals (xternal/public-ledger#77, #78), and the site's own check, with the list, finds none missing.",
   },
   {
     area: "Checks",
     match: /`cost` rule/,
     verdict: "accepted",
-    reason: "A gap in the site's data the engine catches: Public Ledger's costs carry no quality label (sourced, approx or modelled), and the converter never invents one (docs/COMPARISON.md). Editors add them during the move (docs/MIGRATING.md step 4); Public Ledger's switch adds them (xternal/public-ledger#82).",
+    reason: "A gap in the site's data the engine catches: LedgerGov.UK's costs carry no quality label (sourced, approx or modelled), and the converter never invents one (docs/COMPARISON.md). Editors add them during the move (docs/MIGRATING.md step 4); LedgerGov.UK's switch adds them (xternal/public-ledger#82).",
   },
   {
     area: "Card pages",
@@ -175,13 +175,13 @@ export const ACCEPTED: Accepted[] = [
     area: "llms.txt",
     match: /other links? \(the site's own pages\)/,
     verdict: "site",
-    reason: "Public Ledger's llms.txt guides the whole site (budget, people, method). The site keeps writing it, and can take its promise list from the engine's.",
+    reason: "LedgerGov.UK's llms.txt guides the whole site (budget, people, method). The site keeps writing it, and can take its promise list from the engine's.",
   },
   {
     area: "Checks",
     match: /submission_ref and credit belong to cards with origin: reader_submission/,
     verdict: "site",
-    reason: "Both fields are Public Ledger's own (in x), and the check needs the card's origin, which a site's x schema cannot see. Public Ledger keeps this one check in its validate script, which keeps running for its budget data; agreed on 9 October 2026 (docs/MIGRATING.md, Per site).",
+    reason: "Both fields are LedgerGov.UK's own (in x), and the check needs the card's origin, which a site's x schema cannot see. LedgerGov.UK keeps this one check in its validate script, which keeps running for its budget data; agreed on 9 October 2026 (docs/MIGRATING.md, Per site).",
   },
   {
     area: "Structured data",
@@ -205,7 +205,7 @@ export const ACCEPTED: Accepted[] = [
     area: "Open data",
     match: /site's own API/,
     verdict: "site",
-    reason: "Public Ledger's /api/v1 serves its budget data as well as cards.",
+    reason: "LedgerGov.UK's /api/v1 serves its budget data as well as cards.",
   },
   {
     area: "Titles and descriptions",
@@ -222,7 +222,7 @@ export const ACCEPTED: Accepted[] = [
 ];
 
 export const LEDGERGOV: SiteProfile = {
-  name: "Public Ledger",
+  name: "LedgerGov.UK",
   slug: "ledgergov",
   live: "https://ledgergov.uk",
   repo: { env: "PUBLIC_LEDGER_DIR", default: "../public-gov-ledger/open-pnl" },

@@ -8,7 +8,7 @@ It reads the site's content from its checkout and fetches its live pages. It cha
 pnpm dry-run
 ```
 
-There are two: Public Ledger (ledgergov.uk) and Borough Book (boroughbook.uk). `pnpm dry-run` runs both; `pnpm dry-run ledgergov` or `pnpm dry-run boroughbook` runs one. Each expects the site's checkout beside this repository (`../public-gov-ledger/open-pnl`, `../borough-ledger`); a setting below points elsewhere. When a checkout is missing, its dry run is skipped.
+There are two: LedgerGov.UK and BoroughBook.UK. `pnpm dry-run` runs both; `pnpm dry-run ledgergov` or `pnpm dry-run boroughbook` runs one. Each expects the site's checkout beside this repository (`../public-gov-ledger/open-pnl`, `../borough-ledger`); a setting below points elsewhere. When a checkout is missing, its dry run is skipped.
 
 | Setting | What it does |
 |---|---|
@@ -51,6 +51,6 @@ The run itself is `lib/run.tsx`, the same for every site. A site adds a profile 
 - `ledgergov.config.ts`: the site's configuration as it would be on the day it moves, built on `fixtures/public-ledger/openpromises.config.ts`
 - `ledgergov.ts`: the site's own checks, as broken cards in format v1, so they run on its content from before its switch (converted as it is read) and after it; what the site keeps making itself (`OWN`: its contract and figures entries, its contracts section), which the run takes from the live site and hands to the engine as the site's code would, by kind and title only, so nothing the engine should make can be filled in from the live copy; and the differences already decided, each with its reason
 - `ledgergov.dry.tsx`: the run
-- `boroughbook.ts`, `boroughbook.config.ts`, `boroughbook.dry.tsx`: the same for Borough Book. Its own checks come from borough-ledger `packages/schema/src/content.ts` and `append-only.ts`; it has no page listing its feeds, so they are found on its pages and at the engine's own feed addresses
+- `boroughbook.ts`, `boroughbook.config.ts`, `boroughbook.dry.tsx`: the same for BoroughBook.UK. Its own checks come from borough-ledger `packages/schema/src/content.ts` and `append-only.ts`; it has no page listing its feeds, so they are found on its pages and at the engine's own feed addresses
 
 A difference goes into the decided list only once it is decided, with the decision or document that says so.

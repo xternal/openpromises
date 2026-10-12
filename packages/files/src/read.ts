@@ -114,7 +114,7 @@ export function readContent(source: ContentSource, config: Config, opts: ReadOpt
       actors.push({ file, data });
     }
     if (legacy === "borough-book") {
-      // Borough Book keeps parties in one file and councillors in their own folder; each becomes an actor file.
+      // BoroughBook.UK keeps parties in one file and councillors in their own folder; each becomes an actor file.
       const have = new Set(actors.map((a) => a.file));
       const councillors = source
         .list("councillors")

@@ -24,7 +24,7 @@ writes, for every configured language (other languages under their prefix, such 
 | `sitemap-promises.xml` | The promise pages, with each language's address; list it in the site's sitemap index |
 | `data/promises.json`, `data/promises.csv` | Open data: every published card (format v1), and one row a card |
 
-With `site.paths.feeds: "{page}/feed.xml"`, each feed sits beside its page instead (`/promise/<id>/feed.xml`, `/promises/feed.xml`), as Borough Book has them.
+With `site.paths.feeds: "{page}/feed.xml"`, each feed sits beside its page instead (`/promise/<id>/feed.xml`, `/promises/feed.xml`), as BoroughBook.UK has them.
 
 The command refuses while a published card has an error, so a broken card is never published. It needs `site.url` and `publish.tag` in the configuration. Give it the editors list (`--editors`, or `OPENPROMISES_EDITORS`) when it is kept outside the content folder, so every card can say how far it has been verified (below).
 
@@ -49,7 +49,7 @@ Make the views with the editors list, `cardViews(cards, actors, editors)`, and e
 
 ## Feed entry ids never change
 
-Every entry's id is a tag URI: `publish.tag`, then the card and the entry's place in its append-only history, such as `tag:ledgergov.uk,2026:promise/uk-bus-cap-2-2026/event/1`. Because history only grows, an entry's id never changes, and a feed reader never shows it twice. **Set `publish.tag` once and never change it.** A site moving to OpenPromises sets it to what its feeds already use, so followers notice nothing: Public Ledger `ledgergov.uk,2026`, Borough Book `borough-ledger,2026` (the fixture configurations do, and the tests check the ids match).
+Every entry's id is a tag URI: `publish.tag`, then the card and the entry's place in its append-only history, such as `tag:ledgergov.uk,2026:promise/uk-bus-cap-2-2026/event/1`. Because history only grows, an entry's id never changes, and a feed reader never shows it twice. **Set `publish.tag` once and never change it.** A site moving to OpenPromises sets it to what its feeds already use, so followers notice nothing: LedgerGov.UK `ledgergov.uk,2026`, BoroughBook.UK `borough-ledger,2026` (the fixture configurations do, and the tests check the ids match).
 
 ## A server-rendered or static Next.js site
 
@@ -111,7 +111,7 @@ Or call `publishFiles({ config, views, today, actors })` in a build step and wri
 
 ## What the site adds of its own
 
-Some things on a promise page are the site's own: Public Ledger's contracts behind delivery and its editions of official figures, Borough Book's council decisions. The site keeps making them, and hands them to the engine, which puts them where readers expect them:
+Some things on a promise page are the site's own: LedgerGov.UK's contracts behind delivery and its editions of official figures, BoroughBook.UK's council decisions. The site keeps making them, and hands them to the engine, which puts them where readers expect them:
 
 ```ts
 publishFiles({
@@ -149,16 +149,16 @@ Every component takes `config` and `locale` (the site's default when left out). 
 
 ## IndexNow
 
-`changedPages(before, after, config)` lists the pages a change touched (each changed card, its actor, party and area pages, and the list, in every language); `indexNowPayload(config, key, urls)` makes the request body. The engine sends nothing: once the deploy shows the new pages, the site POSTs the body to `https://api.indexnow.org/indexnow`, as Public Ledger does now.
+`changedPages(before, after, config)` lists the pages a change touched (each changed card, its actor, party and area pages, and the list, in every language); `indexNowPayload(config, key, urls)` makes the request body. The engine sends nothing: once the deploy shows the new pages, the site POSTs the body to `https://api.indexnow.org/indexnow`, as LedgerGov.UK does now.
 
 ## Compared with the sites today
 
 What changes when a site renders its promise pages and feeds with these packages. A dry run ([tools/dry-run](../tools/dry-run/README.md)) checks this against the live site, item by item:
 
-| | Public Ledger | Borough Book |
+| | LedgerGov.UK | BoroughBook.UK |
 |---|---|---|
 | Feed addresses and entry ids | The same (`/feeds/…xml`, `tag:ledgergov.uk,2026:promise/<id>/event/<n>`) | The same (`<page>/feed.xml`, `tag:borough-ledger,2026:…`) |
-| Feed entry words | The same: all 560 live entries identical in id, title, text, link and date (dry run of 9 October 2026), with the site's contract and figures entries handed in as its own (`site.entries`) | Titles now name the event first ("In plan: …"), as Public Ledger's do; the one-off "new pledge card" item is no longer made (the "Promised" entry covers it) |
+| Feed entry words | The same: all 560 live entries identical in id, title, text, link and date (dry run of 9 October 2026), with the site's contract and figures entries handed in as its own (`site.entries`) | Titles now name the event first ("In plan: …"), as LedgerGov.UK's do; the one-off "new pledge card" item is no longer made (the "Promised" entry covers it) |
 | Card structured data | `Article` with the `Quotation`, as RFC-0001 §6 asks (today `WebPage`); breadcrumbs unchanged | `Article` with the `Quotation`, as today; the FAQ block stays the site's own |
 | Markdown, `llms-full.txt` | The same layout and facts, with the site's own words set in `messages` (as in `tools/dry-run/ledgergov.config.ts`) | New |
 | Open data | New in this form (the site's `/api/v1` stays its own) | New |
