@@ -405,7 +405,7 @@ const approvals: Rule = {
       const have = approvers(card, ctx).size;
       const which = ctx.config.editorial.publish === "checked" ? (card.origin ? "a reader's submission" : "a card that does not say its origin") : "a published card";
       if (!ctx.editors) add(["reviews"], `${which} needs editors' approvals, but the site has no editors list`);
-      else if (have < need) add(["reviews"], `${which} needs ${plural(need, "editor")}' approvals; it has ${have}. Keep it in drafts/ until editors approve it (openpromises review)`);
+      else if (have < need) add(["reviews"], `${which} needs ${plural(need, "editor's approval", "editors' approvals")}; it has ${have}. Keep it in drafts/ until editors approve it (openpromises review)`);
     }
     return out;
   },

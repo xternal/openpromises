@@ -103,8 +103,8 @@ describe("configuration files", () => {
     const loaded = await loadConfig(join(d, "openpromises.config.yaml"));
     expect(loaded.config.ladder.name).toBe("local");
     expect(loaded.contentDir).toBe(join(d, "cards"));
-    write(join(d, "openpromises.config.json"), JSON.stringify({ site: { name: "Json" }, editorial: { approvals: 1 } }));
-    await expect(loadConfig(join(d, "openpromises.config.json"))).rejects.toThrow("should be 2 or more");
+    write(join(d, "openpromises.config.json"), JSON.stringify({ site: { name: "Json" }, editorial: { approvals: 0 } }));
+    await expect(loadConfig(join(d, "openpromises.config.json"))).rejects.toThrow("should be 1 or more");
   });
 });
 

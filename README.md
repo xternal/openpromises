@@ -15,7 +15,7 @@ It is a library and a command-line tool, not a hosted service. It makes no netwo
 1. **Exact words.** A quote that is not found at its stored or archived source cannot be published.
 2. **Evidence moves status.** Every status change after "promised" links to its evidence.
 3. **Nothing is rewritten.** Versions, events and replies only grow. Our own mistakes are fixed with a recorded correction, and the check proves that undoing the corrections gives back what was published.
-4. **Two editors.** Publishing needs two editors' approvals, recorded in the card, and an editor never approves a card about their own party. A site may instead publish a card once its checks pass; every card then says plainly whether an editor has verified it, and a reader's submission still needs two editors.
+4. **Two editors.** Publishing needs two editors' approvals, recorded in the card, and an editor never approves a card about their own party. A site may instead publish a card once its checks pass; every card then says plainly whether an editor has verified it, and a reader's submission still needs two editors. A site with a single editor may set the count to one (`editorial.approvals`, decision 27); its labels then say who verified each card and which automated reviewer checked it.
 5. **One standard.** No rule, label or code path depends on which party is involved; a conformance test proves it.
 6. **Numbers carry their source.** A cost is a range with a quality label and a source, never a single figure.
 7. **Machines suggest, people decide.** Automatic intake and reviewers write drafts and notes, and never approve a card.

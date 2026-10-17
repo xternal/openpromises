@@ -35,7 +35,7 @@ describe("PromiseCard", () => {
     const reviews = [...(v.card.reviews ?? []), { by: "Ada", kind: "editor" as const, on: "2026-10-12", approves: true }, { by: "Ben", kind: "editor" as const, on: "2026-10-12", approves: true }];
     const shown = { ...v, card: { ...v.card, reviews }, verification: { level: "editors" as const, named: ["Ada"], counted: 1, automated: ["Junior Editor"] } };
     const out = html(<PromiseCard view={shown} config={s.config} today={s.today} />);
-    expect(out).toContain('<span class="op-verified op-verified--editors">Verified by Ada and 1 independent editor</span>');
+    expect(out).toContain('<span class="op-verified op-verified--editors">Verified by Ada and 1 independent editor, checked by Junior Editor</span>');
     expect(out).toContain("Approved by Ada, editor, on 12 October 2026");
     expect(out).toContain("Approved by an independent editor on 12 October 2026");
     expect(out).not.toContain("Ben");
