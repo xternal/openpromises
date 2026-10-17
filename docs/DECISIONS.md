@@ -110,4 +110,4 @@ Four of the plan's questions were already settled that evening, by decisions 13 
 
 ## Proposed, waiting for the owner
 
-None.
+**RFC-0002: what a promise costs, and what that cost compares with.** Pavel Guzhikov asked on 17 October 2026 for "an educated calculation of a cost of a promise", in money, people, time and changes, with comparisons. [RFC-0002](RFC-0002.md) proposes it in the engine, for all three sites. Each card can show its cost, with our own labelled estimate when no one else costed it, plus the staff a promise needs, how long delivery usually takes, the steps it needs, and what the cost equals, in one fixed basket of units per site, worded neutrally. Nothing is decided: its nine questions (§9) wait for Pavel.

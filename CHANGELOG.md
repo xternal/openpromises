@@ -2,6 +2,10 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
+## Unreleased
+
+- Documentation: RFC-0002 proposes what a promise costs and what that cost compares with, waiting for the owner's decisions. Nothing changes in the engine yet.
+
 ## 0.7.0 (17 October 2026)
 
 Decisions 25 to 27.
