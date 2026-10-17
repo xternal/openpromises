@@ -37,8 +37,9 @@ Decision 23. Every card says so in words, from one function, so the page, the fe
 | `none` | Not yet verified by an editor |
 | `automated` | Checked automatically by AI Journalist, not yet verified by an editor (the reviewer's name as readers see it, `editorial.renamed`) |
 | `editor`, `editors` | Verified by Pavel Guzhikov and 1 independent editor (editors with `named: true` in the editors list by name, the rest counted) |
+| `editor`, `editors`, with an automated review | Verified by Pavel Guzhikov, checked by AI Journalist (decision 27) |
 
-"Verified" is kept for people. Change the words with `messages`: `verify.none`, `verify.automated` (`{reviewers}`), `verify.by` (`{editors}`) and `verify.counted` (plural forms; English `.one` and `.other`, Russian also `.few` and `.many`).
+"Verified" is kept for people. Change the words with `messages`: `verify.none`, `verify.automated` (`{reviewers}`), `verify.by` (`{editors}`), `verify.by_checked` (`{editors}`, `{reviewers}`) and `verify.counted` (plural forms; English `.one` and `.other`, Russian also `.few` and `.many`).
 
 Make the views with the editors list, `cardViews(cards, actors, editors)`, and each view carries `verification`; `verificationText(view, config, words)` gives its words. Without the list, approvals cannot be checked, so the views carry none and nothing is shown. Where it appears:
 

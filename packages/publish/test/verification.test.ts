@@ -26,6 +26,21 @@ describe("verificationText", () => {
     expect(verificationText(v({ level: "editors", named: ["A", "B"], counted: 3, automated: [] }), config, en)).toBe("Verified by A, B and 3 independent editors");
   });
 
+  it("names the automated reviewer beside the editors when one checked the card too (decision 27)", () => {
+    expect(verificationText(v({ level: "editor", named: ["Pavel Guzhikov"], counted: 0, automated: ["Junior Editor"] }), config, en)).toBe(
+      "Verified by Pavel Guzhikov, checked by AI Journalist",
+    );
+    expect(verificationText(v({ level: "editors", named: [], counted: 2, automated: ["Junior Editor", "Linter"] }), config, en)).toBe(
+      "Verified by 2 independent editors, checked by AI Journalist and Linter",
+    );
+    expect(verificationText(v({ level: "editor", named: ["Павел Гужиков"], counted: 0, automated: ["Junior Editor"] }), config, ru)).toBe(
+      "Подтвердили: Павел Гужиков; автоматическая проверка: AI Journalist",
+    );
+    expect(verificationText(v({ level: "editors", named: [], counted: 2, automated: ["Junior Editor", "Linter"] }), config, ru)).toBe(
+      "Подтвердили: 2 независимых редактора; автоматическая проверка: AI Journalist и Linter",
+    );
+  });
+
   it("speaks Russian with Russian plurals", () => {
     expect(verificationText(v({ level: "none", named: [], counted: 0, automated: [] }), config, ru)).toBe("Редактор ещё не подтвердил");
     expect(verificationText(v({ level: "editors", named: ["Павел Гужиков"], counted: 1, automated: [] }), config, ru)).toBe("Подтвердили: Павел Гужиков и 1 независимый редактор");
@@ -36,6 +51,10 @@ describe("verificationText", () => {
   it("takes the site's own words", () => {
     const own = resolveConfig({ site: { name: "Test", url: "https://example.org" }, messages: { en: { "verify.none": "Awaiting an editor" } } });
     expect(verificationText(v({ level: "none", named: [], counted: 0, automated: [] }), own, words(own, "en"))).toBe("Awaiting an editor");
+    const checked = resolveConfig({ site: { name: "Test", url: "https://example.org" }, messages: { en: { "verify.by_checked": "{editors} approved it; {reviewers} checked it" } } });
+    expect(verificationText(v({ level: "editor", named: ["Pavel Guzhikov"], counted: 0, automated: ["AI Journalist"] }), checked, words(checked, "en"))).toBe(
+      "Pavel Guzhikov approved it; AI Journalist checked it",
+    );
   });
 
   it("is nothing without the editors list", () => {
@@ -76,5 +95,20 @@ describe("the label in every output", async () => {
   it("is in the card's own feed", () => {
     const feed = buildFeed(views, "promise", one.id, { config: c, w, today: "2026-10-12" }, "atom");
     expect(feed.body).toContain(`${label}.</subtitle>`);
+  });
+
+  it("names the automated reviewer in every output when one checked the card too (decision 27)", () => {
+    const checked = r.cards.map((x) => (x.card.id === one.id ? { ...x, card: { ...x.card, reviews: [...(x.card.reviews ?? []), { by: "AI Journalist", kind: "automated" as const, on: "2026-10-12" }] } } : x));
+    const cv = cardViews(checked, r.actors, r.editors);
+    const view = cv.find((x) => x.id === one.id)!;
+    const text = verificationText(view, c, w)!;
+    expect(text).toBe(`${label}, checked by AI Journalist`);
+    expect(verificationText(view, c, words(c, "ru"))).toMatch(/; автоматическая проверка: AI Journalist$/);
+    expect(cardMarkdown(view, { config: c, w, today: "2026-10-12" })).toContain(`- **Verification:** ${text}`);
+    const data = openDataJson(cv, c, "2026-10-12");
+    expect(data.verification?.[one.id]?.text.en).toBe(text);
+    expect(data.verification?.[one.id]?.automated).toEqual(["AI Journalist"]);
+    expect(openDataCsv(cv, c, w, "2026-10-12")).toContain(`,${view.verification!.level},"${text}"`);
+    expect(buildFeed(cv, "promise", one.id, { config: c, w, today: "2026-10-12" }, "atom").body).toContain(`${text}.</subtitle>`);
   });
 });

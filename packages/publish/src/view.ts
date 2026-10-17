@@ -191,15 +191,17 @@ export const listOf = (w: Words, items: readonly string[]) => new Intl.ListForma
  * The card's verification in words (decision 23): "Not yet verified by an
  * editor", "Checked automatically by …, not yet verified by an editor", or
  * "Verified by …", naming the editors who chose to be named and counting the
- * rest. Undefined when the view has no verification (no editors list).
+ * rest, and "…, checked by …" when an automated reviewer checked it too
+ * (decision 27). Undefined when the view has no verification (no editors list).
  */
 export function verificationText(v: Pick<CardView, "verification">, config: Pick<Config, "editorial">, w: Words): string | undefined {
   const ver = v.verification;
   if (!ver) return undefined;
   if (ver.level === "none") return w.t("verify.none");
-  if (ver.level === "automated") return w.t("verify.automated", { reviewers: listOf(w, ver.automated.map((by) => reviewerName(config, by))) });
-  const editors = [...ver.named.map((by) => reviewerName(config, by)), ...(ver.counted ? [w.n("verify.counted", ver.counted)] : [])];
-  return w.t("verify.by", { editors: listOf(w, editors) });
+  const reviewers = listOf(w, ver.automated.map((by) => reviewerName(config, by)));
+  if (ver.level === "automated") return w.t("verify.automated", { reviewers });
+  const editors = listOf(w, [...ver.named.map((by) => reviewerName(config, by)), ...(ver.counted ? [w.n("verify.counted", ver.counted)] : [])]);
+  return ver.automated.length ? w.t("verify.by_checked", { editors, reviewers }) : w.t("verify.by", { editors });
 }
 
 /** The finished statuses that are not the top of the ladder: not met, undone. */

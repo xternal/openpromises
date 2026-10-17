@@ -4,6 +4,8 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+- **The label names the automated checker** (decision 27): a card verified by an editor that an automated reviewer has also checked now reads "Verified by Pavel Guzhikov, checked by AI Journalist" (Russian: "Подтвердили: Павел Гужиков; автоматическая проверка: AI Journalist"), with the reviewer's name as readers see it (`editorial.renamed`). A new message, `verify.by_checked` (`{editors}`, `{reviewers}`); a card with no automated review keeps `verify.by`. Every output follows, since they all use `verificationText`: `PromiseCard` and `Verification`, the card's Markdown and llms-full.txt, the card's own feed subtitle, and the open data (`verification.text` in `promises.json`, the CSV column `verification`).
+- Documentation: LedgerGov.UK, BoroughBook.UK and RussiaLedger.com each need one editor's approval, set in each site's configuration (`editorial.approvals: 1`, decision 27). The engine's default stays 2.
 - Documentation: the sites are called by their domain, LedgerGov.UK, BoroughBook.UK and RussiaLedger.com (decision 25). Names in code are unchanged.
 - Documentation: the engine never holds or asks for an AI key; a site that uses a model brings its own (decision 26). The README's principles now say what decision 22 changed for a site that publishes by checks.
 
