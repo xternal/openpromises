@@ -1,0 +1,43 @@
+format: openpromises/1
+id: lab-2026-pathway-bond
+actor_id: labour
+made_on: "2026-05-01"
+venue: manifesto
+area: Young people and jobs
+status: delivering
+versions:
+  - version: 1
+    text: Offer every local young person a Pathway Bond career opportunity
+    recorded_on: "2026-10-07"
+    source_url: https://hflabour.com/wp-content/uploads/2026/05/HF-manifesto-EXEC.pdf
+    archived_url: https://web.archive.org/web/20260617065909/https://hflabour.com/wp-content/uploads/2026/05/HF-manifesto-EXEC.pdf
+    page: 2
+    parameters:
+      deadline: null
+events:
+  - date: "2026-05-01"
+    type: promised
+    text:
+      en: Headline pledge in the 2026 Labour manifesto
+  - date: "2026-01-28"
+    type: delivering
+    text:
+      en: >-
+        Full Council resolution, 28 Jan 2026 (being delivered): “Already, 109 local businesses and
+        26 schools have shown exceptional commitment to inclusive economic growth by signing up to
+        the Pathway Bond, agreeing to provide opportunities for young people in cutting-edge
+        industries.”
+    evidence_url: https://democracy.lbhf.gov.uk/ieListDocuments.aspx?CId=114&MId=7894
+replies: []
+links:
+  decisions:
+    - decision_id: mg-72977
+      event: delivering
+      quote: >-
+        Already, 109 local businesses and 26 schools have shown exceptional commitment to inclusive
+        economic growth by signing up to the Pathway Bond, agreeing to provide opportunities for
+        young people in cutting-edge industries.
+      suggested_by: Claude (backfill, read in a session)
+      suggested_on: "2026-10-08"
+x:
+  editor_check_required: false
