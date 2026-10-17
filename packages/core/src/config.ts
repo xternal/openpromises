@@ -97,7 +97,7 @@ export const ConfigInput = z.strictObject({
   headline: z.record(Locale, HeadlineLimits).optional(),
   editorial: z
     .strictObject({
-      approvals: z.number().int().min(2, "should be 2 or more: publishing needs two editors (principle 4)").optional(),
+      approvals: z.number().int().min(1, "should be 1 or more: someone must approve (principle 4; a site may choose 1, decision 27)").optional(),
       /** "approved": every published card has the editors' approvals; "checked": a card is published once its checks pass, and a reader's submission still needs the approvals (decision 22). */
       publish: z.enum(["approved", "checked"]).optional(),
       partyConflict: z.literal(true, { error: "cannot be turned off: an editor never approves a card about their own party (principle 4)" }).optional(),

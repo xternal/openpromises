@@ -308,6 +308,18 @@ describe("approvals", () => {
     expect(ruleIssues("approvals", one, { where: "drafts" })).toEqual([]);
   });
 
+  it("lets a site with one editor publish on one approval, a reader's submission included (decision 27)", () => {
+    const single = resolveConfig({ ...CONFIG_INPUT, editorial: { approvals: 1, publish: "checked" } });
+    const submitted = (n: number) => card((c) => ((c.origin = "reader_submission"), (c.reviews = c.reviews!.slice(0, n))));
+    expect(ruleIssues("approvals", submitted(1), { config: single })).toEqual([]);
+    expect(ruleIssues("approvals", submitted(0), { config: single })).toEqual([
+      "reviews: a reader's submission needs 1 editor's approval; it has 0. Keep it in drafts/ until editors approve it (openpromises review)",
+    ]);
+    expect(ruleIssues("approvals", submitted(1))).toEqual([
+      "reviews: a published card needs 2 editors' approvals; it has 1. Keep it in drafts/ until editors approve it (openpromises review)",
+    ]);
+  });
+
   it("never counts an editor approving a card about their own party", () => {
     const c = card((c) => (c.reviews![1] = { by: "Kim", kind: "editor", on: "2026-05-04", approves: true }));
     expect(ruleIssues("approvals", c)).toEqual([

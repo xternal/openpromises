@@ -7,14 +7,14 @@ All notable changes to OpenPromises. The packages share one version and follow [
 Decisions 25 to 27.
 
 - **The label names the automated checker** (decision 27): a card verified by an editor that an automated reviewer has also checked now reads "Verified by Pavel Guzhikov, checked by AI Journalist" (Russian: "Подтвердили: Павел Гужиков; автоматическая проверка: AI Journalist"), with the reviewer's name as readers see it (`editorial.renamed`). A new message, `verify.by_checked` (`{editors}`, `{reviewers}`); a card with no automated review keeps `verify.by`. Every output follows, since they all use `verificationText`: `PromiseCard` and `Verification`, the card's Markdown and llms-full.txt, the card's own feed subtitle, and the open data (`verification.text` in `promises.json`, the CSV column `verification`).
-- Documentation: LedgerGov.UK, BoroughBook.UK and RussiaLedger.com each need one editor's approval, set in each site's configuration (`editorial.approvals: 1`, decision 27). The engine's default stays 2.
+- **One approval, by a site's choice** (decision 27): `editorial.approvals` now accepts 1; before 0.7.0 the configuration refused anything under 2. 0 is still refused, and the default stays 2. LedgerGov.UK, BoroughBook.UK and RussiaLedger.com each set 1 in their own configuration. The approvals message reads "needs 1 editor's approval" when one is needed.
 - Documentation: the sites are called by their domain, LedgerGov.UK, BoroughBook.UK and RussiaLedger.com (decision 25). Names in code are unchanged.
 - Documentation: the engine never holds or asks for an AI key; a site that uses a model brings its own (decision 26). The README's principles now say what decision 22 changed for a site that publishes by checks.
 
 ### Upgrading from 0.6.0
 
 - **No configuration needed.** Labels gain "checked by …" where an automated review exists: "Verified by Pavel Guzhikov" becomes "Verified by Pavel Guzhikov, checked by AI Journalist" on a card the AI Journalist reviewed. Cards with no automated review, and cards no editor has approved, read as before. To keep the old words, set `verify.by_checked` in `messages` to the same words as `verify.by`.
-- **LedgerGov.UK, BoroughBook.UK and RussiaLedger.com:** to need only one editor's approval, set `editorial: { approvals: 1 }` in the site's own configuration, in its own pull request (decision 27). It applies wherever approvals are needed, a reader's submission included. If the site has its own words for `verify.by`, add `verify.by_checked` beside them.
+- **LedgerGov.UK, BoroughBook.UK and RussiaLedger.com:** to need only one editor's approval, set `editorial: { approvals: 1 }` in the site's own configuration, in its own pull request (decision 27); 0.6.0 refused it, so upgrade first. It applies wherever approvals are needed, a reader's submission included. If the site has its own words for `verify.by`, add `verify.by_checked` beside them.
 
 ## 0.6.0 (12 October 2026)
 

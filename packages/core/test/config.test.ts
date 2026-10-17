@@ -50,8 +50,10 @@ describe("configuration", () => {
     expect(statusLabel(c, "started")).toBe("Started");
   });
 
-  it("refuses fewer than two approvals, or turning off the party check (principle 4)", () => {
-    expect(() => resolveConfig({ site, editorial: { approvals: 1 } })).toThrow("should be 2 or more");
+  it("refuses no approvals, or turning off the party check (principle 4)", () => {
+    expect(() => resolveConfig({ site, editorial: { approvals: 0 } })).toThrow("should be 1 or more");
+    expect(resolveConfig({ site }).editorial.approvals).toBe(2);
+    expect(resolveConfig({ site, editorial: { approvals: 1 } }).editorial.approvals).toBe(1);
     expect(() => resolveConfig({ site, editorial: { partyConflict: false } })).toThrow("cannot be turned off");
   });
 
