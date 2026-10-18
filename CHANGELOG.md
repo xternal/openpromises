@@ -4,7 +4,7 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
-- Documentation: RFC-0002 proposes what a promise costs and what that cost compares with, waiting for the owner's decisions. Nothing changes in the engine yet.
+- Documentation: RFC-0002 says what a promise costs and what that cost compares with. Accepted as recommended on 18 October 2026 (decision 28); the engine work follows in its own pull requests.
 - Documentation: RFC-0002 Appendix A lists candidate baskets for the three sites, with their sources. They are candidates, not decisions.
 
 ## 0.7.0 (17 October 2026)

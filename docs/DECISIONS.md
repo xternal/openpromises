@@ -108,6 +108,21 @@ Four of the plan's questions were already settled that evening, by decisions 13 
 
 **27. On Pavel Guzhikov's sites, one editor's approval is enough, and the label names the automated checker.** For now each of his three sites, LedgerGov.UK, BoroughBook.UK and RussiaLedger.com, has one editor: him. Each sets `editorial.approvals: 1` in its own configuration, in its own pull request; the engine's default stays 2 for every other site, so an upgrade loosens no one's rules (decision 13). The setting counts wherever approvals are needed, so on his sites a reader's submission (decision 22) waits for his one approval too. For those sites this amends RFC principle 4, "two editors", until a second editor joins. The engine refused fewer than two approvals before 0.7.0; from 0.7.0 it accepts 1 or more, by the site's choice, and still refuses 0. The label of decision 23 now names the automated reviewer beside the editors when a card has both: "Verified by {editors}, checked by {reviewers}" (`verify.by_checked`), with the reviewer's name as readers see it (`editorial.renamed`). A card with no automated review keeps "Verified by {editors}" (`verify.by`). "Verified" is still kept for people, and machines still never approve. Every output follows, since they all use `verificationText`. Decided by Pavel Guzhikov on 17 October 2026, about 23:00 BST: "for all project now we have only ME, so make my approval the only needed since now and also the AI Editor as a checker to mention". He wrote "AI Editor"; the sites call their automated reviewer "AI Journalist", and nothing is renamed. Why: one approval states honestly what one person can check, and naming the machine's check tells readers what else was done, without calling it verification.
 
+## Accepted on 18 October 2026
+
+**28. What a promise costs, and what that cost compares with: RFC-0002, as recommended.** Pavel Guzhikov asked on 17 October 2026 for "an educated calculation of a cost of a promise", in money, people, time and changes, with comparisons. [RFC-0002](RFC-0002.md) puts it in the engine, for all three sites. Its nine questions (§9) are decided as recommended:
+- Q1: one fixed basket per site, the same units in the same order on every card, never chosen card by card.
+- Q2: neutral words, "Equal to the cost of …" and "Столько же стоит: …", never "could build", "instead", "можно было бы" or "вместо". Pavel's own example wording is not used.
+- Q3: the site may publish its own estimate (`cost.by.kind: editorial`, `quality: modelled`, a required method, at least ±25%), labelled "Our estimate", only when no official body, party or independent source has costed the promise.
+- Q4: the first release has money, comparisons and people. Time and the delivery path are optional fields. The reference class is shown once there are at least 10 comparable cards.
+- Q5: the basket lives in the site's configuration, with a source for each unit.
+- Q6: comparisons are in the open data, not in the feeds.
+- Q7: a basket has at least 3 units. A card shows 3, and a table lists them all.
+- Q8: each price year is shown, and prices are adjusted only with a deflator the site supplies and names.
+- Q9: delivery-path step types are listed in the configuration, with labels, like the status ladder.
+
+The baskets in RFC-0002 Appendix A stay candidates: each site fixes its own from them, in its own pull request, before any card shows a comparison. Accepted by Pavel Guzhikov on 18 October 2026 at about 19:35 BST ("Q1–Q9 as recommended"). Why: it gives readers a sense of scale with one standard for every party, and keeps the numbers' sources in view.
+
 ## Proposed, waiting for the owner
 
-**RFC-0002: what a promise costs, and what that cost compares with.** Pavel Guzhikov asked on 17 October 2026 for "an educated calculation of a cost of a promise", in money, people, time and changes, with comparisons. [RFC-0002](RFC-0002.md) proposes it in the engine, for all three sites. Each card can show its cost, with our own labelled estimate when no one else costed it, plus the staff a promise needs, how long delivery usually takes, the steps it needs, and what the cost equals, in one fixed basket of units per site, worded neutrally. Nothing is decided: its nine questions (§9) wait for Pavel.
+None.
