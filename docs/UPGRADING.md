@@ -33,7 +33,16 @@ Version 1.0 comes once LedgerGov.UK and BoroughBook.UK run on the engine. Node 2
    pnpm up "@openpromises/*@0.3.0"
    ```
 
-   On pnpm 12, run it a day after the release: pnpm waits 1,440 minutes before installing a new version by default. If the setting is not written down, check that `pnpm-workspace.yaml` gained no `minimumReleaseAgeExclude` entries; remove any it did.
+   On pnpm 12, a site installs OpenPromises' own packages as soon as they are published (decision 32), and waits pnpm's 1,440 minutes for every other package as before. In `pnpm-workspace.yaml`:
+
+   ```yaml
+   minimumReleaseAgeExclude:
+     - "@openpromises/*"
+   ```
+
+   Exclude nothing else. In exchange, CI checks where those packages came from, before anything else uses them:
+   - `npm audit signatures` verifies the registry's signatures and attestations;
+   - a short script checks each `@openpromises/*` package's provenance: built by `.github/workflows/release.yml` in `https://github.com/xternal/openpromises`, from the tag `v<its version>`, covering the very tarball the registry serves (`dist.integrity`). RussiaLedger.com's `scripts/openpromises-provenance.ts` is one to copy.
 
 2. Read the changelog's "Upgrading" notes for every version you pass.
 3. Run your checks and your build, as your CI does:

@@ -131,6 +131,14 @@ The baskets in RFC-0002 Appendix A stay candidates: each site fixes its own from
 
 **31. An editor's note on a review may be in one of the site's languages.** Every text a site writes is in all its languages, but a review's note is the editor's own record of what they checked, written once and never edited (reviews are history). RussiaLedger.com's editors write theirs in Russian, and 188 of its review notes failed the engine's check for want of English that could only be added by rewriting history. The note now needs at least one of the site's languages, and no language the site does not have; readers of another language see it as written. Everything else a site writes still needs every language. Decided by Pavel Guzhikov on 19 October 2026, as part of «реши вопрос с RussiaLedger и полностью обнови все что надо».
 
+**32. Sites take each release as soon as it is out; releases come in batches.** Four releases in two days (0.7.0 to 0.10.0) left the sites on 0.4.0 and 0.6.0: each waited pnpm's one-day minimum age, a site upgrade was put off to the next day, and by then the next release had come. The wait guards against a hijacked package, but OpenPromises' own packages already have stronger guards: they are published only by this repository's Release workflow, with provenance, after the owner approves each one. Decided:
+- A site excludes `@openpromises/*`, and nothing else, from pnpm's minimum release age, and installs each release as soon as it is published, in its own pull request.
+- In exchange, its CI runs `npm audit signatures` and checks each `@openpromises/*` package's provenance: built by `.github/workflows/release.yml` in github.com/xternal/openpromises from the tag of its own version, covering the tarball the registry serves.
+- When a release is published, each site's upgrade pull request opens at once, by the coordinating session or by a dependency bot grouped on `@openpromises/*`; no "a day later" reminders.
+- Releases come when `main` holds changes the sites should take together, not after every merge; a fix that cannot wait goes out on its own.
+
+This replaces the "no exclusions" rule of CONTRIBUTING.md step 3 and UPGRADING.md. Decided by Pavel Guzhikov on 19 October 2026 («решение 32 как предложено»), after he called the release-then-wait cycle «как-то ТУПО».
+
 ## Proposed, waiting for the owner
 
 None.
