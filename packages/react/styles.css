@@ -632,3 +632,17 @@
 .op-story__item[data-to-come] {
   opacity: 0.85;
 }
+
+/* The first screen's promises (decision 30). */
+.op-spotlight__count {
+  font-size: 1.1em;
+}
+.op-spotlight__all a,
+.op-row__open {
+  font-weight: 600;
+  color: var(--op-accent);
+}
+.op-row__open {
+  display: block;
+  margin-top: 0.25rem;
+}

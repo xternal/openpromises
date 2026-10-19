@@ -26,6 +26,8 @@ import {
   reviewerName,
   quoteIn,
   shownComparisons,
+  spotlight,
+  statusMix,
   verificationText,
   wordDiff,
   words,
@@ -624,12 +626,53 @@ export function PromiseList({ views, today, actors, id, empty, ...b }: PromiseLi
                     {longDate(w, v.card.made_on)}
                   </span>
                 </span>
+                <span className="op-row__open" aria-hidden="true">
+                  {w.t("list.open")} →
+                </span>
               </span>
             </a>
           </li>
         );
       })}
     </ul>
+  );
+}
+
+/**
+ * Promises for the first screen (decision 30): how many and where they
+ * stand, the latest changes and what is due next, each a link straight to
+ * its card, then a link to them all. Chosen by rule (spotlight() in
+ * @openpromises/publish), the same for every party. Place it high on the
+ * home page, after the site's own opening.
+ */
+export function PromiseSpotlight({ views, today, recent = 3, due = 3, actors, ...b }: Base & { views: readonly CardView[]; today: string; recent?: number; due?: number; actors?: ReadonlyMap<string, Actor> }) {
+  const { config, L, w } = ctx(b);
+  const p = paths(config);
+  const s = spotlight(views, config, today, { recent, due });
+  if (!s.total) return null;
+  const headingId = "op-spotlight";
+  return (
+    <section className="op-spotlight" aria-labelledby={headingId}>
+      <h2 id={headingId}>{w.t("spotlight.title")}</h2>
+      <p className="op-spotlight__count">
+        <a href={p.promises(L)}>{w.n("spotlight.count", s.total)}</a>: {statusMix(views.filter((v) => v.where === "promises"), config, w)}
+      </p>
+      {s.recent.length > 0 && (
+        <>
+          <h3>{w.t("spotlight.recent")}</h3>
+          <PromiseList views={s.recent} today={today} config={config} locale={L} {...(actors ? { actors } : {})} />
+        </>
+      )}
+      {s.due.length > 0 && (
+        <>
+          <h3>{w.t("spotlight.due")}</h3>
+          <PromiseList views={s.due} today={today} config={config} locale={L} {...(actors ? { actors } : {})} />
+        </>
+      )}
+      <p className="op-spotlight__all">
+        <a href={p.promises(L)}>{w.t("spotlight.all")} →</a>
+      </p>
+    </section>
   );
 }
 

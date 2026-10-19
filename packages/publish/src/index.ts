@@ -9,6 +9,7 @@ export * from "./format";
 export * from "./compare";
 export * from "./estimate";
 export * from "./story";
+export * from "./spotlight";
 export * from "./view";
 export * from "./urls";
 export * from "./corrections";

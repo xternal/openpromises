@@ -2,6 +2,10 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
+## Unreleased
+
+- **Promises on the first screen** (decision 30): a new `PromiseSpotlight` component and `spotlight()` give a home page how many promises there are and where they stand, the three latest changes and the three open promises due next, chosen by rule, each a link to its card, then a link to them all. `lastChanged()` gives the day a promise last changed (an event, a rewording or a reply). Every `PromiseList` row now ends "Open the promise →" (hidden from screen readers, since the whole row is already the link). New messages `spotlight.*` and `list.open`; styles under `.op-spotlight` and `.op-row__open`.
+
 ## 0.9.0 (19 October 2026)
 
 Decision 29.
