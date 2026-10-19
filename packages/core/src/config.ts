@@ -171,6 +171,8 @@ export const ConfigInput = z.strictObject({
    * give per-person and per-household figures; `total` (a yearly total, in
    * whole currency units) gives a share; `units` at least three.
    */
+  /** Delivery-path steps a card's estimate may use, with their labels per language (decision 28, Q9). Added to the built-in steps. */
+  delivery: z.strictObject({ steps: z.record(Word, PerLocale) }).optional(),
   comparisons: z
     .strictObject({
       population: BasketFigure.optional(),
@@ -223,7 +225,20 @@ export interface Config {
   x: { card?: z.ZodType; actor?: z.ZodType };
   /** The comparison basket (decision 28); undefined when the site has none. */
   comparisons?: Comparisons;
+  /** Delivery-path steps and their labels per language (decision 28). */
+  delivery: { steps: Record<string, Record<string, string>> };
 }
+
+/** The built-in delivery-path steps (decision 28), in English and Russian; a site adds its own or relabels these with `delivery.steps`. */
+export const DELIVERY_STEPS: Record<string, Record<string, string>> = {
+  primary_legislation: { en: "Primary legislation", ru: "Федеральный закон" },
+  secondary_legislation: { en: "Secondary legislation", ru: "Подзаконный акт" },
+  budget_line: { en: "Money in the budget", ru: "Строка в бюджете" },
+  procurement: { en: "Procurement", ru: "Закупка" },
+  planning_consent: { en: "Planning consent", ru: "Разрешение на строительство" },
+  new_body: { en: "A new body set up", ru: "Создание нового органа" },
+  recruitment: { en: "Recruitment", ru: "Набор сотрудников" },
+};
 
 export type BasketSource = z.infer<typeof BasketSource>;
 export type BasketUnit = z.infer<typeof BasketUnit>;
@@ -373,6 +388,10 @@ export function resolveConfig(input: unknown): Config {
     if (basket.total) for (const l of locales.all) if (!basket.total.label[l]) problems.push(`comparisons.total.label has no "${l}" name`);
   }
 
+  const steps: Record<string, Record<string, string>> = {};
+  for (const [id, labels] of Object.entries({ ...DELIVERY_STEPS, ...(c.delivery?.steps ?? {}) })) steps[id] = { ...(DELIVERY_STEPS[id] ?? {}), ...labels };
+  for (const l of Object.keys(c.delivery?.steps ?? {}).flatMap((id) => Object.keys(c.delivery!.steps[id]!))) if (!locales.all.includes(l)) problems.push(`delivery.steps: "${l}" is not one of the configured languages`);
+
   if (problems.length) throw new ConfigError(problems);
 
   return {
@@ -409,6 +428,7 @@ export function resolveConfig(input: unknown): Config {
     messages: c.messages ?? {},
     publish: { ...(c.publish?.tag ? { tag: c.publish.tag } : {}), feeds: c.publish?.feeds ?? "atom", ...(c.publish?.licence ? { licence: c.publish.licence } : {}) },
     x: { ...(c.x?.card ? { card: c.x.card } : {}), ...(c.x?.actor ? { actor: c.x.actor } : {}) },
+    delivery: { steps },
     ...(basket ? { comparisons: { ...basket, show: basket.show ?? 3 } as Comparisons } : {}),
   };
 }

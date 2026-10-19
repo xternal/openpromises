@@ -1,6 +1,7 @@
 import { statusLabel, type Config } from "@openpromises/core";
 import { correctionTarget, correctionValue } from "./corrections";
 import { comparisonLines } from "./compare";
+import { estimateWords } from "./estimate";
 import { costFacts, costText, longDate } from "./format";
 import type { Words } from "./messages";
 import { absolute, paths } from "./urls";
@@ -69,6 +70,7 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
   const metric = params?.metric;
   const measurement = f.links?.measurement;
   const deadline = params?.deadline;
+  const est = estimateWords(v, config, w);
   const facts: [string, string | null][] = [
     [
       "card.status",
@@ -86,6 +88,10 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
     ["card.deadline", deadline ? longDate(w, deadline) : null],
     ["cost.label", costLine(v, ctx)],
     ["cost.capital", params?.capital_cost ? costText(w, config, params.capital_cost, { period: "total" }) : null],
+    ["estimate.staff", est.staff ?? null],
+    ["estimate.reached", est.reached ?? null],
+    ["estimate.time", est.time ?? null],
+    ["estimate.path", est.path ? `${est.path}: ${est.steps.map((s) => `${s.label} (${s.done ? w.t("estimate.step_done") : s.by ? w.t("estimate.step_by", { date: s.by }) : "…"})`).join("; ")}` : null],
     [
       "card.target",
       metric

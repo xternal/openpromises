@@ -85,6 +85,40 @@ export const Metric = z.strictObject({
   by: IsoDate,
 });
 
+/** A count of people as a range, with what they are ("teachers") and its sources (decision 28). */
+export const PeopleRange = z.strictObject({
+  range: Range,
+  unit: LangMap,
+  sources: z.array(Source).optional(),
+});
+
+/**
+ * Our estimate of what delivering a promise takes (decision 28, RFC-0002
+ * §4.2–4.4): the people it needs and reaches, how long it usually takes, and
+ * the steps it needs. All optional.
+ */
+export const Estimate = z.strictObject({
+  people: z.strictObject({ staff: PeopleRange.optional(), reached: PeopleRange.optional() }).optional(),
+  time: z
+    .strictObject({
+      /** Months delivery is expected to take: [low, central, high]. */
+      lead: z.strictObject({ months: Range, basis: z.enum(["official_plan", "reference_class"]), sources: z.array(Source).optional() }),
+    })
+    .optional(),
+  /** The steps delivery needs, in order. A step is met only by a timeline event with evidence. */
+  path: z
+    .array(
+      z.strictObject({
+        step: Word,
+        by: IsoDate.optional(),
+        /** The timeline event (its index in events) that met this step. */
+        met_by_event: z.number().int().nonnegative().optional(),
+      }),
+    )
+    .optional(),
+});
+export type Estimate = z.infer<typeof Estimate>;
+
 export const Parameters = z.strictObject({
   who: LangMap.optional(),
   cost: Cost.optional(),
@@ -94,6 +128,8 @@ export const Parameters = z.strictObject({
   funded_by: LangMap.nullable().optional(),
   funding_verifiable: z.boolean().optional(),
   metric: Metric.optional(),
+  /** What delivery takes: people, time and steps (decision 28). Added 19 October 2026, so a late field (FORMAT.md §9). */
+  estimate: Estimate.optional(),
 });
 export type Parameters = z.infer<typeof Parameters>;
 

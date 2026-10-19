@@ -78,6 +78,8 @@ export function* langMaps(card: Card, defaultLocale: string): Generator<LangMapA
     yield* ours(["versions", i, "parameters", "cost", "method"], p.cost?.method);
     yield* ours(["versions", i, "parameters", "capital_cost", "note"], p.capital_cost?.note);
     yield* ours(["versions", i, "parameters", "capital_cost", "method"], p.capital_cost?.method);
+    yield* ours(["versions", i, "parameters", "estimate", "people", "staff", "unit"], p.estimate?.people?.staff?.unit);
+    yield* ours(["versions", i, "parameters", "estimate", "people", "reached", "unit"], p.estimate?.people?.reached?.unit);
   }
   for (const [i, e] of card.events.entries()) yield* ours(["events", i, "text"], e.text);
   for (const [i, r] of (card.replies ?? []).entries()) {
@@ -308,6 +310,56 @@ const cost: Rule = {
       ...(v.parameters?.cost ? costIssues(v.parameters.cost, ["versions", i, "parameters", "cost"], config, true) : []),
       ...(v.parameters?.capital_cost ? costIssues(v.parameters.capital_cost, ["versions", i, "parameters", "capital_cost"], config, false) : []),
     ]),
+};
+
+// ---------------------------------------------------------------- estimate
+
+function rangeIssues(range: readonly number[], path: Path, add: (p: Path, m: string) => void, what: string) {
+  const [low, central, high] = range as [number, number, number];
+  if (low < 0) add([...path, "range"], `cannot be below zero: ${what}`);
+  else if (low === high) add([...path, "range"], `is a single figure (${low}); give a low–high range`);
+  else if (!(low <= central && central <= high)) add([...path, "range"], `is not in order: [low, central, high] needs low ≤ central ≤ high, and it has [${low}, ${central}, ${high}]`);
+}
+
+const estimate: Rule = {
+  id: "estimate",
+  summary:
+    "What delivery takes (decision 28): people and months are ranges in order, with sources for staff, reached and an official plan; every delivery-path step is one the configuration lists, once, and a step met by an event points to an event with evidence.",
+  check: (card, { config }) => {
+    const out: Issue[] = [];
+    card.versions.forEach((v, i) => {
+      const e = v.parameters?.estimate;
+      if (!e) return;
+      const at: Path = ["versions", i, "parameters", "estimate"];
+      const add = (p: Path, m: string) => out.push(issue("estimate", [...at, ...p], m));
+      for (const k of ["staff", "reached"] as const) {
+        const p = e.people?.[k];
+        if (!p) continue;
+        rangeIssues(p.range, ["people", k], add, "a count of people");
+        if (!p.sources?.length) add(["people", k, "sources"], "are missing: a count of people names at least one source");
+      }
+      const lead = e.time?.lead;
+      if (lead) {
+        const [low, central, high] = lead.months;
+        if (low <= 0) add(["time", "lead", "months"], "should be more than zero months");
+        else if (low === high) add(["time", "lead", "months"], `is a single figure (${low}); give a low–high range of months`);
+        else if (!(low <= central && central <= high)) add(["time", "lead", "months"], `is not in order: [low, central, high] needs low ≤ central ≤ high, and it has [${low}, ${central}, ${high}]`);
+        if (lead.basis === "official_plan" && !lead.sources?.length) add(["time", "lead", "sources"], "are missing: a time taken from an official plan names the plan");
+      }
+      const seen = new Set<string>();
+      (e.path ?? []).forEach((s, j) => {
+        if (!config.delivery.steps[s.step]) add(["path", j, "step"], `"${s.step}" is not a delivery step in the configuration (${list(Object.keys(config.delivery.steps))})`);
+        else if (seen.has(s.step)) add(["path", j, "step"], `"${s.step}" is listed twice; a step is listed once`);
+        seen.add(s.step);
+        if (s.met_by_event !== undefined) {
+          const ev = card.events[s.met_by_event];
+          if (!ev) add(["path", j, "met_by_event"], `there is no event ${s.met_by_event}; the card has ${card.events.length}`);
+          else if (!ev.evidence_url) add(["path", j, "met_by_event"], `event ${s.met_by_event} has no evidence_url, so it cannot meet a step (principle 2)`);
+        }
+      });
+    });
+    return out;
+  },
 };
 
 // ---------------------------------------------------------------- corrections
@@ -651,6 +703,7 @@ export const RULES: readonly Rule[] = [
   statusEvent,
   scoreable,
   cost,
+  estimate,
   corrections,
   approvals,
   standing,

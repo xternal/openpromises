@@ -7,6 +7,7 @@
 export * from "./messages";
 export * from "./format";
 export * from "./compare";
+export * from "./estimate";
 export * from "./view";
 export * from "./urls";
 export * from "./corrections";

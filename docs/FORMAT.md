@@ -62,6 +62,7 @@ export default defineConfig({
 | `messages` | Words on pages, feeds and Markdown, per language, replacing the built-in ones: `{ en: { "card.timeline": "Timeline" } }`. The keys are in `@openpromises/publish` (`MESSAGES`); English and Russian are built in. | built in |
 | `publish` | `{ tag, feeds, licence }`. `tag`: the fixed start of every feed entry id, such as `"example.org,2026"`; set it once and never change it, or every reader sees every entry again. `feeds`: `"atom"`, `"rss"` or `"both"`. `licence`: `{ name, url }` of the site's own writing, for Markdown and open data. | `feeds: "atom"` |
 | `x` | Zod schemas for the site's own fields: `{ card, actor }` (TypeScript configuration only). | none |
+| `delivery` | `{ steps: { council_vote: { en: "Council vote" } } }`: delivery-path steps a card's estimate may use, with labels per language, added to the built-in ones (or relabelling them). | the built-in steps (§5) |
 | `comparisons` | The site's fixed basket for comparing costs (decision 28, [PUBLISHING.md](PUBLISHING.md#what-a-cost-compares-with)): `{ population, households, total, units, show }`. `population` and `households` are `{ value, year, source }`; `total` (a yearly total in whole currency units, for a share) adds a `label` per language. `units` lists at least 3: each `{ id, label, cost, type, price_year, source }`, with `label` in every plural form each language uses, `cost` a `[low, central, high]` range in whole currency units, and `type` `recurring` or `one_off`. A `source` is `{ title, url, locator?, quality }`. `show`: how many units a card shows. | none; `show: 3` |
 
 A YAML or JSON configuration has the same keys, except `x`.
@@ -182,6 +183,7 @@ A version is the promise as worded once. Rewording a promise, or moving its dead
 | `funded_by` | language map or `null` | What pays for it, exactly as stated. `null` means "Funding not stated". |
 | `funding_verifiable` | `true` or `false` | `false` when the money sits where open documents cannot show it. |
 | `metric` | metric | With the `metrics` module: an indicator target (§10). |
+| `estimate` | estimate | What delivery takes (decision 28): people, time and steps. See below. |
 
 A **cost** is a range, never a single figure:
 
@@ -212,6 +214,22 @@ cost:
   sources:
     - { title: "School teachers' pay and conditions 2026", url: "https://www.gov.uk/…" }
 ```
+
+An **estimate** says what delivering the promise takes (decision 28, [RFC-0002](RFC-0002.md) §4.2–4.4). Every part is optional:
+
+```yaml
+estimate:
+  people:
+    staff: { range: [6000, 6500, 7000], unit: { en: teachers }, sources: [...] }     # people needed, full-time
+    reached: { range: [1000000, 1200000, 1500000], unit: { en: pupils }, sources: [...] }
+  time:
+    lead: { months: [18, 24, 36], basis: official_plan, sources: [...] }            # or basis: reference_class
+  path:                                                                              # the steps delivery needs, in order
+    - { step: budget_line, by: "2027-03-31", met_by_event: 3 }
+    - { step: recruitment }
+```
+
+People and months are low–high ranges in order, and a count of people names its sources, as does a time taken from an official plan. A `path` step is one of the configured delivery steps (`delivery.steps`, §2; built in: `primary_legislation`, `secondary_legislation`, `budget_line`, `procurement`, `planning_consent`, `new_body`, `recruitment`), listed once; a step is met only by a timeline event with evidence (`met_by_event`, its index in `events`), so the path never moves on our say-so. `referenceClass(cards, area, config)` in `@openpromises/core` gives how long similar promises took: how many cards in the area, how many finished and their median months, and nothing below 10 cards. Added 19 October 2026, so a late field (§9).
 
 ## 6. Status ladder
 
@@ -321,6 +339,7 @@ Two checks hold every correction to account: the card's field must equal the `no
 |---|---|
 | `versions[n].parameters.cost.by` | 9 October 2026 (decision 14) |
 | `versions[n].parameters.cost.method` | 18 October 2026 (decision 28) |
+| `versions[n].parameters.estimate` | 19 October 2026 (decision 28) |
 
 A site converted from an older format (its `legacy` setting) may also fill in, once, the fields that format had no place for (decision 15). The list is the engine's, per format, so no site can make its own history editable. Keep `legacy` in the configuration after converting, so these stay allowed.
 
@@ -436,6 +455,7 @@ error  content/promises/uk-bus-cap.yaml  events[1].evidence_url: an "in_plan" ev
 | `status-event` | The status has a matching event (except `off_ladder` statuses). |
 | `scoreable` | The current version has parameters, unless the card is `unscoreable`; an `unscoreable` card has none. |
 | `cost` | Every cost with a range has low less than high, the central figure between them, a quality label from `money.qualities` and at least one source; a cost without a range has a note. `by` goes only with a range, and every yearly cost with a range has one when `money.costedBy` is `required`. |
+| `estimate` | People and months are ranges in order, with sources for people and an official plan; every delivery-path step is configured and listed once; a step met by an event points to an event with evidence. |
 | `corrections` | Each correction names a field that exists, and the field equals the `now` of its last correction. |
 | `approvals` | A published card has enough approvals, from listed editors, made while they were editors, none from an editor about their own party; automated reviews never approve. With `editorial.publish: checked`, only a reader's submission or a card with no `origin` needs them (decision 22). |
 | `standing` | The `not_in_power` rule (§11). |

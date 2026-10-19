@@ -304,6 +304,48 @@ describe("cost: the site's own estimate (decision 28)", () => {
   });
 });
 
+describe("estimate (decision 28)", () => {
+  const sources = [{ title: "Workforce statistics", url: "https://example.org/w" }];
+  const est = (estimate: Record<string, unknown>) => card((c) => (c.versions[0]!.parameters!.estimate = estimate as never));
+  const good = {
+    people: { staff: { range: [6000, 6500, 7000], unit: { en: "teachers" }, sources }, reached: { range: [1e6, 1.2e6, 1.5e6], unit: { en: "pupils" }, sources } },
+    time: { lead: { months: [18, 24, 36], basis: "official_plan", sources } },
+    path: [{ step: "budget_line", by: "2027-03-31", met_by_event: 1 }, { step: "recruitment" }],
+  };
+
+  it("passes people and months as ranges with sources, and known steps met by events with evidence", () => {
+    expect(ruleIssues("estimate", est(good))).toEqual([]);
+    expect(ruleIssues("estimate", est({ time: { lead: { months: [6, 9, 12], basis: "reference_class" } } }))).toEqual([]);
+  });
+
+  it("fails ranges out of order or without sources, an unknown or repeated step, and a step met by an event without evidence", () => {
+    expect(
+      ruleIssues(
+        "estimate",
+        est({
+          people: { staff: { range: [7000, 6500, 6000], unit: { en: "teachers" } } },
+          time: { lead: { months: [12, 12, 12], basis: "official_plan" } },
+          path: [{ step: "magic" }, { step: "recruitment", met_by_event: 0 }, { step: "recruitment" }, { step: "budget_line", met_by_event: 9 }],
+        }),
+      ),
+    ).toEqual([
+      "versions[0].parameters.estimate.people.staff.range: is not in order: [low, central, high] needs low ≤ central ≤ high, and it has [7000, 6500, 6000]",
+      "versions[0].parameters.estimate.people.staff.sources: are missing: a count of people names at least one source",
+      "versions[0].parameters.estimate.time.lead.months: is a single figure (12); give a low–high range of months",
+      "versions[0].parameters.estimate.time.lead.sources: are missing: a time taken from an official plan names the plan",
+      'versions[0].parameters.estimate.path[0].step: "magic" is not a delivery step in the configuration (primary_legislation, secondary_legislation, budget_line, procurement, planning_consent, new_body, recruitment)',
+      "versions[0].parameters.estimate.path[1].met_by_event: event 0 has no evidence_url, so it cannot meet a step (principle 2)",
+      'versions[0].parameters.estimate.path[2].step: "recruitment" is listed twice; a step is listed once',
+      "versions[0].parameters.estimate.path[3].met_by_event: there is no event 9; the card has 2",
+    ]);
+  });
+
+  it("takes a site's own steps", () => {
+    const own = resolveConfig({ ...CONFIG_INPUT, delivery: { steps: { council_vote: { en: "Council vote" } } } });
+    expect(ruleIssues("estimate", est({ path: [{ step: "council_vote" }, { step: "procurement" }] }), { config: own })).toEqual([]);
+  });
+});
+
 describe("corrections", () => {
   const corrected = card((c) => {
     c.events[1]!.date = "2026-06-02";
