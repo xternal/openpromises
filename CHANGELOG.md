@@ -4,8 +4,18 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+## 0.11.0 (19 October 2026)
+
+Decisions 31 and 32.
+
 - Documentation: sites take each release as soon as it is out, excluding `@openpromises/*` (only) from pnpm's one-day wait and checking those packages' provenance in CI instead; releases come in batches (decision 32). CONTRIBUTING.md and UPGRADING.md say how.
 - **A review's note in one language** (decision 31): an editor's note on a review needs at least one of the site's languages, not all of them, since a review is written once and never edited. The note is still linted for neutral words, and a language the site does not have is still an error. Nothing else changes; a check can only pass more often.
+
+### Upgrading from 0.10.0
+
+- **No configuration needed.** Feeds, Markdown, open data, the card format and the components are unchanged.
+- **Fewer errors:** a review note in one of the site's languages now passes. A site that listed such notes as a known gap removes that gap (RussiaLedger.com's `languages` gap in `scripts/openpromises-check.ts`).
+- **Take releases at once** (decision 32): add `minimumReleaseAgeExclude: ["@openpromises/*"]` to `pnpm-workspace.yaml` and check provenance in CI, as docs/UPGRADING.md shows.
 
 ## 0.10.0 (19 October 2026)
 
