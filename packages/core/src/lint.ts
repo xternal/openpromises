@@ -119,7 +119,7 @@ export function lintCard(card: Card, config: Config): Issue[] {
   const out: Issue[] = [];
   const cache = new Map<string, Lexicon>();
   for (const at of langMaps(card, config.locales.default)) {
-    if (at.kind !== "ours" || !at.lint) continue;
+    if (at.kind === "translation" || !at.lint) continue;
     for (const [locale, text] of Object.entries(at.map)) {
       const lex = cache.get(locale) ?? lexicon(config, locale);
       cache.set(locale, lex);
