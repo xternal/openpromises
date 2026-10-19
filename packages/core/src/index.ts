@@ -13,5 +13,6 @@ export * from "./deadlines";
 export * from "./lint";
 export * from "./stats";
 export * from "./compare";
+export * from "./reference";
 export * from "./adapters";
 export * from "./json-schema";

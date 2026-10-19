@@ -164,3 +164,21 @@ describe("Comparisons (decision 28)", () => {
     expect(renderToStaticMarkup(<Comparisons view={v} config={s.config} />)).toBe("");
   });
 });
+
+describe("what delivery takes (decision 28)", () => {
+  it("shows staff, time and the steps done at a glance, in the reader's language", async () => {
+    const s = await site("synthetic-bilingual");
+    const v = s.views.find((x) => x.where === "promises")!;
+    const sources = [{ title: "Источник", url: "https://example.org/w" }];
+    const estimate = {
+      people: { staff: { range: [600, 650, 700] as [number, number, number], unit: { ru: "учителей", en: "teachers" }, sources } },
+      path: [{ step: "budget_line" }, { step: "recruitment" }],
+    };
+    const shown = { ...v, current: { ...v.current, parameters: { ...v.current.parameters!, estimate } } };
+    const ru = renderToStaticMarkup(<PromiseCard view={shown} config={s.config} today={s.today} locale="ru" />);
+    expect(ru).toContain("<dt>Нужно сотрудников</dt><dd>от 600 до 700 (учителей)</dd>");
+    expect(ru).toContain("<dd>выполнено 0 из 2</dd>");
+    expect(ru).toContain("Строка в бюджете");
+    expect(renderToStaticMarkup(<PromiseCard view={shown} config={s.config} today={s.today} locale="en" />)).toContain("<dt>Staff needed</dt><dd>600 to 700 teachers</dd>");
+  });
+});

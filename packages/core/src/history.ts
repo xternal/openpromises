@@ -71,8 +71,9 @@ const HISTORY = ["versions", "events", "replies"] as const;
  */
 export const LATE_FIELDS: Readonly<Record<(typeof HISTORY)[number], readonly string[]>> = {
   // Who made a cost's central figure (decision 14), added 9 October 2026;
-  // how it was worked out (decision 28), added 18 October 2026.
-  versions: [".parameters.cost.by", ".parameters.cost.method"],
+  // how it was worked out (decision 28), added 18 October 2026; what
+  // delivery takes (decision 28), added 19 October 2026.
+  versions: [".parameters.cost.by", ".parameters.cost.method", ".parameters.estimate"],
   events: [],
   replies: [],
 };

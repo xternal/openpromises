@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { contentStats, lintCard, lintText, lexicon, missedDeadline, resolveConfig, todayIn, validateContent, type ContentInput } from "@openpromises/core";
+import { contentStats, lintCard, lintText, lexicon, missedDeadline, referenceClass, resolveConfig, todayIn, validateContent, type ContentInput } from "@openpromises/core";
 import { ACTORS, BASE, card, config, CONFIG_INPUT, EDITORS } from "./helpers";
 
 describe("deadlines", () => {
@@ -142,5 +142,24 @@ describe("stats", () => {
     );
     const s = contentStats(r.cards, config, r.actors, r.editors);
     expect(s).toMatchObject({ published: 1, drafts: 1, byStatus: { in_plan: 1 }, byCategory: { progress: 1 }, draftsWaiting: 1, draftsApproved: 0 });
+  });
+});
+
+describe("reference class (decision 28)", () => {
+  const finished = (i: number, months: number) =>
+    card((c) => {
+      c.id = `p-${i}`;
+      c.status = "delivered";
+      c.events = [c.events[0]!, { date: new Date(Date.parse(c.events[0]!.date) + months * 30.4375 * 864e5).toISOString().slice(0, 10), type: "delivered", text: { en: "Done" }, evidence_url: "https://example.org/d" }];
+    });
+  const open = (i: number) => card((c) => (c.id = `o-${i}`));
+
+  it("says how many similar cards there are and how many finished, with the median months among those", () => {
+    const cards = [...[10, 20, 30, 40].map((m, i) => finished(i, m)), ...Array.from({ length: 6 }, (_, i) => open(i))];
+    expect(referenceClass(cards, BASE.area, config)).toEqual({ n: 10, finished: 4, medianMonths: 25 });
+  });
+
+  it("is nothing below 10 comparable cards", () => {
+    expect(referenceClass([finished(0, 12), open(1)], BASE.area, config)).toBeNull();
   });
 });

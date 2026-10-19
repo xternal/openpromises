@@ -268,6 +268,23 @@ describe("Markdown", () => {
     expect(md).toContain("How we estimated it: 200m journeys × £1.80–£2.20 a journey");
   });
 
+  it("says what delivery takes: staff, people reached, time against the deadline, and steps done (decision 28)", async () => {
+    const s = await site("public-ledger");
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const sources = [{ title: "Workforce", url: "https://example.org/w" }];
+    const estimate = {
+      people: { staff: { range: [6000, 6500, 7000] as [number, number, number], unit: { en: "drivers" }, sources } },
+      time: { lead: { months: [18, 24, 30] as [number, number, number], basis: "official_plan" as const, sources } },
+      path: [{ step: "budget_line", met_by_event: 1 }, { step: "procurement", by: "2027-03-31" }],
+    };
+    const withEstimate = { ...v, current: { ...v.current, parameters: { ...v.current.parameters!, estimate } } };
+    const md = cardMarkdown(withEstimate, { config: s.config, w: words(s.config, "en"), today: s.today });
+    expect(md).toContain("- **Staff needed:** 6,000 to 7,000 drivers");
+    expect(md).toMatch(/- \*\*Time to deliver:\*\* 18 to 30 months, by the official plan; the promise allows \d+ months/);
+    expect(md).toContain("- **Steps to deliver:** 1 of 2 done: Money in the budget (done); Procurement (expected by 31 March 2027)");
+    expect(cardMarkdown(v, { config: s.config, w: words(s.config, "en"), today: s.today })).not.toContain("Staff needed");
+  });
+
   it("writes corrections in words, with the old and new values", async () => {
     const s = await site("public-ledger");
     const md = cardMarkdown(s.views.find((x) => x.id === "uk-nato-5pc-2035-2025")!, { config: s.config, w: words(s.config, "en"), today: s.today });

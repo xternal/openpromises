@@ -10,6 +10,7 @@ import {
   correctionValue,
   costFacts,
   countedEditor,
+  estimateWords,
   costText,
   eventLabel,
   headline,
@@ -207,6 +208,7 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
   const id = (part: string) => `op-${part}-${view.id}`;
   const updated = lastUpdated(f, today);
   const cost = params?.cost;
+  const est = estimateWords(view, config, w);
   const facts = cost?.range ? costFacts(w, config, cost.range) : null;
   const deadline = params?.deadline;
   const whenText = pick(params?.when, L, config);
@@ -293,6 +295,27 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
               {params?.capital_cost && (
                 <Fact label={w.t("cost.capital")}>
                   <dd>{costText(w, config, params.capital_cost, { period: "total" })}</dd>
+                </Fact>
+              )}
+              {(["staff", "reached", "time"] as const).map((k) =>
+                est[k] ? (
+                  <Fact key={k} label={w.t(`estimate.${k}`)}>
+                    <dd>{est[k]}</dd>
+                  </Fact>
+                ) : null,
+              )}
+              {est.path && (
+                <Fact label={w.t("estimate.path")}>
+                  <dd>{est.path}</dd>
+                  <dd>
+                    <ol className="op-steps">
+                      {est.steps.map((s) => (
+                        <li key={s.label} data-done={s.done ? "true" : undefined}>
+                          {s.label} <span className="op-muted">({s.done ? w.t("estimate.step_done") : s.by ? w.t("estimate.step_by", { date: s.by }) : "…"})</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </dd>
                 </Fact>
               )}
               {params?.who && (

@@ -650,6 +650,337 @@
                       "by"
                     ],
                     "additionalProperties": false
+                  },
+                  "estimate": {
+                    "type": "object",
+                    "properties": {
+                      "people": {
+                        "type": "object",
+                        "properties": {
+                          "staff": {
+                            "type": "object",
+                            "properties": {
+                              "range": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ],
+                                "items": false,
+                                "minItems": 3,
+                                "maxItems": 3
+                              },
+                              "unit": {
+                                "type": "object",
+                                "propertyNames": {
+                                  "type": "string",
+                                  "pattern": "^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+                                },
+                                "additionalProperties": {
+                                  "type": "string",
+                                  "pattern": "\\S"
+                                }
+                              },
+                              "sources": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "title": {
+                                      "type": "string",
+                                      "pattern": "\\S"
+                                    },
+                                    "url": {
+                                      "type": "string",
+                                      "format": "uri"
+                                    },
+                                    "archived_url": {
+                                      "type": "string",
+                                      "format": "uri"
+                                    },
+                                    "kind": {
+                                      "type": "string",
+                                      "enum": [
+                                        "official",
+                                        "party",
+                                        "media",
+                                        "independent"
+                                      ]
+                                    },
+                                    "designation": {
+                                      "type": "object",
+                                      "properties": {
+                                        "status": {
+                                          "type": "string",
+                                          "enum": [
+                                            "none",
+                                            "foreign_agent",
+                                            "undesirable",
+                                            "extremist",
+                                            "unchecked"
+                                          ]
+                                        },
+                                        "checked_on": {
+                                          "type": "string",
+                                          "format": "date",
+                                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                                        }
+                                      },
+                                      "required": [
+                                        "status"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": [
+                                    "title",
+                                    "url"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": [
+                              "range",
+                              "unit"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "reached": {
+                            "type": "object",
+                            "properties": {
+                              "range": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ],
+                                "items": false,
+                                "minItems": 3,
+                                "maxItems": 3
+                              },
+                              "unit": {
+                                "type": "object",
+                                "propertyNames": {
+                                  "type": "string",
+                                  "pattern": "^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+                                },
+                                "additionalProperties": {
+                                  "type": "string",
+                                  "pattern": "\\S"
+                                }
+                              },
+                              "sources": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "title": {
+                                      "type": "string",
+                                      "pattern": "\\S"
+                                    },
+                                    "url": {
+                                      "type": "string",
+                                      "format": "uri"
+                                    },
+                                    "archived_url": {
+                                      "type": "string",
+                                      "format": "uri"
+                                    },
+                                    "kind": {
+                                      "type": "string",
+                                      "enum": [
+                                        "official",
+                                        "party",
+                                        "media",
+                                        "independent"
+                                      ]
+                                    },
+                                    "designation": {
+                                      "type": "object",
+                                      "properties": {
+                                        "status": {
+                                          "type": "string",
+                                          "enum": [
+                                            "none",
+                                            "foreign_agent",
+                                            "undesirable",
+                                            "extremist",
+                                            "unchecked"
+                                          ]
+                                        },
+                                        "checked_on": {
+                                          "type": "string",
+                                          "format": "date",
+                                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                                        }
+                                      },
+                                      "required": [
+                                        "status"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": [
+                                    "title",
+                                    "url"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": [
+                              "range",
+                              "unit"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "time": {
+                        "type": "object",
+                        "properties": {
+                          "lead": {
+                            "type": "object",
+                            "properties": {
+                              "months": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ],
+                                "items": false,
+                                "minItems": 3,
+                                "maxItems": 3
+                              },
+                              "basis": {
+                                "type": "string",
+                                "enum": [
+                                  "official_plan",
+                                  "reference_class"
+                                ]
+                              },
+                              "sources": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "title": {
+                                      "type": "string",
+                                      "pattern": "\\S"
+                                    },
+                                    "url": {
+                                      "type": "string",
+                                      "format": "uri"
+                                    },
+                                    "archived_url": {
+                                      "type": "string",
+                                      "format": "uri"
+                                    },
+                                    "kind": {
+                                      "type": "string",
+                                      "enum": [
+                                        "official",
+                                        "party",
+                                        "media",
+                                        "independent"
+                                      ]
+                                    },
+                                    "designation": {
+                                      "type": "object",
+                                      "properties": {
+                                        "status": {
+                                          "type": "string",
+                                          "enum": [
+                                            "none",
+                                            "foreign_agent",
+                                            "undesirable",
+                                            "extremist",
+                                            "unchecked"
+                                          ]
+                                        },
+                                        "checked_on": {
+                                          "type": "string",
+                                          "format": "date",
+                                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                                        }
+                                      },
+                                      "required": [
+                                        "status"
+                                      ],
+                                      "additionalProperties": false
+                                    }
+                                  },
+                                  "required": [
+                                    "title",
+                                    "url"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": [
+                              "months",
+                              "basis"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "lead"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "path": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "step": {
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9_]{0,59}$"
+                            },
+                            "by": {
+                              "type": "string",
+                              "format": "date",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                            },
+                            "met_by_event": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 9007199254740991
+                            }
+                          },
+                          "required": [
+                            "step"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "additionalProperties": false
                   }
                 },
                 "additionalProperties": false
