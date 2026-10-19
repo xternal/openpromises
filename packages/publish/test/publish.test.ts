@@ -86,6 +86,12 @@ describe("money and dates", () => {
     expect(costText(en, gbpM, { range: [7.2, 8, 8.8] }, { period: "total" })).toBe("Costs £7.2m to £8.8m in all");
   });
 
+  it("say so wherever the figure is the site's own estimate (decision 28)", () => {
+    const ours = { range: [1.8, 2.4, 3.2] as [number, number, number], by: { kind: "editorial" as const, name: "T" } };
+    expect(costText(en, gbp, ours)).toBe("Costs £1.8bn to £3.2bn a year (our estimate)");
+    expect(costText(words(rub, "ru"), rub, ours)).toBe("Стоит от 1,8 млрд ₽ до 3,2 млрд ₽ в год (наша оценка)");
+  });
+
   it("write days as days, in the reader's language", () => {
     expect(longDate(en, "2026-10-06")).toBe("6 October 2026");
     expect(longDate(words(rub, "ru"), "2026-10-06")).toBe("6 октября 2026 г.");
@@ -250,6 +256,16 @@ describe("Markdown", () => {
     expect(md).toContain("- **Cost a year:** Costs £0.36bn to £0.44bn a year (central £0.4bn by Department for Transport, official)");
     expect(md).toContain("(checked word for word at its source on 6 October 2026)");
     expect(md).toContain("- 1 January 2027, Deadline (to come): Due to start");
+  });
+
+  it("labels the site's own estimate and says how it was made (decision 28)", async () => {
+    const s = await site("public-ledger");
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const cost = { ...v.current.parameters!.cost!, by: { kind: "editorial" as const, name: s.config.site.name }, method: { en: "200m journeys × £1.80–£2.20 a journey" } };
+    const ours = { ...v, current: { ...v.current, parameters: { ...v.current.parameters!, cost } } };
+    const md = cardMarkdown(ours, { config: s.config, w: words(s.config, "en"), today: s.today });
+    expect(md).toContain(`- **Cost a year:** Costs £0.36bn to £0.44bn a year (our estimate) (central £0.4bn by ${s.config.site.name}, our estimate)`);
+    expect(md).toContain("How we estimated it: 200m journeys × £1.80–£2.20 a journey");
   });
 
   it("writes corrections in words, with the old and new values", async () => {

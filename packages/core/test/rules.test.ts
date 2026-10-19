@@ -265,6 +265,45 @@ describe("cost", () => {
   });
 });
 
+describe("cost: the site's own estimate (decision 28)", () => {
+  const sources = [{ title: "DfE STRB 2026", url: "https://example.org/strb" }];
+  const ours = (cost: Record<string, unknown>) =>
+    card(
+      (c) =>
+        (c.versions[0]!.parameters!.cost = {
+          range: [1.8, 2.4, 3.2],
+          quality: "modelled",
+          by: { kind: "editorial", name: "Test Tracker" },
+          method: { en: "6,500 teachers × £37k–£49k a year" },
+          sources,
+          ...cost,
+        } as never),
+    );
+
+  it("passes a modelled estimate by the site, with its method and at least ±25%", () => {
+    expect(ruleIssues("cost", ours({}))).toEqual([]);
+    expect(ruleIssues("cost", ours({ range: [-3, -2, -1.5] }))).toEqual([]);
+  });
+
+  it("fails another quality, no method, another maker's name and a narrow range", () => {
+    expect(ruleIssues("cost", ours({ quality: "sourced", method: undefined, by: { kind: "editorial", name: "IFS" }, range: [2, 2.4, 2.8] }))).toEqual([
+      'versions[0].parameters.cost.quality: is "sourced", but the site\'s own estimate is "modelled"',
+      "versions[0].parameters.cost.method: is missing: the site's own estimate says how it was worked out (inputs times unit costs, each with its source), so a reader can redo the sum",
+      'versions[0].parameters.cost.by.name: is "IFS", but the site\'s own estimate is made by the site: "Test Tracker"',
+      "versions[0].parameters.cost.range: is narrower than ±25% of its central figure (2.4): a model is less certain than a costing, so the site's own estimate runs from at most 1.8 to at least 3",
+    ]);
+  });
+
+  it("leaves other makers' figures as they are, method or not", () => {
+    expect(ruleIssues("cost", ours({ by: { kind: "independent", name: "IFS" }, quality: "sourced", range: [2.3, 2.4, 2.5] }))).toEqual([]);
+  });
+
+  it("needs its method in every language", () => {
+    const bilingual = resolveConfig({ ...CONFIG_INPUT, locales: { default: "en", all: ["en", "ru"] } });
+    expect(ruleIssues("languages", ours({}), { config: bilingual })).toContain('versions[0].parameters.cost.method.ru: has no "ru" text; every text we write has en, ru');
+  });
+});
+
 describe("corrections", () => {
   const corrected = card((c) => {
     c.events[1]!.date = "2026-06-02";
@@ -522,7 +561,7 @@ describe("cost maker (decision 14)", () => {
       "versions[0].parameters.cost.by: goes with a figure: this cost has no range, so there is no central figure for anyone to have made",
     ]);
     expect(ruleIssues("cost", BASE, { config: required })).toEqual([
-      "versions[0].parameters.cost.by: is missing: say who made the central figure (kind: official, party or independent; and a name), as the configuration asks (money.costedBy)",
+      "versions[0].parameters.cost.by: is missing: say who made the central figure (kind: official, party, independent or editorial; and a name), as the configuration asks (money.costedBy)",
     ]);
   });
 });

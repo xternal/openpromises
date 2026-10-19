@@ -124,6 +124,7 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
   const cost = params?.cost;
   section(w.t("card.about_cost"), [
     ...(cost?.note ? [flat(pick(cost.note, L, config)!)] : []),
+    ...(cost?.method ? [...(cost.note ? [""] : []), `${w.t("card.cost_method")}: ${flat(pick(cost.method, L, config)!)}`] : []),
     ...(cost?.sources?.length ? ["", `${w.t("card.cost_sources")}:`, ...cost.sources.map((s) => `- ${link(s.title, s.url)}`)] : []),
   ]);
   for (const extra of ctx.sections?.(v, L) ?? []) section(extra.title, [...extra.lines]);

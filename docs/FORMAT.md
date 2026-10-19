@@ -196,7 +196,21 @@ cost:
 
 With a `range`, a cost needs a `quality` and at least one source, and low must be less than high. A single official figure becomes a range with a stated editorial margin, and the note says so. A cost with no `range` records why there is no figure: it needs a `note` (and may list the sources it read).
 
-`by` says who made the central figure: `kind` is `official` (a government department or an official forecaster such as the OBR), `party` (a party's own figure, including one a party now in government made in opposition) or `independent` (anyone else: a think tank, academics); `name` is the maker as a reader would say it. It goes only with a range. Added 9 October 2026 (decision 14), so it is a late field (§9).
+`by` says who made the central figure: `kind` is `official` (a government department or an official forecaster such as the OBR), `party` (a party's own figure, including one a party now in government made in opposition) `independent` (anyone else: a think tank, academics) or `editorial` (the site's own estimate, decision 28); `name` is the maker as a reader would say it. It goes only with a range. Added 9 October 2026 (decision 14), so it is a late field (§9).
+
+`method` (a language map) says how the figure was worked out: the inputs times their unit costs, each with its source, so a reader can redo the sum. Any cost may have one; the site's own estimate must.
+
+**The site's own estimate** (decision 28, [RFC-0002](RFC-0002.md)): when no official body, party or independent source has costed a promise, the site may publish its own figure, with `by: { kind: editorial, name: <the site's name> }`, `quality: modelled`, a `method` and its sources, and a range at least ±25% around the central figure, since a model is less certain than a costing. Every output labels it "our estimate". It never replaces anyone else's figure: when one is published, the card uses that one.
+
+```yaml
+cost:
+  range: [1.8, 2.4, 3.2]
+  quality: modelled
+  by: { kind: editorial, name: LedgerGov.UK }
+  method: { en: "6,500 teachers × £37k–£49k a year, employer cost (DfE STRB 2026)" }
+  sources:
+    - { title: "School teachers' pay and conditions 2026", url: "https://www.gov.uk/…" }
+```
 
 ## 6. Status ladder
 
@@ -305,6 +319,7 @@ Two checks hold every correction to account: the card's field must equal the `no
 | Field | Added |
 |---|---|
 | `versions[n].parameters.cost.by` | 9 October 2026 (decision 14) |
+| `versions[n].parameters.cost.method` | 18 October 2026 (decision 28) |
 
 A site converted from an older format (its `legacy` setting) may also fill in, once, the fields that format had no place for (decision 15). The list is the engine's, per format, so no site can make its own history editable. Keep `legacy` in the configuration after converting, so these stay allowed.
 

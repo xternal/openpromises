@@ -50,8 +50,13 @@ export const Source = z.strictObject({
 });
 export type Source = z.infer<typeof Source>;
 
-/** Who made a cost's central figure (decision 14): an official body, a party (its own figure), or anyone else. */
-export const COST_MAKERS = ["official", "party", "independent"] as const;
+/**
+ * Who made a cost's central figure (decision 14): an official body, a party
+ * (its own figure), anyone else, or the site itself (`editorial`, "Our
+ * estimate", decision 28), kept apart from `independent` because a site is
+ * not independent of its own estimate.
+ */
+export const COST_MAKERS = ["official", "party", "independent", "editorial"] as const;
 
 export const CostBy = z.strictObject({
   kind: z.enum(COST_MAKERS),
@@ -66,6 +71,8 @@ export const Cost = z.strictObject({
   /** Who made the central figure (decision 14). Added after format v1 was first published, so it may be filled in once on a published version (FORMAT.md §9). */
   by: CostBy.optional(),
   note: LangMap.optional(),
+  /** How the figure was worked out: inputs times unit costs, each with its source (decision 28). Required on the site's own estimate. */
+  method: LangMap.optional(),
   sources: z.array(Source).optional(),
 });
 export type Cost = z.infer<typeof Cost>;
