@@ -142,3 +142,25 @@ describe("lists and indexes", () => {
     expect(out.startsWith('<script type="application/ld+json">[{"@context":"https://schema.org","@type":"Article"')).toBe(true);
   });
 });
+
+describe("Comparisons (decision 28)", () => {
+  it("shows the first units and a table of them all, with prices and sources, and nothing without a basket", async () => {
+    const { resolveConfig } = await import("@openpromises/core");
+    const { Comparisons } = await import("@openpromises/react");
+    const s = await site("public-ledger");
+    const source = { title: "Pay scales", url: "https://example.org/pay", locator: "Table 1", quality: "sourced" };
+    const unit = (id: string, one: string, other: string, cost: [number, number, number]) => ({ id, label: { en: { one, other } }, cost, type: "recurring" as const, price_year: "2026-27", source });
+    const comparisons = resolveConfig({
+      site: { name: "T" },
+      comparisons: { units: [unit("nurse", "nurse", "nurses", [32_000, 35_000, 39_000]), unit("teacher", "teacher", "teachers", [34_000, 47_000, 53_000]), unit("pension", "pension", "pensions", [12_000, 12_500, 13_000])], show: 2 },
+    }).comparisons;
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const out = renderToStaticMarkup(<Comparisons view={v} config={{ ...s.config, comparisons }} />);
+    expect(out).toContain("<li>Equal to the cost of 9,200–14,000 nurses</li>");
+    expect(out).not.toContain("<li>Equal to the cost of 28,000–37,000 pensions</li>");
+    expect(out).toContain("<td>Equal to the cost of 28,000–37,000 pensions</td>");
+    expect(out).toContain('<a href="https://example.org/pay" rel="noopener noreferrer">Pay scales</a>, Table 1');
+    expect(renderToStaticMarkup(<PromiseCard view={v} config={{ ...s.config, comparisons }} today={s.today} />)).toContain("What the cost compares with");
+    expect(renderToStaticMarkup(<Comparisons view={v} config={s.config} />)).toBe("");
+  });
+});

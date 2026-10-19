@@ -1,4 +1,5 @@
-import { categoryOf, statusLabel, type Actor, type Config, type VerificationLevel } from "@openpromises/core";
+import { categoryOf, statusLabel, type Actor, type Comparison, type Config, type VerificationLevel } from "@openpromises/core";
+import { comparisonLines } from "./compare";
 import type { Words } from "./messages";
 import { absolute, paths } from "./urls";
 import { actorName, areaLabel, headline, lastUpdated, reviewerName, verificationText, type CardView } from "./view";
@@ -19,7 +20,11 @@ export interface OpenData {
   actors: Actor[];
   /** Each card's verification by id (decision 23), with its words in every language of the site; absent when built without the editors list. */
   verification?: Record<string, { level: VerificationLevel; named: string[]; counted: number; automated: string[]; text: Record<string, string> }>;
+  /** What each card's cost compares with (decision 28), by id: the yearly cost's and the one-off cost's comparisons, with their words in every language. Absent without a basket. */
+  comparisons?: Record<string, { cost: ComparisonData[]; capital_cost: ComparisonData[] }>;
 }
+
+export type ComparisonData = Comparison & { text: Record<string, string> };
 
 export function openDataJson(views: readonly CardView[], config: Config, today: string): OpenData {
   const published = views.filter((v) => v.where === "promises");
@@ -36,7 +41,23 @@ export function openDataJson(views: readonly CardView[], config: Config, today: 
     cards: published.map((v) => v.card),
     actors: [...actors.values()].sort((a, b) => (a.id < b.id ? -1 : 1)),
     ...(published.some((v) => v.verification) ? { verification: verificationData(published, config) } : {}),
+    ...(config.comparisons ? { comparisons: comparisonData(published, config) } : {}),
   };
+}
+
+function comparisonData(views: readonly CardView[], config: Config): NonNullable<OpenData["comparisons"]> {
+  const ws = config.locales.all.map((l) => words(config, l));
+  const out: NonNullable<OpenData["comparisons"]> = {};
+  const all = (cost: Parameters<typeof comparisonLines>[0], oneOff: boolean): ComparisonData[] => {
+    const per = ws.map((w) => comparisonLines(cost, config, w, { oneOff }));
+    return (per[0] ?? []).map((l, i) => ({ ...l.comparison, text: Object.fromEntries(ws.map((w, j) => [w.locale, per[j]![i]!.text])) }));
+  };
+  for (const v of views) {
+    const p = v.current.parameters;
+    const entry = { cost: all(p?.cost, false), capital_cost: all(p?.capital_cost, true) };
+    if (entry.cost.length || entry.capital_cost.length) out[v.id] = entry;
+  }
+  return out;
 }
 
 function verificationData(views: readonly CardView[], config: Config): NonNullable<OpenData["verification"]> {
@@ -99,6 +120,8 @@ export const CSV_COLUMNS = [
   // Added in 0.6.0 (decision 23); empty when built without the editors list.
   "verification_level",
   "verification",
+  // Added in 0.8.0 (decision 28); empty without a basket.
+  "comparisons",
 ] as const;
 
 /** Every published card as CSV, one row each, in the language of `w` for headlines and labels. */
@@ -143,6 +166,9 @@ export function openDataCsv(views: readonly CardView[], config: Config, w: Words
         brought_about_by_id: v.card.brought_about_by?.actor_id ?? "",
         verification_level: v.verification?.level ?? "",
         verification: verificationText(v, config, w) ?? "",
+        comparisons: comparisonLines(p?.cost, config, w)
+          .map((l) => l.text)
+          .join("; "),
       };
       return CSV_COLUMNS.map((c) => csvField(row[c])).join(",");
     });

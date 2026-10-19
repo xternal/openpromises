@@ -1,5 +1,6 @@
 import { statusLabel, type Config } from "@openpromises/core";
 import { correctionTarget, correctionValue } from "./corrections";
+import { comparisonLines } from "./compare";
 import { costFacts, costText, longDate } from "./format";
 import type { Words } from "./messages";
 import { absolute, paths } from "./urls";
@@ -127,6 +128,16 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
     ...(cost?.method ? [...(cost.note ? [""] : []), `${w.t("card.cost_method")}: ${flat(pick(cost.method, L, config)!)}`] : []),
     ...(cost?.sources?.length ? ["", `${w.t("card.cost_sources")}:`, ...cost.sources.map((s) => `- ${link(s.title, s.url)}`)] : []),
   ]);
+  const compared = [...comparisonLines(cost, config, w), ...comparisonLines(params?.capital_cost, config, w, { oneOff: true })];
+  section(
+    w.t("compare.title"),
+    compared.length
+      ? [
+          ...compared.map((l) => `- ${l.text} (${w.t("compare.col.prices").toLowerCase()} ${l.comparison.year}; ${link(l.comparison.source.title, l.comparison.source.url)})`),
+          ...(params?.funding_verifiable === false ? ["", w.t("compare.unverifiable")] : []),
+        ]
+      : [],
+  );
   for (const extra of ctx.sections?.(v, L) ?? []) section(extra.title, [...extra.lines]);
   section(
     w.t("card.replies"),

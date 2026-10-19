@@ -34,6 +34,30 @@ const PathTemplate = z.string().regex(/^\/[^\s]*$/, "should be a path starting w
 const AreaLabels = z.record(z.string(), PerLocale);
 const AreaSlugs = z.record(z.string(), Slug);
 
+/** Where a figure in the comparison basket comes from (decision 28): a source, where in it, and its quality label. */
+const BasketSource = z.strictObject({
+  title: z.string().min(1),
+  url: Url,
+  /** Where in the source: a table, a paragraph, a line. */
+  locator: z.string().min(1).optional(),
+  /** sourced (an official figure), approx (simple arithmetic on official figures), unverified (media only), or the site's own label. */
+  quality: Word,
+});
+const BasketFigure = z.strictObject({ value: z.number().positive(), year: z.string().min(1), source: BasketSource });
+const PLURAL_FORMS = ["zero", "one", "two", "few", "many", "other"] as const;
+const BasketUnit = z.strictObject({
+  id: Word,
+  /** The unit's name per language, in every plural form the language uses: { en: { one: "polyclinic", other: "polyclinics" } }. */
+  label: z.record(Locale, z.partialRecord(z.enum(PLURAL_FORMS), z.string().min(1))),
+  /** What one unit costs, in whole currency units (pounds, roubles): [low, central, high]. */
+  cost: z.tuple([z.number().positive(), z.number().positive(), z.number().positive()], { error: "should be a range of three positive numbers: [low, central, high]" }),
+  /** recurring: a yearly cost, compared with yearly costs; one_off: compared with one-off costs. */
+  type: z.enum(["recurring", "one_off"]),
+  /** The year its prices are in. */
+  price_year: z.string().min(1),
+  source: BasketSource,
+});
+
 /** A Zod schema for the site's own `x` fields (TypeScript configuration only). */
 const SchemaLike = z.custom<z.ZodType>((v) => !!v && typeof (v as { safeParse?: unknown }).safeParse === "function", "should be a Zod schema");
 
@@ -141,6 +165,22 @@ export const ConfigInput = z.strictObject({
     })
     .optional(),
   x: z.strictObject({ card: SchemaLike.optional(), actor: SchemaLike.optional() }).optional(),
+  /**
+   * The site's fixed basket for comparing costs (decision 28, RFC-0002): the
+   * same units, in the same order, on every card. Population and households
+   * give per-person and per-household figures; `total` (a yearly total, in
+   * whole currency units) gives a share; `units` at least three.
+   */
+  comparisons: z
+    .strictObject({
+      population: BasketFigure.optional(),
+      households: BasketFigure.optional(),
+      total: BasketFigure.extend({ label: PerLocale }).optional(),
+      units: z.array(BasketUnit).min(3, "should list at least 3 units (decision 28)"),
+      /** How many units a card shows; the table lists them all. */
+      show: z.number().int().min(1).optional(),
+    })
+    .optional(),
 });
 export type ConfigInput = z.input<typeof ConfigInput>;
 
@@ -181,6 +221,18 @@ export interface Config {
   messages: Record<string, Record<string, string>>;
   publish: { tag?: string; feeds: "atom" | "rss" | "both"; licence?: { name: string; url: string } };
   x: { card?: z.ZodType; actor?: z.ZodType };
+  /** The comparison basket (decision 28); undefined when the site has none. */
+  comparisons?: Comparisons;
+}
+
+export type BasketSource = z.infer<typeof BasketSource>;
+export type BasketUnit = z.infer<typeof BasketUnit>;
+export interface Comparisons {
+  population?: { value: number; year: string; source: BasketSource };
+  households?: { value: number; year: string; source: BasketSource };
+  total?: { value: number; year: string; source: BasketSource; label: Record<string, string> };
+  units: BasketUnit[];
+  show: number;
 }
 
 const DEFAULT_PATHS: SitePaths = { promises: "/promises", card: "/promise/{id}", actor: "/actor/{id}", area: "/promises/area/{area}", feeds: "/feeds" };
@@ -303,6 +355,24 @@ export function resolveConfig(input: unknown): Config {
   }
   if (actors.responsibleRequired && !actors.responsible.length) problems.push(`actors.responsibleRequired needs at least one kind of body in actors.responsible`);
 
+  const basket = c.comparisons;
+  if (basket) {
+    const ids = basket.units.map((u) => u.id);
+    if (new Set(ids).size !== ids.length) problems.push("comparisons.units lists a unit twice");
+    basket.units.forEach((u, i) => {
+      const [low, central, high] = u.cost;
+      if (!(low <= central && central <= high)) problems.push(`comparisons.units[${i}].cost is not in order: [low, central, high] needs low ≤ central ≤ high`);
+      for (const l of locales.all) {
+        const forms = u.label[l];
+        if (!forms) problems.push(`comparisons.units[${i}].label has no "${l}" name`);
+        else
+          for (const f of new Intl.PluralRules(l).resolvedOptions().pluralCategories)
+            if (!forms[f]) problems.push(`comparisons.units[${i}].label.${l} has no "${f}" form, which ${l} uses`);
+      }
+    });
+    if (basket.total) for (const l of locales.all) if (!basket.total.label[l]) problems.push(`comparisons.total.label has no "${l}" name`);
+  }
+
   if (problems.length) throw new ConfigError(problems);
 
   return {
@@ -339,6 +409,7 @@ export function resolveConfig(input: unknown): Config {
     messages: c.messages ?? {},
     publish: { ...(c.publish?.tag ? { tag: c.publish.tag } : {}), feeds: c.publish?.feeds ?? "atom", ...(c.publish?.licence ? { licence: c.publish.licence } : {}) },
     x: { ...(c.x?.card ? { card: c.x.card } : {}), ...(c.x?.actor ? { actor: c.x.actor } : {}) },
+    ...(basket ? { comparisons: { ...basket, show: basket.show ?? 3 } as Comparisons } : {}),
   };
 }
 
