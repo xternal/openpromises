@@ -62,6 +62,7 @@ export default defineConfig({
 | `messages` | Words on pages, feeds and Markdown, per language, replacing the built-in ones: `{ en: { "card.timeline": "Timeline" } }`. The keys are in `@openpromises/publish` (`MESSAGES`); English and Russian are built in. | built in |
 | `publish` | `{ tag, feeds, licence }`. `tag`: the fixed start of every feed entry id, such as `"example.org,2026"`; set it once and never change it, or every reader sees every entry again. `feeds`: `"atom"`, `"rss"` or `"both"`. `licence`: `{ name, url }` of the site's own writing, for Markdown and open data. | `feeds: "atom"` |
 | `x` | Zod schemas for the site's own fields: `{ card, actor }` (TypeScript configuration only). | none |
+| `comparisons` | The site's fixed basket for comparing costs (decision 28, [PUBLISHING.md](PUBLISHING.md#what-a-cost-compares-with)): `{ population, households, total, units, show }`. `population` and `households` are `{ value, year, source }`; `total` (a yearly total in whole currency units, for a share) adds a `label` per language. `units` lists at least 3: each `{ id, label, cost, type, price_year, source }`, with `label` in every plural form each language uses, `cost` a `[low, central, high]` range in whole currency units, and `type` `recurring` or `one_off`. A `source` is `{ title, url, locator?, quality }`. `show`: how many units a card shows. | none; `show: 3` |
 
 A YAML or JSON configuration has the same keys, except `x`.
 

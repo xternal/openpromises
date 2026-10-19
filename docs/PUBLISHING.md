@@ -48,6 +48,20 @@ Make the views with the editors list, `cardViews(cards, actors, editors)`, and e
 - The card's own feed: at the end of its subtitle. Entries are not changed, so followers are not sent old entries again.
 - Open data: `verification` in `promises.json`, by card id, with the level, the named editors, the count and the words in every language; the CSV columns `verification_level` and `verification`.
 
+## What a cost compares with
+
+Decision 28 ([RFC-0002](RFC-0002.md)). A site that sets a basket (`comparisons` in its configuration, FORMAT.md §2) shows what each cost compares with. It is worked out by `compare()` in `@openpromises/core` and put in words by `comparisonLines()` in `@openpromises/publish`; nothing is stored on the card.
+
+- **One basket for every card**, in the same order, so the comparison never depends on who made the promise. A site fixes its basket before any card uses it, and its changelog says when it changes.
+- **In this order:** per person, per household, a share of the site's yearly total (for a yearly cost), then the units.
+- **Like with like:** a yearly cost compares with `recurring` units, a one-off cost (`capital_cost`) with `one_off` units.
+- **Ranges in, ranges out:** the low count divides the low cost by the high unit cost, and the high count the high cost by the low unit cost. Two significant figures; "about" when both ends round to one figure.
+- **Neutral words:** "Equal to the cost of 8–12 polyclinics", ru "Столько же стоит: 8–12 поликлиник". Never "could build", "instead", "можно было бы" or "вместо". Change them with `messages` (`compare.*`), keeping them neutral.
+- **Every figure with its source:** each comparison carries its price year, its source (with where in it) and its quality label. Prices of different years are shown as they are, not adjusted.
+- **Money that cannot be traced:** when a version says `funding_verifiable: false`, the comparison says so beside it.
+
+Where it appears: `PromiseCard` (a section after "About the cost", with per person, per household, the share and the first `show` units, and a table of all of them; place `<Comparisons view={…} config={…} />` anywhere else), the card's Markdown (a section with prices and sources), and the open data (`comparisons` in `promises.json`, by card id, with the words in every language; a `comparisons` column at the end of the CSV). Not in feeds: a basket change would otherwise send old entries again.
+
 ## Feed entry ids never change
 
 Every entry's id is a tag URI: `publish.tag`, then the card and the entry's place in its append-only history, such as `tag:ledgergov.uk,2026:promise/uk-bus-cap-2-2026/event/1`. Because history only grows, an entry's id never changes, and a feed reader never shows it twice. **Set `publish.tag` once and never change it.** A site moving to OpenPromises sets it to what its feeds already use, so followers notice nothing: LedgerGov.UK `ledgergov.uk,2026`, BoroughBook.UK `borough-ledger,2026` (the fixture configurations do, and the tests check the ids match).

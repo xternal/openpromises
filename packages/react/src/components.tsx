@@ -5,6 +5,7 @@ import {
   actorShortName,
   areaLabel,
   climb,
+  comparisonLines,
   correctionTarget,
   correctionValue,
   costFacts,
@@ -22,6 +23,7 @@ import {
   pick,
   reviewerName,
   quoteIn,
+  shownComparisons,
   verificationText,
   wordDiff,
   words,
@@ -130,6 +132,57 @@ export interface PromiseCardProps extends Base {
   children?: ReactNode;
   /** Show how far the card has been verified (decision 23) beside the source; false to place <Verification> elsewhere. */
   verification?: boolean;
+}
+
+/**
+ * What a card's cost compares with (decision 28): per person, per household,
+ * a share of the site's total and the first units of the site's basket, then
+ * a table of every comparison with its prices and source. Plain text and a
+ * table, no chart. Nothing without a basket or a cost range.
+ */
+export function Comparisons({ view, ...b }: Base & { view: CardView }) {
+  const { config, w } = ctx(b);
+  const params = view.current.parameters;
+  const lines = [...comparisonLines(params?.cost, config, w), ...comparisonLines(params?.capital_cost, config, w, { oneOff: true })];
+  if (!lines.length) return null;
+  return (
+    <div className="op-compare">
+      <ul>
+        {shownComparisons(lines, config).map((l) => (
+          <li key={`${l.comparison.kind}-${l.comparison.id}`}>{l.text}</li>
+        ))}
+      </ul>
+      {params?.funding_verifiable === false && <p className="op-muted">{w.t("compare.unverifiable")}</p>}
+      <details>
+        <summary>{w.t("compare.title")}</summary>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">{w.t("compare.col.equal")}</th>
+              <th scope="col">{w.t("compare.col.prices")}</th>
+              <th scope="col">{w.t("compare.col.quality")}</th>
+              <th scope="col">{w.t("compare.col.source")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lines.map((l) => (
+              <tr key={`${l.comparison.kind}-${l.comparison.id}`}>
+                <td>{l.text}</td>
+                <td>{l.comparison.year}</td>
+                <td>{l.comparison.quality}</td>
+                <td>
+                  <a href={l.comparison.source.url} rel="noopener noreferrer">
+                    {l.comparison.source.title}
+                  </a>
+                  {l.comparison.source.locator ? `, ${l.comparison.source.locator}` : ""}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </details>
+    </div>
+  );
 }
 
 /** How far a card has been verified, in words (decision 23): nothing when the views were made without the editors list. */
@@ -319,6 +372,12 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
                   <strong>{w.t("card.cost_method")}:</strong> {pick(cost.method, L, config)}
                 </p>
               )}
+
+          {config.comparisons && (cost?.range || params?.capital_cost?.range) && (
+            <Section id={id("compare")} title={w.t("compare.title")}>
+              <Comparisons view={view} config={config} locale={L} />
+            </Section>
+          )}
               {cost.sources?.length ? (
                 <ul className="op-links" aria-label={w.t("card.cost_sources")}>
                   {cost.sources.map((s) => (
