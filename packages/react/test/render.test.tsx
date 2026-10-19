@@ -194,3 +194,16 @@ describe("PromiseStory (decision 29)", () => {
     expect(out).toContain('rel="noopener noreferrer">source</a>');
   });
 });
+
+describe("PromiseSpotlight (decision 30)", () => {
+  it("puts the count, the latest changes and what is due next on the first screen, each a link to its card", async () => {
+    const { PromiseSpotlight } = await import("@openpromises/react");
+    const s = await site("public-ledger");
+    const out = html(<PromiseSpotlight views={s.views} config={s.config} today={s.today} />);
+    expect(out).toMatch(/<h2 id="op-spotlight">Promises<\/h2><p class="op-spotlight__count"><a href="\/promises">\d+ promises tracked<\/a>: /);
+    expect(out).toContain("<h3>Latest changes</h3>");
+    expect(out).toContain('<span class="op-row__open" aria-hidden="true">Open the promise →</span>');
+    expect(out).toContain('<a href="/promises">All promises →</a>');
+    expect(html(<PromiseSpotlight views={[]} config={s.config} today={s.today} />)).toBe("");
+  });
+});
