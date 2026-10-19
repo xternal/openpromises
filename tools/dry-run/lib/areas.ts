@@ -559,12 +559,22 @@ export function cardPagesArea(run: EngineRun, pages: LivePages, rendered: Render
       lostText.push(`${v.id}: "${squash(el.textContent ?? "").slice(0, 140)}"`);
     }
   }
+  // A link on every compared card page belongs to the site's shell (a footer, a banner), not to the card.
+  const perUrl = new Map<string, number>();
+  for (const l of lostLinks) {
+    const u = l.slice(l.indexOf(": ") + 2);
+    perUrl.set(u, (perUrl.get(u) ?? 0) + 1);
+  }
+  const shell = (l: string) => compared > 1 && perUrl.get(l.slice(l.indexOf(": ") + 2)) === compared;
   const hosts = new Map<string, string[]>();
+  const shellHosts = new Map<string, string[]>();
   for (const l of lostLinks) {
     const host = new URL(l.slice(l.indexOf(": ") + 2)).host;
-    hosts.set(host, [...(hosts.get(host) ?? []), l]);
+    const m = shell(l) ? shellHosts : hosts;
+    m.set(host, [...(m.get(host) ?? []), l]);
   }
   for (const [host, list] of hosts) out.push({ area, verdict: "worse", what: `${plural(list.length, "link")} to ${host} on live card pages that the engine's card would not show`, items: list });
+  for (const [host, list] of shellHosts) out.push({ area, verdict: "site", what: `${plural(list.length, "link")} to ${host} on every live card page: the site's own layout, which stays around the engine's card`, items: list });
   if (lostFacts.length) out.push({ area, verdict: "worse", what: `${plural(lostFacts.length, "fact")} the live card pages show that the engine's card would not`, items: lostFacts });
   if (lostInternal.length) out.push({ area, verdict: "changed", what: `${plural(lostInternal.length, "link")} to the site's own pages that the engine's card does not make (the site's layout may still have them)`, items: lostInternal });
   if (lostText.length) out.push({ area, verdict: "changed", what: `${plural(lostText.length, "piece")} of live card-page text the engine's card does not show: the site's own sections, or something lost`, items: lostText });
