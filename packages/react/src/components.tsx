@@ -311,9 +311,14 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
             </ol>
           </Section>
 
-          {(cost?.note || cost?.sources?.length) && (
+          {(cost?.note || cost?.method || cost?.sources?.length) && (
             <Section id={id("cost")} title={w.t("card.about_cost")}>
               {cost.note && <p>{pick(cost.note, L, config)}</p>}
+              {cost.method && (
+                <p>
+                  <strong>{w.t("card.cost_method")}:</strong> {pick(cost.method, L, config)}
+                </p>
+              )}
               {cost.sources?.length ? (
                 <ul className="op-links" aria-label={w.t("card.cost_sources")}>
                   {cost.sources.map((s) => (

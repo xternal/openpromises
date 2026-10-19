@@ -75,7 +75,9 @@ export function* langMaps(card: Card, defaultLocale: string): Generator<LangMapA
     yield* ours(["versions", i, "parameters", "when"], p.when);
     yield* ours(["versions", i, "parameters", "funded_by"], p.funded_by, false);
     yield* ours(["versions", i, "parameters", "cost", "note"], p.cost?.note);
+    yield* ours(["versions", i, "parameters", "cost", "method"], p.cost?.method);
     yield* ours(["versions", i, "parameters", "capital_cost", "note"], p.capital_cost?.note);
+    yield* ours(["versions", i, "parameters", "capital_cost", "method"], p.capital_cost?.method);
   }
   for (const [i, e] of card.events.entries()) yield* ours(["events", i, "text"], e.text);
   for (const [i, r] of (card.replies ?? []).entries()) {
@@ -273,14 +275,34 @@ function costIssues(cost: Cost, path: Path, config: Config, yearly: boolean): Is
   else if (!config.money.qualities.includes(cost.quality)) add(["quality"], `"${cost.quality}" is not a quality label in the configuration (${list(config.money.qualities)})`);
   if (!cost.sources?.length) add(["sources"], "are missing: a cost names at least one source");
   if (yearly && config.money.costedBy === "required" && !cost.by)
-    add(["by"], "is missing: say who made the central figure (kind: official, party or independent; and a name), as the configuration asks (money.costedBy)");
+    add(["by"], "is missing: say who made the central figure (kind: official, party, independent or editorial; and a name), as the configuration asks (money.costedBy)");
+  if (cost.by?.kind === "editorial") out.push(...estimateIssues(cost, path, config));
   return out;
 }
+
+/** The site's own estimate is at least this far either side of its central figure (decision 28). */
+export const ESTIMATE_MIN_WIDTH = 0.25;
+
+/** The site's own estimate (decision 28): modelled, with its method, the site's name and a wide enough range. */
+function estimateIssues(cost: Cost, path: Path, config: Config): Issue[] {
+  const out: Issue[] = [];
+  const add = (p: Path, m: string) => out.push(issue("cost", [...path, ...p], m));
+  if (cost.quality && cost.quality !== "modelled") add(["quality"], `is "${cost.quality}", but the site's own estimate is "modelled"`);
+  if (!cost.method) add(["method"], "is missing: the site's own estimate says how it was worked out (inputs times unit costs, each with its source), so a reader can redo the sum");
+  if (cost.by!.name !== config.site.name) add(["by", "name"], `is "${cost.by!.name}", but the site's own estimate is made by the site: "${config.site.name}"`);
+  const [low, central, high] = cost.range!;
+  const margin = ESTIMATE_MIN_WIDTH * Math.abs(central);
+  if (central - low < margin - 1e-9 || high - central < margin - 1e-9)
+    add(["range"], `is narrower than ±${ESTIMATE_MIN_WIDTH * 100}% of its central figure (${central}): a model is less certain than a costing, so the site's own estimate runs from at most ${round(central - margin)} to at least ${round(central + margin)}`);
+  return out;
+}
+
+const round = (n: number) => Math.round(n * 1e6) / 1e6;
 
 const cost: Rule = {
   id: "cost",
   summary:
-    "A cost is a range (low below high) with a quality label and a source, or explains in a note why there is no figure. Who made the central figure (by) goes only with a range, and is required when the configuration says so.",
+    "A cost is a range (low below high) with a quality label and a source, or explains in a note why there is no figure. Who made the central figure (by) goes only with a range, and is required when the configuration says so. The site's own estimate (by.kind: editorial) is modelled, says its method, is made by the site, and is at least ±25% wide.",
   check: (card, { config }) =>
     card.versions.flatMap((v, i) => [
       ...(v.parameters?.cost ? costIssues(v.parameters.cost, ["versions", i, "parameters", "cost"], config, true) : []),

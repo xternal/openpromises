@@ -76,12 +76,14 @@ export function costFacts(w: Words, config: Pick<Config, "money">, range: readon
 /**
  * The cost as a card shows it: "Costs £0.36bn to £0.44bn a year", "Raises …",
  * "Cost not stated", "No costing published", or "Not costable" for a card
- * without parameters. `period` "total" is for a one-off (capital) cost.
+ * without parameters. `period` "total" is for a one-off (capital) cost. The
+ * site's own estimate always says so: "… (our estimate)" (decision 28).
  */
 export function costText(w: Words, config: Pick<Config, "money">, cost: Cost | null | undefined, opts: { costable?: boolean; period?: "year" | "month" | "total" } = {}): string {
   if (opts.costable === false) return w.t("cost.not_costable");
   if (!cost) return w.t("cost.not_stated");
   if (!cost.range) return w.t("cost.no_figure");
   const f = costFacts(w, config, cost.range);
-  return w.t(f.raises ? "cost.raises" : "cost.costs", { low: f.low, high: f.high, per: w.t(`per.${opts.period ?? config.money.period}`) });
+  const text = w.t(f.raises ? "cost.raises" : "cost.costs", { low: f.low, high: f.high, per: w.t(`per.${opts.period ?? config.money.period}`) });
+  return cost.by?.kind === "editorial" ? w.t("cost.ours", { text }) : text;
 }
