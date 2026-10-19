@@ -358,7 +358,7 @@ A **review** is a check of the whole card, shown on it.
 | `by` | text, up to 40 characters | Who reviewed it: an editor's handle, or the name of an automated reviewer. |
 | `kind` | `automated`, `editor`, `legal` or `external` | What kind of review it is. |
 | `on` | date | When. |
-| `note` | language map | What was checked or found. |
+| `note` | language map | What was checked or found: in at least one of the site's languages, since a review is written once and never edited (decision 31). |
 | `approves` | `true` or `false` | An editor's approval to publish. |
 | `batch` | `true` | The approval was given for a batch of cards by a recorded decision, not card by card. |
 

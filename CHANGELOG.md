@@ -2,6 +2,10 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
+## Unreleased
+
+- **A review's note in one language** (decision 31): an editor's note on a review needs at least one of the site's languages, not all of them, since a review is written once and never edited. The note is still linted for neutral words, and a language the site does not have is still an error. Nothing else changes; a check can only pass more often.
+
 ## 0.10.0 (19 October 2026)
 
 Decision 30.

@@ -85,6 +85,20 @@ describe("languages", () => {
     expect(ruleIssues("languages", c, { config: bilingual })).toEqual([]);
   });
 
+  it("takes an editor's note on a review in one of the site's languages, but not in another (decision 31)", () => {
+    const base = card((c) => {
+      c.headline = { ru: "Ограничить цену проезда", en: "Cap bus fares at £2" };
+      c.versions[0]!.lang = "en";
+      c.versions[0]!.translations = { ru: "Мы ограничим цену проезда в автобусе 2 фунтами." };
+      c.versions[0]!.parameters = { who: { ru: "Пассажиры", en: "Bus passengers" } };
+      for (const e of c.events) e.text = { ru: "Событие", en: "Event" };
+    });
+    const noted = (note: Record<string, string>) => ({ ...base, reviews: base.reviews!.map((r, i) => (i === 0 ? { ...r, note } : r)) });
+    expect(ruleIssues("languages", noted({ ru: "Цитата сверена с архивной копией." }), { config: bilingual })).toEqual([]);
+    expect(ruleIssues("languages", noted({ ru: "Сверено.", en: "Checked." }), { config: bilingual })).toEqual([]);
+    expect(ruleIssues("languages", noted({ fr: "Vérifié." }), { config: bilingual })).toEqual(['reviews[0].note.fr: "fr" is not one of the configured languages (ru, en)']);
+  });
+
   it("fails a missing language, an unknown one, and a translation into the original language", () => {
     const c = card((c) => {
       c.headline = { ru: "Ограничить цену проезда", fr: "Plafonner les tarifs" };

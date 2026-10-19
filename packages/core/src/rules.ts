@@ -53,8 +53,12 @@ const baseLang = (lang: string) => lang.toLowerCase().split("-")[0]!;
 export interface LangMapAt {
   path: Path;
   map: LangMap;
-  /** "ours": text we write, in every language. "translation": our translations of someone's words, in every language but theirs. */
-  kind: "ours" | "translation";
+  /**
+   * "ours": text we write, in every language. "translation": our translations of someone's words, in every language
+   * but theirs. "note": an editor's note on a review, written once and never edited, in at least one of the site's
+   * languages (decision 31).
+   */
+  kind: "ours" | "translation" | "note";
   /** For a translation: the language of the original words. */
   original?: string;
   /** False for text recorded exactly as stated (funded_by), which the neutral-words lint leaves alone. */
@@ -87,7 +91,7 @@ export function* langMaps(card: Card, defaultLocale: string): Generator<LangMapA
     yield* ours(["replies", i, "editor_response"], r.editor_response);
   }
   for (const [i, c] of (card.corrections ?? []).entries()) yield* ours(["corrections", i, "reason"], c.reason);
-  for (const [i, r] of (card.reviews ?? []).entries()) yield* ours(["reviews", i, "note"], r.note);
+  for (const [i, r] of (card.reviews ?? []).entries()) if (r.note) yield { path: ["reviews", i, "note"], map: r.note, kind: "note", lint: true };
   const lever = card.links?.lever;
   if (lever && typeof lever === "object") yield* ours(["links", "lever", "label"], lever.label);
   yield* ours(["links", "measurement", "note"], card.links?.measurement?.note);
@@ -97,7 +101,7 @@ export function* langMaps(card: Card, defaultLocale: string): Generator<LangMapA
 export function langMapIssues(at: LangMapAt, config: Config, rule = "languages"): Issue[] {
   const out: Issue[] = [];
   const all = config.locales.all;
-  const required = at.kind === "ours" ? all : all.filter((l) => baseLang(l) !== baseLang(at.original ?? ""));
+  const required = at.kind === "ours" ? all : at.kind === "note" ? [] : all.filter((l) => baseLang(l) !== baseLang(at.original ?? ""));
   for (const l of required) if (!(l in at.map)) out.push(issue(rule, [...at.path, l], `has no "${l}" text; every text we write has ${list(all)}`));
   for (const l of Object.keys(at.map)) {
     if (!all.includes(l)) out.push(issue(rule, [...at.path, l], `"${l}" is not one of the configured languages (${list(all)})`));
@@ -108,7 +112,7 @@ export function langMapIssues(at: LangMapAt, config: Config, rule = "languages")
 
 const languages: Rule = {
   id: "languages",
-  summary: "Every language map has exactly the configured languages.",
+  summary: "Every language map has exactly the configured languages; an editor's note on a review needs only one of them.",
   check: (card, ctx) => [...langMaps(card, ctx.config.locales.default)].flatMap((at) => langMapIssues(at, ctx.config)),
 };
 
