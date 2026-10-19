@@ -605,3 +605,30 @@
     transition: none !important;
   }
 }
+
+/* The story (decision 29): one dated line, newest last. */
+.op-story ol {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 1rem;
+  border-left: 2px solid var(--op-line-strong);
+}
+.op-story__item {
+  margin: 0 0 1rem;
+}
+.op-story__item time {
+  display: block;
+  color: var(--op-muted);
+  font-size: 0.9em;
+}
+.op-story__label {
+  display: block;
+}
+.op-story__item blockquote {
+  margin: 0.25rem 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--op-line);
+}
+.op-story__item[data-to-come] {
+  opacity: 0.85;
+}

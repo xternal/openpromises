@@ -182,3 +182,15 @@ describe("what delivery takes (decision 28)", () => {
     expect(renderToStaticMarkup(<PromiseCard view={shown} config={s.config} today={s.today} locale="en" />)).toContain("<dt>Staff needed</dt><dd>600 to 700 teachers</dd>");
   });
 });
+
+describe("PromiseStory (decision 29)", () => {
+  it("lays the story out as one dated list, quotes the words, links the evidence", async () => {
+    const { PromiseStory } = await import("@openpromises/react");
+    const s = await site("public-ledger");
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const out = html(<PromiseStory view={v} config={s.config} today={s.today} />);
+    expect(out).toContain('<h2 id="op-story-uk-bus-cap-2-2026">The story so far</h2>');
+    expect(out).toMatch(/<li class="op-story__item op-story__item--promised"><time dateTime="[\d-]+">[^<]+<\/time><strong class="op-story__label">Promised<\/strong><blockquote>“/);
+    expect(out).toContain('rel="noopener noreferrer">source</a>');
+  });
+});

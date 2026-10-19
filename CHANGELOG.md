@@ -2,6 +2,10 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
+## Unreleased
+
+- **The story of a promise** (decision 29): `cardStory()` in `@openpromises/publish` puts a card's whole story in one dated line: the words as first said, every rewording, every event with its evidence, replies, cost changes, corrections, and deadlines and delivery steps still to come. `storyMarkdown()` writes it as Markdown, and a new `PromiseStory` component renders it, for a page of its own that is easy to share. New messages `story.*`; styles under `.op-story`. Nothing else changes.
+
 ## 0.8.0 (19 October 2026)
 
 Decision 28 (RFC-0002): what a promise costs, what that cost compares with, and what delivery takes.

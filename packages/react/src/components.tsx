@@ -4,6 +4,7 @@ import {
   actorName,
   actorShortName,
   areaLabel,
+  cardStory,
   climb,
   comparisonLines,
   correctionTarget,
@@ -183,6 +184,40 @@ export function Comparisons({ view, ...b }: Base & { view: CardView }) {
         </table>
       </details>
     </div>
+  );
+}
+
+/**
+ * A promise's whole story in one dated line (decision 29): the words as
+ * first said, rewordings, events with their evidence, replies, cost changes,
+ * corrections, and what is still to come. The same layout for every party;
+ * nothing the card does not record. Made to stand on its own page, so it is
+ * easy to share.
+ */
+export function PromiseStory({ view, today, headingLevel = 2, ...b }: Base & { view: CardView; today: string; headingLevel?: 2 | 3 }) {
+  const { config, w } = ctx(b);
+  const H = `h${headingLevel}` as const;
+  const items = cardStory(view, config, w, today);
+  return (
+    <section className="op-story" aria-labelledby={`op-story-${view.id}`}>
+      <H id={`op-story-${view.id}`}>{w.t("story.title")}</H>
+      <ol>
+        {items.map((i, n) => (
+          <li key={n} className={`op-story__item op-story__item--${i.kind}`} data-to-come={i.toCome ? "true" : undefined}>
+            <Time iso={i.date} w={w} />
+            {i.toCome && <span className="op-muted"> ({w.t("card.to_come")})</span>}
+            <strong className="op-story__label">{i.label}</strong>
+            {i.quote && <blockquote>{i.quote}</blockquote>}
+            {i.text && <p>{i.text}</p>}
+            {i.link && (
+              <a href={i.link} rel="noopener noreferrer">
+                {w.t("story.link")}
+              </a>
+            )}
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
 
