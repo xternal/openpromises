@@ -1,0 +1,13 @@
+format: openpromises/1
+id: snp
+kind: party
+name:
+  en: Scottish National Party
+short_name:
+  en: SNP
+standing: opposition
+roles: []
+identifiers:
+  parliament_party_id: 29
+same_as:
+  - https://www.snp.org/

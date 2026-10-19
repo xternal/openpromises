@@ -1,0 +1,13 @@
+format: openpromises/1
+id: example-governor
+kind: person
+name:
+  ru: Губернатор Примерной области
+  en: Governor of the Example Region
+party_id: example-party-b
+level: regional
+roles:
+  - title:
+      ru: Губернатор Примерной области
+      en: Governor of the Example Region
+    from: "2024-09-15"
