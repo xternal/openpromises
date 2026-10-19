@@ -123,6 +123,10 @@ Four of the plan's questions were already settled that evening, by decisions 13 
 
 The baskets in RFC-0002 Appendix A stay candidates: each site fixes its own from them, in its own pull request, before any card shows a comparison. Accepted by Pavel Guzhikov on 18 October 2026 at about 19:35 BST ("Q1–Q9 as recommended"). Why: it gives readers a sense of scale with one standard for every party, and keeps the numbers' sources in view.
 
+## Accepted on 19 October 2026
+
+**29. Every promise can tell its whole story on one page.** Pavel Guzhikov asked for a "Promise timeline" for each promise: from the original words to everything found later, words, actions and solutions, as a page people share. Most of it was already on the card, in separate sections: the versions, the timeline, the replies, the corrections and the cost changes. The engine now puts them in one dated line: `cardStory()` in `@openpromises/publish`, `storyMarkdown()` and a `PromiseStory` component, made to stand on its own page. It is built only from what the card records, so it adds nothing an editor has not checked: an action is there only as an event with its evidence, and a delivery step only when it is met by one or still expected. The same layout and order for every party, and neutral words, as for every label (principle 5). Not part of this decision: a share image per promise, which needs an image renderer the engine does not have, and finding later words and actions automatically, which is each site's intake and needs the AI Journalist's own evaluation first. Decided by Pavel Guzhikov on 19 October 2026 ("story as recommended").
+
 ## Proposed, waiting for the owner
 
 None.
