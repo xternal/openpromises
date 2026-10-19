@@ -1,6 +1,6 @@
 {
   "name": "@openpromises/cli",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "The openpromises command: validate, new, review, check-quote, deadlines, lint, migrate, stats",
   "keywords": [
     "promises",

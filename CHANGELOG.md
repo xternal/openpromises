@@ -2,9 +2,17 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
-## Unreleased
+## 0.9.0 (19 October 2026)
+
+Decision 29.
 
 - **The story of a promise** (decision 29): `cardStory()` in `@openpromises/publish` puts a card's whole story in one dated line: the words as first said, every rewording, every event with its evidence, replies, cost changes, corrections, and deadlines and delivery steps still to come. `storyMarkdown()` writes it as Markdown, and a new `PromiseStory` component renders it, for a page of its own that is easy to share. New messages `story.*`; styles under `.op-story`. Nothing else changes.
+
+### Upgrading from 0.8.0
+
+- **No configuration needed.** Nothing changes on a page until a site uses the story: the card format, `PromiseCard`, feeds, Markdown and open data are as they were.
+- **To show a promise's story:** render `<PromiseStory view={…} config={…} today={…} />` on a page of its own (for example `/promise/<id>/story`), or inside a card page; `cardStory()` gives the same items as data and `storyMarkdown()` as Markdown. Styles are under `.op-story` in `@openpromises/react/styles.css`.
+- **New words** (`story.*`, English and Russian); a site with its own `messages` may set them.
 
 ## 0.8.0 (19 October 2026)
 
