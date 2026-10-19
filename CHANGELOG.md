@@ -2,13 +2,24 @@
 
 All notable changes to OpenPromises. The packages share one version and follow [semantic versioning](https://semver.org/): until 1.0, a minor version (0.x) may change the card format or an API, and says so here. A change that would make a valid card invalid also needs a new format version and a migration (docs/FORMAT.md §14).
 
-## Unreleased
+## 0.8.0 (19 October 2026)
+
+Decision 28 (RFC-0002): what a promise costs, what that cost compares with, and what delivery takes.
 
 - **What delivery takes** (decision 28, RFC-0002): a version's parameters may carry an `estimate`: the staff a promise needs and the people it reaches (ranges with a unit and sources), how many months delivery takes (`official_plan` or `reference_class`) and the steps it needs (`path`, from the configured `delivery.steps`; a step is met only by an event with evidence). A new rule, `estimate`, checks them. The card's facts and Markdown show them: "Staff needed: 6,000 to 7,000 teachers", "Time to deliver: 18 to 30 months, by the official plan; the promise allows 14 months", "Steps to deliver: 1 of 2 done". `referenceClass()` gives how long similar promises took, with how many finished, and nothing below 10 cards. `estimate` is a late field.
 - **What a cost compares with** (decision 28, RFC-0002): a site may set a fixed basket, `comparisons` in its configuration (population, households, a yearly total and at least 3 units, each with its source, price year and plural forms). `compare()` in `@openpromises/core` works the comparisons out, ranges in and ranges out, yearly costs with recurring units and one-off costs with one-off units; `comparisonLines()` in `@openpromises/publish` puts them in neutral words ("Equal to the cost of 8–12 polyclinics", "Столько же стоит: 8–12 поликлиник"). They appear in a new `Comparisons` component and a section of `PromiseCard`, in the card's Markdown, and in the open data (`comparisons` in `promises.json`; a `comparisons` column at the end of `promises.csv`), never in feeds. Nothing changes for a site without a basket.
 - **Our own estimate** (decision 28, RFC-0002): when no one else has costed a promise, a site may publish its own figure, with `cost.by.kind: editorial` (the site's name), `quality: modelled`, a new `cost.method` (how it was worked out) and a range at least ±25% wide. The cost check enforces all four. Every output labels it: "Costs £1.8bn to £3.2bn a year (our estimate)", ru "(наша оценка)"; the card and the Markdown show the method under "About the cost". `cost.method` is a late field (FORMAT.md §9). New messages: `cost.by.editorial`, `cost.ours`, `card.cost_method`. Nothing changes for a card without it.
 - Documentation: RFC-0002 says what a promise costs and what that cost compares with. Accepted as recommended on 18 October 2026 (decision 28); the engine work follows in its own pull requests.
 - Documentation: RFC-0002 Appendix A lists candidate baskets for the three sites, with their sources. They are candidates, not decisions.
+
+### Upgrading from 0.7.0
+
+- **No configuration needed.** Every new field and setting is optional: a card without them, and a site without a basket, publish exactly as before. The new `estimate` rule checks only cards that have an estimate.
+- **New words** in English and Russian (`cost.by.editorial`, `cost.ours`, `card.cost_method`, `estimate.*`, `compare.*`). A site with its own `messages` may set them; the defaults are neutral.
+- **New open-data column** at the end of `promises.csv`: `comparisons` (empty without a basket). No column moves.
+- **To publish the site's own estimate:** give the cost `by: { kind: editorial, name: <your site.name> }`, `quality: modelled` (keep `modelled` in `money.qualities`), a `method` in every language and a range at least ±25% wide. Use it only when no official body, party or independent source has costed the promise (decision 28, Q3).
+- **To show comparisons:** fix your basket first (RFC-0002 Appendix A has candidates), in its own pull request, before any card shows one: set `comparisons` in your configuration with at least 3 units, each with its source, price year and every plural form your languages use (FORMAT.md §2, PUBLISHING.md "What a cost compares with"). Units are in whole currency units; costs scale from `money.unit` (`bn`, `m`, `k` or none).
+- **To say what delivery takes:** add `estimate` to a version's parameters (FORMAT.md §5); add your own delivery steps with `delivery.steps`.
 
 ## 0.7.0 (17 October 2026)
 

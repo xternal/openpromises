@@ -1,0 +1,11 @@
+# Invented editors for tests.
+editors:
+  - handle: Editor A
+    since: "2026-01-01"
+    party: null
+  - handle: Editor B
+    since: "2026-01-01"
+    party: example-party-b
+  - handle: Editor C
+    since: "2026-01-01"
+    party: example-party-a

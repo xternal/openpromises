@@ -1,0 +1,19 @@
+format: openpromises/1
+id: labour
+kind: party
+name:
+  en: Hammersmith & Fulham Labour
+short_name:
+  en: Labour
+seats: 38
+x:
+  manifesto:
+    title: >-
+      Hope you can believe in (Hammersmith & Fulham Labour, 2026 local election manifesto summary)
+    url: https://hflabour.com/wp-content/uploads/2026/05/HF-manifesto-EXEC.pdf
+    archive_url: https://web.archive.org/web/20260617065909/https://hflabour.com/wp-content/uploads/2026/05/HF-manifesto-EXEC.pdf
+    published_on: "2026-05-01"
+    published_note: >-
+      PDF creation date. The party site did not respond on 7 Oct 2026; the copy read is the Wayback
+      Machine capture of 17 Jun 2026.
+    sha256: e08440222a5f071c5c1c7a41d2ed2fb60b5c7d62607614d6f5ab91da3f72c974

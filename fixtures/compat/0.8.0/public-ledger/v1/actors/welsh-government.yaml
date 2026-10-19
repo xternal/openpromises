@@ -1,0 +1,8 @@
+format: openpromises/1
+id: welsh-government
+kind: government
+name:
+  en: Welsh Government
+roles: []
+same_as:
+  - https://www.gov.wales/

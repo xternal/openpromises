@@ -1,0 +1,9 @@
+format: openpromises/1
+id: hm-government
+kind: government
+name:
+  en: HM Government
+standing: in_power
+roles: []
+same_as:
+  - https://www.gov.uk/
