@@ -18,6 +18,8 @@
  * character, and in Russian and Belarusian ё/е. Pure functions, no I/O.
  */
 
+import { ENTITIES, LEGACY, LONGEST_LEGACY } from "./entities";
+
 export type Tier = "exact" | "close" | "none";
 
 /** Languages where ё and е are written interchangeably, so a quote matches either. */
@@ -123,41 +125,63 @@ export function findSpan(quote: string, text: string): [number, number] | null {
   return at < 0 || !quote ? null : [at, at + quote.length];
 }
 
-const ENTITIES: Record<string, string> = {
-  amp: "&",
-  lt: "<",
-  gt: ">",
-  quot: '"',
-  apos: "'",
-  nbsp: " ",
-  shy: "­",
-  laquo: "«",
-  raquo: "»",
-  ldquo: "“",
-  rdquo: "”",
-  bdquo: "„",
-  lsquo: "‘",
-  rsquo: "’",
-  sbquo: "‚",
-  ndash: "–",
-  mdash: "—",
-  hellip: "…",
-  pound: "£",
-  euro: "€",
-  copy: "©",
-  thinsp: " ",
-  ensp: " ",
-  emsp: " ",
+/**
+ * What a browser shows for the numeric references 128 to 159 (&#146; is ’), as
+ * old pages written in Windows-1252 use them; the HTML standard's table
+ * (https://html.spec.whatwg.org/multipage/parsing.html#numeric-character-reference-end-state).
+ * 129, 141, 143, 144 and 157 are not in it and stay as they are.
+ */
+const WINDOWS_1252: Readonly<Record<number, string>> = {
+  0x80: "€",
+  0x82: "‚",
+  0x83: "ƒ",
+  0x84: "„",
+  0x85: "…",
+  0x86: "†",
+  0x87: "‡",
+  0x88: "ˆ",
+  0x89: "‰",
+  0x8a: "Š",
+  0x8b: "‹",
+  0x8c: "Œ",
+  0x8e: "Ž",
+  0x91: "‘",
+  0x92: "’",
+  0x93: "“",
+  0x94: "”",
+  0x95: "•",
+  0x96: "–",
+  0x97: "—",
+  0x98: "˜",
+  0x99: "™",
+  0x9a: "š",
+  0x9b: "›",
+  0x9c: "œ",
+  0x9e: "ž",
+  0x9f: "Ÿ",
 };
 
-/** Decode HTML character references: named ones in common use, and every numeric one. */
+/**
+ * Decode HTML character references as a browser reads them in a page's text:
+ * every HTML5 named one, case-sensitively (&Eacute; is É, &eacute; is é); the
+ * old names a browser also reads without their semicolon (&eacute, and
+ * &notit; is ¬it;); and every numeric one, with or without its semicolon,
+ * 128 to 159 as Windows-1252. Anything else, such as &foo; or &#0;, is left as
+ * it is.
+ */
 export function decodeEntities(s: string): string {
-  return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, ref: string) => {
+  return s.replace(/&(#[xX][0-9a-fA-F]+|#[0-9]+|[A-Za-z][A-Za-z0-9]*)(;?)/g, (m, ref: string, semicolon: string) => {
     if (ref[0] === "#") {
       const code = ref[1] === "x" || ref[1] === "X" ? parseInt(ref.slice(2), 16) : parseInt(ref.slice(1), 10);
-      return Number.isFinite(code) && code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : m;
+      return Number.isFinite(code) && code > 0 && code <= 0x10ffff ? (WINDOWS_1252[code] ?? String.fromCodePoint(code)) : m;
     }
-    return ENTITIES[ref.toLowerCase()] ?? m;
+    if (semicolon && Object.hasOwn(ENTITIES, ref)) return ENTITIES[ref]!;
+    // The longest old name the reference starts with, the rest kept as written.
+    for (let n = Math.min(ref.length, LONGEST_LEGACY); n > 1; n--) {
+      const name = ref.slice(0, n);
+      if (LEGACY.has(name)) return ENTITIES[name]! + ref.slice(n) + semicolon;
+    }
+    return m;
   });
 }
 
