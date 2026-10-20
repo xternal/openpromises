@@ -5,7 +5,7 @@ import { JSDOM } from "jsdom";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { relatedCards } from "@openpromises/publish";
-import { ActorIndex, AreaCoverage, AreaIndex, Breadcrumbs, ComingUp, PromiseCard, PromiseList } from "@openpromises/react";
+import { ActorIndex, ActorTimeline, AreaCoverage, AreaIndex, Breadcrumbs, ComingUp, KeyPromises, PromiseCard, PromiseList, PromisesByMonth } from "@openpromises/react";
 import { site, type SiteName } from "../../publish/test/helpers";
 
 /** Run axe-core (WCAG 2.1 A and AA, and best practice) on a whole page. Colour contrast needs a browser's layout; contrast.test.ts checks the colours. */
@@ -56,6 +56,23 @@ describe.each([
           <PromiseList views={s.views} config={s.config} locale={locale} today={s.today} id="cards" />
         </main>
       </>,
+    );
+    expect(await violations(page, locale)).toEqual([]);
+  });
+
+  it("has no WCAG A or AA problems axe can find on an actor's page (decision 34)", async () => {
+    const s = await site(name as SiteName);
+    const owner = s.views.find((x) => x.id === id)!.actor.id;
+    const views = s.views.filter((v) => v.actor.id === owner);
+    const page = renderToStaticMarkup(
+      <main>
+        <h1>{owner}</h1>
+        <AreaCoverage views={views} config={s.config} locale={locale} />
+        <KeyPromises views={views} config={s.config} locale={locale} today={s.today} />
+        <ActorTimeline views={s.views} config={s.config} locale={locale} today={s.today} />
+        <PromisesByMonth views={views} config={s.config} locale={locale} today={s.today} />
+        <PromiseList views={views} config={s.config} locale={locale} today={s.today} />
+      </main>,
     );
     expect(await violations(page, locale)).toEqual([]);
   });

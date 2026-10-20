@@ -153,11 +153,28 @@ publishFiles({
 | `Ladder`, `StatusPill` | The status ladder with the current step marked, and a status as a labelled pill |
 | `Breadcrumbs`, `ActorIndex`, `AreaIndex` | Where the reader is (`aria-current="page"` on the current page) |
 | `AreaCoverage` | Every area the site lists, with how many promises each holds and where they stand, and "None recorded" for the rest (decision 33): on an actor's page, what they have not promised shows as plainly as what they have. The list comes from the configuration (`areaCoverage()`), the same for every actor |
+| `KeyPromises` | On an actor's page, the promises to look at first (decision 34): the open promises due next, with the days left ("65 days left"), then the latest changes, with what changed and when, each a link to its card. Chosen by the home page's rule (`keyPromises()`, which is `spotlight()` over that actor's views), never by hand |
+| `ActorTimeline` | An actor's promises over time (decision 34): every dated thing on their published cards, grouped by day, each entry linking to its cards. Time runs upwards: deadlines still to come above a "Today" line, latest first ("Deadline, in 65 days"), and below it what was promised (and where) and what has happened since, newest first. A passed deadline shows as its outcome; open promises with no deadline are listed beside it, under "No date given". `actorTimeline()` gives the same days as data |
+| `PromisesByMonth` | How many promises an actor made each month, from the first to today, empty months included and the current one "so far" (decision 34): a small bar chart with every bar labelled, and the same numbers as a table under "As a table". `promisesByMonth()` gives the counts |
 | `JsonLd` | Structured data in a safe `<script type="application/ld+json">` |
 | `PromiseSpotlight` | Promises for the first screen of the home page (decision 30): how many and where they stand, the latest changes and the open promises due next, each a link straight to its card with "Open the promise →", then a link to them all. Chosen by rule (`spotlight()`), never by hand, the same for every party |
 | `PromiseStory` | The promise's whole story in one dated line (decision 29): the words as first said, every rewording, every event with its evidence, replies, cost changes, corrections, and deadlines and delivery steps still to come. Made to stand on its own shareable page; `cardStory()` gives the same items as data and `storyMarkdown()` as Markdown |
 | `Verification` | How far the card has been verified, in words, for a site that places it outside `PromiseCard` |
 | `PromiseFilter` (`@openpromises/react/client`) | The only client part: filters a `PromiseList` by status, area and actor once the script runs. Without a script the whole list shows. Build its options with `filterOptions` and its words with `filterWords` |
+
+**An actor's page** (decisions 33 and 34) is built from one actor's views, a party's with its people's, so every actor gets the same page by the same rules:
+
+```tsx
+const mine = views.filter((v) => v.actor.id === id || v.party?.id === id);
+
+<AreaCoverage views={mine} config={config} />
+<KeyPromises views={mine} config={config} today={today} />
+<ActorTimeline views={mine} config={config} today={today} />
+<PromisesByMonth views={mine} config={config} today={today} />
+<PromiseList views={mine} config={config} today={today} />
+```
+
+The photo, its credit and the page's layout are the site's own. Each component takes `headingLevel={3}` to sit under the site's own heading.
 
 Every component takes `config` and `locale` (the site's default when left out). Words come from the catalogues in `@openpromises/publish` (`MESSAGES`, English and Russian built in); change any of them with `messages` in the configuration.
 

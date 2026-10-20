@@ -11,6 +11,7 @@ export * from "./estimate";
 export * from "./story";
 export * from "./spotlight";
 export * from "./coverage";
+export * from "./actor";
 export * from "./view";
 export * from "./urls";
 export * from "./corrections";
