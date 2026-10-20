@@ -5,7 +5,7 @@ import { JSDOM } from "jsdom";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { relatedCards } from "@openpromises/publish";
-import { ActorIndex, AreaIndex, Breadcrumbs, ComingUp, PromiseCard, PromiseList } from "@openpromises/react";
+import { ActorIndex, AreaCoverage, AreaIndex, Breadcrumbs, ComingUp, PromiseCard, PromiseList } from "@openpromises/react";
 import { site, type SiteName } from "../../publish/test/helpers";
 
 /** Run axe-core (WCAG 2.1 A and AA, and best practice) on a whole page. Colour contrast needs a browser's layout; contrast.test.ts checks the colours. */
@@ -52,6 +52,7 @@ describe.each([
         <main>
           <h1>Promises</h1>
           <ComingUp views={s.views} config={s.config} locale={locale} today={s.today} />
+          <AreaCoverage views={s.views} config={s.config} locale={locale} />
           <PromiseList views={s.views} config={s.config} locale={locale} today={s.today} id="cards" />
         </main>
       </>,

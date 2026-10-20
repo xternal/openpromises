@@ -207,3 +207,18 @@ describe("PromiseSpotlight (decision 30)", () => {
     expect(html(<PromiseSpotlight views={[]} config={s.config} today={s.today} />)).toBe("");
   });
 });
+
+describe("AreaCoverage (decision 33)", () => {
+  it("lists every area, empty ones too, with where each one's promises stand", async () => {
+    const { AreaCoverage } = await import("@openpromises/react");
+    const s = await site("public-ledger");
+    const one = s.views.filter((v) => v.actor.id === "andy-burnham");
+    const out = html(<AreaCoverage views={one} config={s.config} />);
+    expect(out).toContain('<h2 id="op-coverage">Promises by area</h2>');
+    const values = s.config.areas.kind === "enum" ? s.config.areas.values : [];
+    expect(out.match(/<tr data-empty="true">/g)?.length ?? 0).toBe(values.length - new Set(one.filter((v) => v.where === "promises").map((v) => v.card.area)).size);
+    expect(out).toMatch(/<tr data-empty="true"><th scope="row">[^<]+<\/th><td>None recorded<\/td><td><\/td><\/tr>/);
+    expect(out).toMatch(/<th scope="row"><a href="\/promises\/area\/[a-z-]+">[^<]+<\/a><\/th><td>\d+<\/td><td>\d+ [a-z ]+/);
+    expect(html(<AreaCoverage views={[]} config={s.config} headingLevel={3} />)).toContain('<h3 id="op-coverage">Promises by area</h3>');
+  });
+});
