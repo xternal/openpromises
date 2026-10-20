@@ -99,7 +99,7 @@ describe("HTML", () => {
   it("leaves unknown references alone", () => {
     expect(decodeEntities("&unknown; &amp;")).toBe("&unknown; &");
     expect(decodeEntities("&foo;")).toBe("&foo;");
-    expect(decodeEntities("&constructor; &toString; &eacute")).toBe("&constructor; &toString; &eacute");
+    expect(decodeEntities("&constructor; &toString; AT&T &Amp &#; &#x;")).toBe("&constructor; &toString; AT&T &Amp &#; &#x;");
   });
 
   it("decodes every HTML5 named reference, accented letters included", () => {
@@ -113,13 +113,29 @@ describe("HTML", () => {
     expect(decodeEntities("&Agrave; &agrave; &AMP; &Amp;")).toBe("À à & &Amp;");
   });
 
-  it("decodes numeric references, decimal and hexadecimal", () => {
-    expect(decodeEntities("d&#39;euros &#xE9;&#XE9;&#233; &#0; &#x110000;")).toBe("d'euros ééé &#0; &#x110000;");
+  it("decodes the old names a browser also reads without their semicolon", () => {
+    expect(decodeEntities("&eacute;t&eacute &copy2026 &amp &ampx;")).toBe("été ©2026 & &x;");
+    expect(decodeEntities("&notin; &notin &notit;")).toBe("∉ ¬in ¬it;");
+    expect(decodeEntities("&rsquo &hellip")).toBe("&rsquo &hellip");
+  });
+
+  it("decodes numeric references, decimal and hexadecimal, with or without the semicolon", () => {
+    expect(decodeEntities("d&#39;euros &#xE9;&#XE9;&#233; &#233t &#0; &#x110000;")).toBe("d'euros ééé ét &#0; &#x110000;");
+  });
+
+  it("reads numeric references 128 to 159 as Windows-1252, as browsers do", () => {
+    expect(decodeEntities("&#128; &#146; &#x92; &#150;&#151; &#147;&#148; &#156;")).toBe("€ ’ ’ –— “” œ");
+    expect(decodeEntities("&#129; &#157;")).toBe("\u0081 \u009d");
   });
 
   it("finds a French quote in a page that writes its accents as references", () => {
     // From the Élysée's page on the France–Ukraine security agreement (16 February 2024), as served.
     const html = `<p>La France a fourni &agrave; l&#39;Ukraine une aide militaire d&#39;une valeur totale de 1,7 milliard d&#39;euros en 2022 et de 2,1 milliards d&rsquo;euros en 2023. En 2024, la France fournira jusqu&rsquo;&agrave; 3 milliards d&#39;euros de soutien suppl&eacute;mentaire.</p>`;
     expect(matchQuote("jusqu’à 3 milliards d'euros de soutien supplémentaire", textFromHtml(html), { lang: "fr" }).tier).toBe("exact");
+  });
+
+  it("finds a quote in an old page that writes its apostrophes as &#146;", () => {
+    const html = "<p>She said: &#147;We&#146;ll cap bus fares at &pound;2 &#150; for every journey&#133;&#148;</p>";
+    expect(matchQuote("We’ll cap bus fares at £2 – for every journey…", textFromHtml(html)).tier).toBe("exact");
   });
 });

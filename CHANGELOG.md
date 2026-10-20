@@ -4,7 +4,13 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
-- **Accented letters in a page's references are read** (`@openpromises/quotes`): `decodeEntities()`, which `textFromHtml()` and `openpromises check-quote --html` use, now decodes every HTML5 named character reference (all 2,125 in the WHATWG list), not 24, by its exact name as browsers do: `&Eacute;` is É and `&eacute;` is é. A page that writes its accents as references, such as the Élysée's `jusqu&rsquo;&agrave; 3 milliards d&#39;euros de soutien suppl&eacute;mentaire`, was reported as `none`, and `--record` wrote a `none` that made `validate` fail; it is now `exact`. Any French, German, Spanish or Italian page written that way was affected. Numeric references are unchanged. A name the standard does not have (`&foo;`) and a name in the wrong case (`&Amp;`, `&NBSP;`, which used to be decoded) are left as they are, as a browser shows them; so is a name without its semicolon (`&eacute`), which browsers still read for about a hundred old names. `&constructor;` and the like no longer turn into JavaScript's own text. The package still has no dependencies; the table is generated into `src/entities.ts` by `pnpm --filter @openpromises/quotes entities`.
+- **Character references read as a browser reads them** (`@openpromises/quotes`): `decodeEntities()`, which `textFromHtml()` and `openpromises check-quote --html` use, knew 24 names, lower-cased; it now reads a page's text as a browser does. A page that writes its accents as references, such as the Élysée's `jusqu&rsquo;&agrave; 3 milliards d&#39;euros de soutien suppl&eacute;mentaire`, was reported as `none`, and `--record` wrote a `none` that made `validate` fail; it is now `exact`. Any French, German, Spanish or Italian page written that way was affected.
+  - Every HTML5 named reference (all 2,125 in the WHATWG list), by its exact name: `&Eacute;` is É and `&eacute;` is é.
+  - The 106 old names a browser also reads without their semicolon: `&eacute` is é, `&copy2026` is ©2026.
+  - Numeric references 128 to 159 as Windows-1252, as old pages use them for quotation marks and dashes: `&#146;` is ’ and `&#150;` is –, where they used to become invisible control characters. Numeric references without their semicolon (`&#233`) are read too.
+  - Left as they are, as a browser shows them: a name the standard does not have (`&foo;`) and a name in the wrong case (`&Amp;`, `&NBSP;`, which used to be decoded). Invalid numbers (`&#0;`, `&#x110000;`) are also left as they are. `&constructor;` and the like no longer turn into JavaScript's own text.
+
+  The package still has no dependencies: the table is generated into `src/entities.ts` by `pnpm --filter @openpromises/quotes entities`, and a site's bundle carries it only if it imports `textFromHtml()` or `decodeEntities()`.
 
 ### Upgrading from 0.14.0
 
