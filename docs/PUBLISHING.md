@@ -161,7 +161,7 @@ publishFiles({
 
 Every component takes `config` and `locale` (the site's default when left out). Words come from the catalogues in `@openpromises/publish` (`MESSAGES`, English and Russian built in); change any of them with `messages` in the configuration.
 
-**Styles.** `@openpromises/react/styles.css` is optional. Every colour is a token on `:root` (`--op-bg`, `--op-ink`, `--op-accent` and so on), so a site restyles the components by setting the tokens, or styles the `op-` classes itself. Dark mode follows the reader's setting (or `data-theme="dark"` on the root) and uses the navy slate palette, never black. Every text colour passes WCAG AA on the backgrounds it is used on; a test checks it.
+**Styles.** `@openpromises/react/styles.css` is optional. Every colour is a token on `:root` (`--op-bg`, `--op-ink`, `--op-accent` and so on), so a site restyles the components by setting the tokens, or styles the `op-` classes itself. Dark mode follows the reader's setting (or `data-theme="dark"` on the root) and uses a dark brown palette, never black or navy: body text at about 13:1 and never above 14:1, and no blue except where a colour carries meaning. Every text colour passes WCAG AA on the backgrounds it is used on, and marks pass 3:1; a test checks it.
 
 **Accessibility.** The components render semantic HTML: headings in order, lists, `<time>`, `lang` on quotes in another language, `aria-current` for the ladder step and the current page, and `<details>` for folded detail. axe-core finds no WCAG 2.1 A or AA problem on the test pages. Pages work at 320px wide without sideways scrolling, and read without JavaScript, from a static export or a `file://` mirror.
 

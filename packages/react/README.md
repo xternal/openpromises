@@ -9,6 +9,6 @@ import "@openpromises/react/styles.css";
 <PromiseCard view={view} config={config} today={today} />;
 ```
 
-The stylesheet is optional: every colour is a token, dark mode is navy slate, and every text colour passes WCAG AA. See [docs/PUBLISHING.md](https://github.com/xternal/openpromises/blob/main/docs/PUBLISHING.md).
+The stylesheet is optional: every colour is a token, dark mode is dark brown (never black or navy), and every text colour passes WCAG AA. See [docs/PUBLISHING.md](https://github.com/xternal/openpromises/blob/main/docs/PUBLISHING.md).
 
 Licence: Apache-2.0.

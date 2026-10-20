@@ -3,10 +3,12 @@
  *
  * Every colour is a token on :root, so a site can restyle the components by
  * setting the tokens (or ignore this file and style the op- classes itself).
- * Dark mode is the navy slate palette, never black. Every text colour passes
- * WCAG AA (4.5:1) on the page background and the first raised surface; faint
- * text is never used on the second raised surface (--op-sunk), where it would
- * not. test/contrast.test.ts checks this.
+ * Dark mode is dark brown, never black or navy: warm and lifted off black,
+ * with body text at about 13:1 (never above 14:1, which glares) and no blue in
+ * the chrome. Blue and red appear only where they carry meaning (--op-good,
+ * --op-bad). Every text colour passes WCAG AA (4.5:1) on the backgrounds it
+ * is used on, and marks pass 3:1; faint text is kept off the second raised
+ * surface (--op-sunk). test/contrast.test.ts checks this.
  */
 
 :root {
@@ -28,34 +30,34 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --op-bg: #101820;
-    --op-surface: #131d27;
-    --op-sunk: #1a2531;
-    --op-line: #26323f;
-    --op-line-strong: #364657;
-    --op-ink: #e7edf3;
-    --op-muted: #a3b0bd;
-    --op-faint: #7d8b99;
-    --op-accent: #7b9dff;
-    --op-good: #6fd39b;
-    --op-warn: #f0b45a;
-    --op-bad: #ff8f87;
+    --op-bg: #241f1a;
+    --op-surface: #2e2822;
+    --op-sunk: #39322b;
+    --op-line: rgba(239, 231, 218, 0.1);
+    --op-line-strong: rgba(239, 231, 218, 0.16);
+    --op-ink: #efe7da;
+    --op-muted: #c0b5a4;
+    --op-faint: #a59a88;
+    --op-accent: #e2b26f;
+    --op-good: #8aa3ec;
+    --op-warn: #f0dcaa;
+    --op-bad: #ec9286;
   }
 }
 
 :root[data-theme="dark"] {
-  --op-bg: #101820;
-  --op-surface: #131d27;
-  --op-sunk: #1a2531;
-  --op-line: #26323f;
-  --op-line-strong: #364657;
-  --op-ink: #e7edf3;
-  --op-muted: #a3b0bd;
-  --op-faint: #7d8b99;
-  --op-accent: #7b9dff;
-  --op-good: #6fd39b;
-  --op-warn: #f0b45a;
-  --op-bad: #ff8f87;
+  --op-bg: #241f1a;
+  --op-surface: #2e2822;
+  --op-sunk: #39322b;
+  --op-line: rgba(239, 231, 218, 0.1);
+  --op-line-strong: rgba(239, 231, 218, 0.16);
+  --op-ink: #efe7da;
+  --op-muted: #c0b5a4;
+  --op-faint: #a59a88;
+  --op-accent: #e2b26f;
+  --op-good: #8aa3ec;
+  --op-warn: #f0dcaa;
+  --op-bad: #ec9286;
 }
 
 .op-card,

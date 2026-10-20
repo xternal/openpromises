@@ -139,7 +139,7 @@ Run `openpromises help <command>` for the options, and `openpromises help rules`
 | [`@openpromises/files`](packages/files) | Reads and writes a content folder, compares it with a git base, migrates older formats on read. |
 | [`@openpromises/quotes`](packages/quotes) | Exact-quote matching: normalisation per language, exact / close / none tiers, spans in stored source text. |
 | [`@openpromises/publish`](packages/publish) | Atom and RSS feeds, JSON-LD, Markdown, `llms.txt`, sitemap, open data and IndexNow change lists, built from cards. |
-| [`@openpromises/react`](packages/react) | Server components for promise pages that read without JavaScript, with an optional stylesheet (navy-slate dark mode). |
+| [`@openpromises/react`](packages/react) | Server components for promise pages that read without JavaScript, with an optional stylesheet (dark brown in dark mode). |
 | [`@openpromises/cli`](packages/cli) | The `openpromises` command. |
 
 ## Who uses it
