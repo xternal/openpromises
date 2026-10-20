@@ -4,6 +4,10 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+## 0.14.1 (20 October 2026)
+
+A fix to quote checks.
+
 - **Character references read as a browser reads them** (`@openpromises/quotes`): `decodeEntities()`, which `textFromHtml()` and `openpromises check-quote --html` use, knew 24 names, lower-cased; it now reads a page's text as a browser does. A page that writes its accents as references, such as the Élysée's `jusqu&rsquo;&agrave; 3 milliards d&#39;euros de soutien suppl&eacute;mentaire`, was reported as `none`, and `--record` wrote a `none` that made `validate` fail; it is now `exact`. Any French, German, Spanish or Italian page written that way was affected.
   - Every HTML5 named reference (all 2,125 in the WHATWG list), by its exact name: `&Eacute;` is É and `&eacute;` is é.
   - The 106 old names a browser also reads without their semicolon: `&eacute` is é, `&copy2026` is ©2026.
