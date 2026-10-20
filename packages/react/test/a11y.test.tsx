@@ -63,6 +63,6 @@ describe.each([
 
 describe("the stylesheet", () => {
   it("is shipped with the package", () => {
-    expect(readFileSync(join(import.meta.dirname, "..", "styles.css"), "utf8")).toContain("--op-bg: #101820;");
+    expect(readFileSync(join(import.meta.dirname, "..", "styles.css"), "utf8")).toContain("--op-bg: #241f1a;");
   });
 });
