@@ -1,0 +1,24 @@
+format: openpromises/1
+id: con-2026-tenants
+actor_id: conservative
+made_on: "2026-03-16"
+venue: manifesto
+area: Housing and homelessness
+status: not_in_power
+versions:
+  - version: 1
+    text: Always put our tenants and our leaseholders first and listen to their needs
+    recorded_on: "2026-10-07"
+    source_url: https://www.hfconservatives.org.uk/sites/www.hfconservatives.org.uk/files/2026-03/Conservative%20Manifesto%20-%20LBHF%202026.pdf
+    archived_url: https://web.archive.org/web/20260326124540/https://www.hfconservatives.org.uk/sites/www.hfconservatives.org.uk/files/2026-03/Conservative%20Manifesto%20-%20LBHF%202026.pdf
+    page: 21
+    parameters:
+      deadline: null
+events:
+  - date: "2026-03-16"
+    type: promised
+    text:
+      en: Key commitment in the 2026 Conservative manifesto
+replies: []
+x:
+  editor_check_required: false

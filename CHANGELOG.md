@@ -4,6 +4,8 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+## 0.12.0 (20 October 2026)
+
 Decision 33.
 
 - **Every area, empty ones too** (decision 33): `areaCoverage()` in `@openpromises/publish` and a new `AreaCoverage` component list every area the site configures, with how many published promises each holds and where they stand, and "None recorded" for an area with none, so an actor's page shows what they have not promised as plainly as what they have. The list comes from the configuration, so it is the same for every actor; a site with free-text areas sees only the areas its cards use, in alphabetical order. New messages `coverage.*` (English and Russian); styles under `.op-coverage`. Nothing else changes.
