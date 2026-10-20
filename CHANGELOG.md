@@ -4,6 +4,23 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+## 0.14.0 (20 October 2026)
+
+Decision 34.
+
+- **An actor's page tells their promises as one story** (decision 34): three functions in `@openpromises/publish` and three components in `@openpromises/react`, made for an actor's page and the same for every actor:
+  - `actorTimeline()` and `ActorTimeline`: everything dated on the actor's published promises, grouped by day, each entry linking to its cards: when each was promised and where, rewordings and restatements, every step on the ladder and every ending, replies, and the deadline of each open promise still to come. Time runs upwards: deadlines still to come above a "Today" line, latest first ("Deadline, in 65 days"), and what has happened below it, newest first. A deadline that has passed shows as its outcome, never as a deadline. Open promises with no deadline are listed beside it, under "No date given".
+  - `keyPromises()` and `KeyPromises`: the home page's rule (`spotlight()`, decision 30) over one actor's promises: the open promises due next, with the days left ("65 days left"), then the latest changes, with what changed ("Promised 14 October 2026"). Never chosen by hand.
+  - `promisesByMonth()` and `PromisesByMonth`: how many promises were made each month, from the first to today, empty months included and the current month "so far", as a small bar chart with every bar labelled, and the same numbers as a table.
+
+  Also new: `lastChange()` (what changed last on a promise, on `lastChanged()`'s day), `daysBetween()` and `shortMonth()`. New messages `key.*`, `timeline.*`, `months.*` and `event.recorded` (English and Russian); styles under `.op-key`, `.op-actor-timeline` and `.op-months`, in light and dark brown. Nothing else changes.
+
+### Upgrading from 0.13.0
+
+- **No configuration needed.** Feeds, Markdown, open data, the card format and the other components are unchanged; `spotlight()` and `PromiseSpotlight` choose the same cards as before.
+- **To build an actor's page:** render `<KeyPromises>`, `<ActorTimeline>` and `<PromisesByMonth>` with that actor's views (a party's with its people's) and `today`, beside `<AreaCoverage>` (0.12.0), as docs/PUBLISHING.md shows. `headingLevel={3}` places each under the site's own heading; `ActorTimeline` takes `daysWithin` (100 by default), how far ahead a deadline also says "in N days". The functions give the same as data, for a site that draws its own.
+- **New words** `key.*`, `timeline.*`, `months.*` and `event.recorded`; a site with its own `messages` may set them. A site that styles the `op-` classes itself styles the new ones too.
+
 ## 0.13.0 (20 October 2026)
 
 The default dark mode in dark brown.

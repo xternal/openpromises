@@ -222,3 +222,71 @@ describe("AreaCoverage (decision 33)", () => {
     expect(html(<AreaCoverage views={[]} config={s.config} headingLevel={3} />)).toContain('<h3 id="op-coverage">Promises by area</h3>');
   });
 });
+
+describe("an actor's page (decision 34)", async () => {
+  const { ActorTimeline, KeyPromises, PromisesByMonth } = await import("@openpromises/react");
+  const s = await site("public-ledger");
+  const burnham = s.views.filter((v) => v.actor.id === "andy-burnham");
+  const today = "2026-10-20";
+
+  it("KeyPromises: the open promises due next, with the days left, then the latest changes, each a link to its card", () => {
+    const out = html(<KeyPromises views={burnham} config={s.config} today={today} recent={1} />);
+    expect(out).toContain('<h2 id="op-key">Key promises</h2>');
+    expect(out.indexOf("<h3>Due next</h3>")).toBeLessThan(out.indexOf("<h3>Latest changes</h3>"));
+    expect(out).toContain(
+      '<a class="op-key__card" href="/promise/uk-mental-health-strategy-2026"><span class="op-key__days">65 days left</span><span class="op-key__headline">Present a mental health strategy before Christmas</span><span class="op-key__meta">Due 24 December 2026, Health</span></a>',
+    );
+    expect(out).toContain('<a class="op-key__card" href="/promise/uk-electricity-vat-2026"><span class="op-key__change">Delivered 1 October 2026</span><span class="op-key__headline">Cut taxes on energy bills</span><span class="op-key__meta">Taxes</span></a>');
+    // A deadline marker that has come is a change (lastChanged()), so a card is due today only without one.
+    const unmarked = burnham.map((v) => ({ ...v, card: { ...v.card, events: v.card.events.filter((e) => e.type !== "deadline") } }));
+    const onTheDay = html(<KeyPromises views={unmarked} config={s.config} today="2026-12-24" recent={1} headingLevel={3} />);
+    expect(onTheDay).toContain('<h3 id="op-key">Key promises</h3>');
+    expect(onTheDay).toContain('<h4>Due next</h4><ul class="op-key__list" data-list="due"><li><a class="op-key__card" href="/promise/uk-mental-health-strategy-2026"><span class="op-key__days">Due today</span>');
+    expect(html(<KeyPromises views={[]} config={s.config} today={today} />)).toBe("");
+  });
+
+  it("ActorTimeline: deadlines above today, latest first; what happened below, newest first; undated promises apart", () => {
+    const out = html(<ActorTimeline views={burnham} config={s.config} today={today} />);
+    expect(out).not.toContain("<script");
+    expect(out).toContain('<h2 id="op-actor-timeline">Promises over time</h2>');
+    const order = ["2027-04-01", "2027-01-01", "2026-12-24", 'aria-current="date"', "2026-10-01", "2026-09-07", "2026-07-21"].map((t) => out.indexOf(t));
+    expect(order.every((x, i) => x >= 0 && (i === 0 || x > order[i - 1]!))).toBe(true);
+    expect(out).toContain('<li class="op-actor-timeline__today" aria-current="date"><span class="op-actor-timeline__date">Today</span><time dateTime="2026-10-20">20 October 2026</time></li>');
+    expect(out).toContain('<strong class="op-actor-timeline__label">Deadline, in 65 days</strong><ul class="op-actor-timeline__cards"><li><a href="/promise/uk-mental-health-strategy-2026">Present a mental health strategy before Christmas</a>');
+    expect(out).toContain('<strong class="op-actor-timeline__label">Deadline</strong><ul class="op-actor-timeline__cards"><li><a href="/promise/uk-disabled-bus-pass-2026">');
+    expect(out).toContain('<li data-mark="top"><span class="op-actor-timeline__dot" aria-hidden="true"></span><strong class="op-actor-timeline__label">Delivered</strong>');
+    expect(out).toContain('<li data-mark="progress"><span class="op-actor-timeline__dot" aria-hidden="true"></span><strong class="op-actor-timeline__label">Promised and in plan</strong>');
+    expect(out).not.toContain("No date given");
+    const all = html(<ActorTimeline views={s.views} config={s.config} today={today} headingLevel={3} />);
+    expect(all).toContain('<h3 id="op-actor-timeline">Promises over time</h3>');
+    expect(all).toMatch(/<h4>No date given<\/h4><p class="op-muted">\d+ open promises name no deadline, so they never appear above today\.<\/p><ul><li><a href="\/promise\//);
+    expect(html(<ActorTimeline views={[]} config={s.config} today={today} />)).toBe("");
+  });
+
+  it("PromisesByMonth: a labelled bar for each month, the current one so far, and the same numbers as a table", () => {
+    const out = html(<PromisesByMonth views={burnham} config={s.config} today={today} />);
+    expect(out).toContain('<h2 id="op-months">Promises made each month</h2>');
+    expect(out).toContain('<ol class="op-months__bars" style="--op-months:4">');
+    expect(out).toContain(
+      '<li style="--op-bar:1"><span class="op-months__count" aria-hidden="true">2</span><span class="op-months__bar" aria-hidden="true"></span><span class="op-months__label" aria-hidden="true">Jul 2026</span><span class="op-sr-only">July 2026: 2 promises</span></li>',
+    );
+    expect(out).toContain('<span class="op-sr-only">August 2026: 1 promise</span>');
+    expect(out).toContain('<li data-so-far="true" style="--op-bar:0"><span class="op-months__count" aria-hidden="true">0</span><span class="op-months__bar" aria-hidden="true"></span><span class="op-months__label" aria-hidden="true">Oct, so far</span>');
+    expect(out).toContain('<details class="op-months__table"><summary>As a table</summary><table><thead><tr><th scope="col">Month</th><th scope="col">Promises made</th></tr></thead>');
+    expect(out).toContain('<tr><th scope="row">October 2026, so far</th><td>0</td></tr>');
+    expect(html(<PromisesByMonth views={[]} config={s.config} today={today} />)).toBe("");
+  });
+
+  it("says it in Russian", async () => {
+    const b = await site("synthetic-bilingual");
+    const out = html(
+      <>
+        <KeyPromises views={b.views} config={b.config} today={b.today} recent={1} />
+        <ActorTimeline views={b.views} config={b.config} today={b.today} />
+        <PromisesByMonth views={b.views} config={b.config} today={b.today} />
+      </>,
+    );
+    for (const words of ["Главные обещания", "Скоро срок", "Хронология обещаний", "Сегодня", "Срок перенесён", "Обещания по месяцам", "на сегодня", "Таблицей"]) expect(out).toContain(words);
+    expect(out).toMatch(/осталось \d+ дн/);
+  });
+});

@@ -21,6 +21,12 @@ export function monthYear(w: Words, iso: string): string {
   return noon(iso).toLocaleDateString(w.m.intl, { month: "long", year: "numeric", timeZone: "UTC" });
 }
 
+/** "Oct", "окт.": a month on a chart's axis. */
+export function shortMonth(w: Words, iso: string): string {
+  if (!DAY.test(iso)) return iso;
+  return noon(iso).toLocaleDateString(w.m.intl, { month: "short", timeZone: "UTC" });
+}
+
 /** A figure with as many decimals as its size needs: 115, 24.6, 0.45. */
 export function figure(w: Words, x: number): string {
   const a = Math.abs(x);

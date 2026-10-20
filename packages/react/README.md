@@ -1,6 +1,6 @@
 # @openpromises/react
 
-React server components for [OpenPromises](https://github.com/xternal/openpromises) promise pages: `PromiseCard`, `PromiseList`, `PromiseSpotlight`, `PromiseStory`, `ComingUp`, `Ladder`, `StatusPill`, `Breadcrumbs`, `ActorIndex`, `AreaIndex`, `AreaCoverage` and `JsonLd`. They render to plain HTML with no script, so pages read without JavaScript, from a static export or a `file://` mirror. The one client part, `PromiseFilter`, is in `@openpromises/react/client`.
+React server components for [OpenPromises](https://github.com/xternal/openpromises) promise pages: `PromiseCard`, `PromiseList`, `PromiseSpotlight`, `PromiseStory`, `ComingUp`, `Ladder`, `StatusPill`, `Breadcrumbs`, `ActorIndex`, `AreaIndex`, `AreaCoverage`, `KeyPromises`, `ActorTimeline`, `PromisesByMonth` and `JsonLd`. They render to plain HTML with no script, so pages read without JavaScript, from a static export or a `file://` mirror. The one client part, `PromiseFilter`, is in `@openpromises/react/client`.
 
 ```tsx
 import { PromiseCard } from "@openpromises/react";

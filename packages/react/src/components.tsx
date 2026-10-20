@@ -1,11 +1,13 @@
 import type { CSSProperties, ReactNode } from "react";
-import { categoryOf, standingOf, statusLabel, type Actor, type Config } from "@openpromises/core";
+import { categoryOf, deadlineOf, isOpen, standingOf, statusLabel, type Actor, type Config } from "@openpromises/core";
 import {
   actorName,
   actorShortName,
+  actorTimeline,
   areaCoverage,
   areaLabel,
   cardStory,
+  clip,
   climb,
   comparisonLines,
   correctionTarget,
@@ -17,6 +19,7 @@ import {
   eventLabel,
   headline,
   jsonLdText,
+  keyPromises,
   lastUpdated,
   longDate,
   metricText,
@@ -24,8 +27,10 @@ import {
   ownerOf,
   paths,
   pick,
+  promisesByMonth,
   reviewerName,
   quoteIn,
+  shortMonth,
   shownComparisons,
   spotlight,
   statusMix,
@@ -34,6 +39,8 @@ import {
   words,
   type CardView,
   type JsonLd as JsonLdData,
+  type MonthCount,
+  type TimelineDay,
   type Words,
 } from "@openpromises/publish";
 
@@ -832,6 +839,221 @@ export function AreaCoverage({ views, headingLevel = 2, ...b }: Base & { views: 
           ))}
         </tbody>
       </table>
+    </section>
+  );
+}
+
+type Heading = 2 | 3;
+const headings = (level: Heading) => [`h${level}`, `h${level + 1}`] as ["h2" | "h3", "h3" | "h4"];
+
+/**
+ * The promises to look at first on an actor's page (decision 34): the open
+ * promises due next, with the days left, then the latest changes, with what
+ * changed and when; each a link straight to its card. Chosen by the home
+ * page's rule (keyPromises(), which is spotlight() over one actor's views),
+ * never by hand, the same for every actor. Pass one actor's views (a
+ * party's with its people's).
+ */
+export function KeyPromises({ views, today, recent = 3, due = 3, headingLevel = 2, ...b }: Base & { views: readonly CardView[]; today: string; recent?: number; due?: number; headingLevel?: Heading }) {
+  const { config, L, w } = ctx(b);
+  const p = paths(config);
+  const k = keyPromises(views, config, today, { recent, due });
+  if (!k.due.length && !k.recent.length) return null;
+  const [H, Sub] = headings(headingLevel);
+  const meta = (v: CardView) => {
+    const deadline = deadlineOf(v.card);
+    const when = !isOpen(v.card, config) ? undefined : !deadline ? w.t("timeline.undated") : w.t(deadline < today ? "list.deadline_passed" : "list.due", { date: longDate(w, deadline) });
+    return [when, areaLabel(config, v.card.area, L)].filter(Boolean).join(", ");
+  };
+  return (
+    <section className="op-key" aria-labelledby="op-key">
+      <H id="op-key">{w.t("key.title")}</H>
+      <p className="op-muted">{w.t("key.note")}</p>
+      {k.due.length > 0 && (
+        <>
+          <Sub>{w.t("spotlight.due")}</Sub>
+          <ul className="op-key__list" data-list="due">
+            {k.due.map(({ view, days }) => (
+              <li key={view.id}>
+                <a className="op-key__card" href={p.card(view.id, L)}>
+                  <span className="op-key__days">{days ? w.n("key.days_left", days) : w.t("key.due_today")}</span>
+                  <span className="op-key__headline">{headline(view, L, config)}</span>
+                  <span className="op-key__meta">{meta(view)}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {k.recent.length > 0 && (
+        <>
+          <Sub>{w.t("spotlight.recent")}</Sub>
+          <ul className="op-key__list" data-list="recent">
+            {k.recent.map(({ view, change }) => (
+              <li key={view.id}>
+                <a className="op-key__card" href={p.card(view.id, L)}>
+                  {change && <span className="op-key__change">{w.t("key.changed", { label: eventLabel(config, w, change.type, change.subtype), date: longDate(w, change.date) })}</span>}
+                  <span className="op-key__headline">{headline(view, L, config)}</span>
+                  <span className="op-key__meta">{meta(view)}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
+  );
+}
+
+/** What a timeline entry's mark repeats of its words: the words, a step, the top of the ladder, an ending, a deadline to come or passed, a reply. */
+function timelineMark(config: Config, type: string): string {
+  if (type === "deadline") return "deadline";
+  if (type === "deadline_missed") return "missed";
+  if (type === "reworded" || type === "restated" || type === "reply") return "words";
+  if (climb(config).at(-1) === type) return "top";
+  const category = categoryOf(config, type);
+  return category === "finished" ? "ending" : (category ?? "words");
+}
+
+const TIMELINE_TEXT = 200;
+
+/**
+ * An actor's promises over time (decision 34), one dated line where time
+ * runs upwards: the deadlines still to come above a "Today" line, latest
+ * first, and below it what was promised and what has happened since, newest
+ * first, grouped by day, each entry linking to its cards. A deadline that
+ * has passed shows as its outcome. Open promises with no deadline are listed
+ * beside it ("No date given"). Built by actorTimeline() in
+ * @openpromises/publish, the same for every actor; the words carry the
+ * meaning and the marks only repeat it. `daysWithin` is how far ahead a
+ * deadline also says "in N days".
+ */
+export function ActorTimeline({ views, today, daysWithin = 100, headingLevel = 2, ...b }: Base & { views: readonly CardView[]; today: string; daysWithin?: number; headingLevel?: Heading }) {
+  const { config, L, w } = ctx(b);
+  const p = paths(config);
+  const t = actorTimeline(views, config, today, L);
+  if (!t.toCome.length && !t.past.length) return null;
+  const [H, Sub] = headings(headingLevel);
+  const day = (d: TimelineDay, part: "to-come" | "past") => (
+    <li key={`${part}-${d.date}`} className="op-actor-timeline__day" data-to-come={part === "to-come" ? "true" : undefined}>
+      <time className="op-actor-timeline__date" dateTime={d.date}>
+        {longDate(w, d.date)}
+      </time>
+      <ul className="op-actor-timeline__entries">
+        {d.entries.map((e) => {
+          const deadline = part === "to-come" && e.types.includes("deadline");
+          const label = !deadline ? e.label : d.days === 0 ? w.t("timeline.on_the_day", { label: e.label }) : d.days <= daysWithin ? w.n("timeline.in_days", d.days, { label: e.label }) : e.label;
+          return (
+            <li key={e.label} data-mark={timelineMark(config, e.types.at(-1)!)}>
+              <span className="op-actor-timeline__dot" aria-hidden="true" />
+              <strong className="op-actor-timeline__label">{label}</strong>
+              <ul className="op-actor-timeline__cards">
+                {e.cards.map((c) => (
+                  <li key={c.view.id}>
+                    <a href={p.card(c.view.id, L)}>{headline(c.view, L, config)}</a>
+                    {c.texts.map((text) => (
+                      <span key={text} className="op-muted">
+                        {clip(text, TIMELINE_TEXT)}
+                      </span>
+                    ))}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          );
+        })}
+      </ul>
+    </li>
+  );
+  return (
+    <section className="op-actor-timeline" aria-labelledby="op-actor-timeline">
+      <H id="op-actor-timeline">{w.t("timeline.title")}</H>
+      <p className="op-muted">{w.t("timeline.note")}</p>
+      <div className="op-actor-timeline__layout">
+        <ol className="op-actor-timeline__days">
+          {t.toCome.map((d) => day(d, "to-come"))}
+          <li className="op-actor-timeline__today" aria-current="date">
+            <span className="op-actor-timeline__date">{w.t("card.today")}</span>
+            <time dateTime={today}>{longDate(w, today)}</time>
+          </li>
+          {t.past.map((d) => day(d, "past"))}
+        </ol>
+        {t.undated.length > 0 && (
+          <div className="op-actor-timeline__undated">
+            <Sub>{w.t("timeline.undated")}</Sub>
+            <p className="op-muted">{w.n("timeline.undated_note", t.undated.length)}</p>
+            <ul>
+              {t.undated.map((v) => (
+                <li key={v.id}>
+                  <a href={p.card(v.id, L)}>{headline(v, L, config)}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * How many promises an actor made each month (decision 34), from the month
+ * of the first to today's, empty months included, as a small bar chart and,
+ * folded under it, the same numbers as a table. Every bar is labelled with
+ * its number and month, so nothing rests on its height alone; the current
+ * month says "so far". Built by promisesByMonth() in @openpromises/publish.
+ */
+export function PromisesByMonth({ views, today, headingLevel = 2, ...b }: Base & { views: readonly CardView[]; today: string; headingLevel?: Heading }) {
+  const { config, w } = ctx(b);
+  const months = promisesByMonth(views, config, today);
+  if (!months.length) return null;
+  const [H] = headings(headingLevel);
+  const max = Math.max(1, ...months.map((m) => m.count));
+  const num = new Intl.NumberFormat(w.m.intl);
+  const full = (m: MonthCount) => {
+    const month = monthYear(w, `${m.month}-01`);
+    return m.soFar ? w.t("months.so_far", { month }) : month;
+  };
+  const short = (m: MonthCount, i: number) => {
+    const month = `${shortMonth(w, `${m.month}-01`)}${i === 0 || m.month.endsWith("-01") ? ` ${m.month.slice(0, 4)}` : ""}`;
+    return m.soFar ? w.t("months.so_far", { month }) : month;
+  };
+  return (
+    <section className="op-months" aria-labelledby="op-months">
+      <H id="op-months">{w.t("months.title")}</H>
+      <ol className="op-months__bars" style={{ "--op-months": months.length } as CSSProperties}>
+        {months.map((m, i) => (
+          <li key={m.month} data-so-far={m.soFar ? "true" : undefined} style={{ "--op-bar": Math.round((m.count / max) * 1000) / 1000 } as CSSProperties}>
+            <span className="op-months__count" aria-hidden="true">
+              {num.format(m.count)}
+            </span>
+            <span className="op-months__bar" aria-hidden="true" />
+            <span className="op-months__label" aria-hidden="true">
+              {short(m, i)}
+            </span>
+            <span className="op-sr-only">{w.n("months.bar", m.count, { month: full(m) })}</span>
+          </li>
+        ))}
+      </ol>
+      <details className="op-months__table">
+        <summary>{w.t("months.table")}</summary>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">{w.t("months.month")}</th>
+              <th scope="col">{w.t("months.count")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {months.map((m) => (
+              <tr key={m.month}>
+                <th scope="row">{full(m)}</th>
+                <td>{num.format(m.count)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </details>
     </section>
   );
 }
