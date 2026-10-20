@@ -1,0 +1,32 @@
+{
+  "2ce605b5eaa2e7b8c9067a0102bbfb65caf12062d419458478046ab5237df402|https://web.archive.org/web/20260302000000/https://example.org/region/address-2026": {
+    "match": "exact",
+    "url": "https://web.archive.org/web/20260302000000/https://example.org/region/address-2026",
+    "checked_on": "2026-10-09",
+    "sha256": "aad14d9aab2d0ebd875ed34b4f35f98a5d63038b0f7b61cd869df59f0f4d95eb"
+  },
+  "44958fccc803cdfe83bfeb9237e9e5107663609c072299deef28b671c2300056|https://web.archive.org/web/20260602000000/https://example.org/address-2026": {
+    "match": "close",
+    "url": "https://web.archive.org/web/20260602000000/https://example.org/address-2026",
+    "checked_on": "2026-10-09",
+    "sha256": "d837fd70c2708207bd54ff074bf0616eddccbff7421a834eeaf5366b534114bd"
+  },
+  "a03351dc1001a231df12761ce54651a85b5556c375d99f86d5f63fd79e39c99f|https://web.archive.org/web/20250302000000/https://example.org/region/address-2025": {
+    "match": "exact",
+    "url": "https://web.archive.org/web/20250302000000/https://example.org/region/address-2025",
+    "checked_on": "2026-10-09",
+    "sha256": "1983bd0fd039e37be7d893915332d5e04fff955cf0c6363ecde4901cf5cd236e"
+  },
+  "e57e3062da027da2e3f9da548964754c80c32b2d867fcfa51a942e1ff358b36a|https://web.archive.org/web/20260821000000/https://example.org/party-c/programme": {
+    "match": "close",
+    "url": "https://web.archive.org/web/20260821000000/https://example.org/party-c/programme",
+    "checked_on": "2026-10-09",
+    "sha256": "d7520ae291c9541366b91c847aff0b401dc3e27b7f3adf2201d23e83a1f6ca42"
+  },
+  "e944b77fa204710c9a1d401a62368b66af40dce39273cbb6fe4ca88ff5853c9a|https://web.archive.org/web/20260511000000/https://example.org/party-a/programme": {
+    "match": "exact",
+    "url": "https://web.archive.org/web/20260511000000/https://example.org/party-a/programme",
+    "checked_on": "2026-10-09",
+    "sha256": "3cd618f5677ac1b74f7ef5e58b5312a817daa03b352766ac9d468ec0ca956e73"
+  }
+}
