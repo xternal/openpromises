@@ -4,6 +4,8 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+## 0.14.0 (20 October 2026)
+
 Decision 34.
 
 - **An actor's page tells their promises as one story** (decision 34): three functions in `@openpromises/publish` and three components in `@openpromises/react`, made for an actor's page and the same for every actor:
