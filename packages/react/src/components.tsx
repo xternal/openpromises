@@ -801,12 +801,13 @@ export function AreaIndex({ views, current, ...b }: Base & { views: readonly Car
  * they have not promised shows as plainly as what they have. Pass one actor's
  * views (a party's with its people's); the list of areas comes from the
  * configuration (areaCoverage() in @openpromises/publish), the same for
- * every actor. An area with promises links to its page.
+ * every actor; free-text areas show only those the cards use, alphabetically
+ * as AreaIndex lists them. An area with promises links to its page.
  */
 export function AreaCoverage({ views, headingLevel = 2, ...b }: Base & { views: readonly CardView[]; headingLevel?: 2 | 3 }) {
   const { config, L, w } = ctx(b);
   const p = paths(config);
-  const rows = areaCoverage(views, config);
+  const rows = areaCoverage(views, config, L);
   if (!rows.length) return null;
   const H = `h${headingLevel}` as const;
   const published = views.filter((v) => v.where === "promises");

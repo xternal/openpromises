@@ -34,8 +34,18 @@ describe("areaCoverage", async () => {
     const b = await site("borough-book");
     expect(b.config.areas.kind).toBe("text");
     const out = areaCoverage(b.views, b.config);
-    const used = [...new Set(b.views.filter((v) => v.where === "promises").map((v) => v.card.area))].sort();
-    expect(out.map((r) => r.area)).toEqual(used);
+    const used = [...new Set(b.views.filter((v) => v.where === "promises").map((v) => v.card.area))];
+    expect(out.map((r) => r.area).sort()).toEqual(used.sort());
+    expect(out.reduce((n, r) => n + r.count, 0)).toBe(b.views.filter((v) => v.where === "promises").length);
     expect(areaCoverage([], b.config)).toEqual([]);
+  });
+
+  it("orders free-text areas alphabetically in the reader's language, as AreaIndex does", async () => {
+    const b = await site("borough-book");
+    const one = b.views.find((v) => v.where === "promises")!;
+    const named = (...areas: string[]) => areas.map((area, i) => ({ ...one, id: `${one.id}-${i}`, card: { ...one.card, area } }));
+    // By character code "Ё" comes before "А", and capitals before small letters.
+    expect(areaCoverage(named("Жильё", "Ёлки", "Аптеки"), b.config, "ru").map((r) => r.area)).toEqual(["Аптеки", "Ёлки", "Жильё"]);
+    expect(areaCoverage(named("parks", "Waste", "housing"), b.config, "en").map((r) => r.area)).toEqual(["housing", "parks", "Waste"]);
   });
 });
