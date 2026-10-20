@@ -139,6 +139,10 @@ The baskets in RFC-0002 Appendix A stay candidates: each site fixes its own from
 
 This replaces the "no exclusions" rule of CONTRIBUTING.md step 3 and UPGRADING.md. Decided by Pavel Guzhikov on 19 October 2026 («решение 32 как предложено»), after he called the release-then-wait cycle «как-то ТУПО».
 
+## Accepted on 20 October 2026
+
+**33. Every area, empty ones too.** Pavel Guzhikov's complaint about LedgerGov.UK's page for the Prime Minister: it shows what he promised on the price of a pint and VAT, but not whether he has promised anything on energy, AI or the long-term future. An actor's page listed only the areas their cards are in, so an area with nothing showed no sign of it, and a reader could not tell "promised nothing" from "not looked at". The engine gains `areaCoverage()` in `@openpromises/publish` and an `AreaCoverage` component: every area the site lists, in the configured order, with how many published promises each holds and where they stand, and "None recorded" for the rest. The list comes from the configuration, never from the cards, so the same list frames every actor (principle 5); a site whose areas are free text has no list, so only the areas its cards use appear. "None recorded" says what the site holds, not what was said: the first use, on 20 October 2026, found energy and AI promises the Prime Minister had made that LedgerGov.UK had not yet recorded, so a site that shows the table keeps its intake current in the areas it shows empty. Each site places it on its actor pages in its own pull request. Decided by Pavel Guzhikov on 20 October 2026 ("follow your recommendations for … Andy Burnham as a separate page on our ledgergov.uk").
+
 ## Proposed, waiting for the owner
 
 None.

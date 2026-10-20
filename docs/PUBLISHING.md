@@ -152,6 +152,7 @@ publishFiles({
 | `ComingUp` | Open promises due in the next months, nearest first; a passed deadline says so |
 | `Ladder`, `StatusPill` | The status ladder with the current step marked, and a status as a labelled pill |
 | `Breadcrumbs`, `ActorIndex`, `AreaIndex` | Where the reader is (`aria-current="page"` on the current page) |
+| `AreaCoverage` | Every area the site lists, with how many promises each holds and where they stand, and "None recorded" for the rest (decision 33): on an actor's page, what they have not promised shows as plainly as what they have. The list comes from the configuration (`areaCoverage()`), the same for every actor |
 | `JsonLd` | Structured data in a safe `<script type="application/ld+json">` |
 | `PromiseSpotlight` | Promises for the first screen of the home page (decision 30): how many and where they stand, the latest changes and the open promises due next, each a link straight to its card with "Open the promise →", then a link to them all. Chosen by rule (`spotlight()`), never by hand, the same for every party |
 | `PromiseStory` | The promise's whole story in one dated line (decision 29): the words as first said, every rewording, every event with its evidence, replies, cost changes, corrections, and deadlines and delivery steps still to come. Made to stand on its own shareable page; `cardStory()` gives the same items as data and `storyMarkdown()` as Markdown |

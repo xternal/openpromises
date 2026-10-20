@@ -646,3 +646,29 @@
   display: block;
   margin-top: 0.25rem;
 }
+
+/* Every area, empty ones included (decision 33). */
+.op-coverage table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.op-coverage th,
+.op-coverage td {
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--op-line);
+}
+.op-coverage thead th {
+  font-weight: 600;
+}
+.op-coverage tbody th {
+  font-weight: 400;
+}
+.op-coverage td:nth-child(2) {
+  white-space: nowrap;
+}
+.op-coverage tr[data-empty] th,
+.op-coverage tr[data-empty] td {
+  color: var(--op-muted);
+}

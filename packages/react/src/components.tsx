@@ -3,6 +3,7 @@ import { categoryOf, standingOf, statusLabel, type Actor, type Config } from "@o
 import {
   actorName,
   actorShortName,
+  areaCoverage,
   areaLabel,
   cardStory,
   climb,
@@ -791,6 +792,47 @@ export function AreaIndex({ views, current, ...b }: Base & { views: readonly Car
         ))}
       </ul>
     </nav>
+  );
+}
+
+/**
+ * Every area the site lists, with how many promises each holds and where
+ * they stand, empty areas included (decision 33), so on an actor's page what
+ * they have not promised shows as plainly as what they have. Pass one actor's
+ * views (a party's with its people's); the list of areas comes from the
+ * configuration (areaCoverage() in @openpromises/publish), the same for
+ * every actor; free-text areas show only those the cards use, alphabetically
+ * as AreaIndex lists them. An area with promises links to its page.
+ */
+export function AreaCoverage({ views, headingLevel = 2, ...b }: Base & { views: readonly CardView[]; headingLevel?: 2 | 3 }) {
+  const { config, L, w } = ctx(b);
+  const p = paths(config);
+  const rows = areaCoverage(views, config, L);
+  if (!rows.length) return null;
+  const H = `h${headingLevel}` as const;
+  const published = views.filter((v) => v.where === "promises");
+  return (
+    <section className="op-coverage" aria-labelledby="op-coverage">
+      <H id="op-coverage">{w.t("coverage.title")}</H>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">{w.t("coverage.area")}</th>
+            <th scope="col">{w.t("coverage.count")}</th>
+            <th scope="col">{w.t("coverage.status")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.area} data-empty={r.count ? undefined : "true"}>
+              <th scope="row">{r.count ? <a href={p.area(r.area, L)}>{areaLabel(config, r.area, L)}</a> : areaLabel(config, r.area, L)}</th>
+              <td>{r.count ? r.count : w.t("coverage.none")}</td>
+              <td>{r.count ? statusMix(published.filter((v) => v.card.area === r.area), config, w) : null}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
   );
 }
 

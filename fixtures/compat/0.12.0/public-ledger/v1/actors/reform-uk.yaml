@@ -1,0 +1,11 @@
+format: openpromises/1
+id: reform-uk
+kind: party
+name:
+  en: Reform UK
+standing: opposition
+roles: []
+identifiers:
+  parliament_party_id: 1036
+same_as:
+  - https://www.reformparty.uk/
