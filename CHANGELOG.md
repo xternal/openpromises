@@ -4,6 +4,13 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+- **Accented letters in a page's references are read** (`@openpromises/quotes`): `decodeEntities()`, which `textFromHtml()` and `openpromises check-quote --html` use, now decodes every HTML5 named character reference (all 2,125 in the WHATWG list), not 24, by its exact name as browsers do: `&Eacute;` is É and `&eacute;` is é. A page that writes its accents as references, such as the Élysée's `jusqu&rsquo;&agrave; 3 milliards d&#39;euros de soutien suppl&eacute;mentaire`, was reported as `none`, and `--record` wrote a `none` that made `validate` fail; it is now `exact`. Any French, German, Spanish or Italian page written that way was affected. Numeric references are unchanged. A name the standard does not have (`&foo;`) and a name in the wrong case (`&Amp;`, `&NBSP;`, which used to be decoded) are left as they are, as a browser shows them; so is a name without its semicolon (`&eacute`), which browsers still read for about a hundred old names. `&constructor;` and the like no longer turn into JavaScript's own text. The package still has no dependencies; the table is generated into `src/entities.ts` by `pnpm --filter @openpromises/quotes entities`.
+
+### Upgrading from 0.14.0
+
+- **No configuration needed.** The card format and every other function are unchanged.
+- **A `none` recorded for such a page:** run the same `openpromises check-quote <card id> --html <file> --record` again; it records the new result over the old one, and `validate` no longer fails on it.
+
 ## 0.14.0 (20 October 2026)
 
 Decision 34.

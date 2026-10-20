@@ -98,5 +98,28 @@ describe("HTML", () => {
 
   it("leaves unknown references alone", () => {
     expect(decodeEntities("&unknown; &amp;")).toBe("&unknown; &");
+    expect(decodeEntities("&foo;")).toBe("&foo;");
+    expect(decodeEntities("&constructor; &toString; &eacute")).toBe("&constructor; &toString; &eacute");
+  });
+
+  it("decodes every HTML5 named reference, accented letters included", () => {
+    expect(decodeEntities("jusqu&rsquo;&agrave;")).toBe("jusqu’à");
+    expect(decodeEntities("&szlig; &uuml; &ouml; &ccedil; &egrave; &ntilde; &oelig; &Scaron;")).toBe("ß ü ö ç è ñ œ Š");
+    expect(decodeEntities("&frac12; &sup2; &NotEqualTilde;")).toBe("½ ² \u2242\u0338");
+  });
+
+  it("decodes named references case-sensitively, as browsers do", () => {
+    expect(decodeEntities("&Eacute;t&eacute;")).toBe("Été");
+    expect(decodeEntities("&Agrave; &agrave; &AMP; &Amp;")).toBe("À à & &Amp;");
+  });
+
+  it("decodes numeric references, decimal and hexadecimal", () => {
+    expect(decodeEntities("d&#39;euros &#xE9;&#XE9;&#233; &#0; &#x110000;")).toBe("d'euros ééé &#0; &#x110000;");
+  });
+
+  it("finds a French quote in a page that writes its accents as references", () => {
+    // From the Élysée's page on the France–Ukraine security agreement (16 February 2024), as served.
+    const html = `<p>La France a fourni &agrave; l&#39;Ukraine une aide militaire d&#39;une valeur totale de 1,7 milliard d&#39;euros en 2022 et de 2,1 milliards d&rsquo;euros en 2023. En 2024, la France fournira jusqu&rsquo;&agrave; 3 milliards d&#39;euros de soutien suppl&eacute;mentaire.</p>`;
+    expect(matchQuote("jusqu’à 3 milliards d'euros de soutien supplémentaire", textFromHtml(html), { lang: "fr" }).tier).toBe("exact");
   });
 });

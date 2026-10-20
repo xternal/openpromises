@@ -18,6 +18,8 @@
  * character, and in Russian and Belarusian ё/е. Pure functions, no I/O.
  */
 
+import { ENTITIES } from "./entities";
+
 export type Tier = "exact" | "close" | "none";
 
 /** Languages where ё and е are written interchangeably, so a quote matches either. */
@@ -123,41 +125,18 @@ export function findSpan(quote: string, text: string): [number, number] | null {
   return at < 0 || !quote ? null : [at, at + quote.length];
 }
 
-const ENTITIES: Record<string, string> = {
-  amp: "&",
-  lt: "<",
-  gt: ">",
-  quot: '"',
-  apos: "'",
-  nbsp: " ",
-  shy: "­",
-  laquo: "«",
-  raquo: "»",
-  ldquo: "“",
-  rdquo: "”",
-  bdquo: "„",
-  lsquo: "‘",
-  rsquo: "’",
-  sbquo: "‚",
-  ndash: "–",
-  mdash: "—",
-  hellip: "…",
-  pound: "£",
-  euro: "€",
-  copy: "©",
-  thinsp: " ",
-  ensp: " ",
-  emsp: " ",
-};
-
-/** Decode HTML character references: named ones in common use, and every numeric one. */
+/**
+ * Decode HTML character references: every HTML5 named one closed by a
+ * semicolon, case-sensitively as browsers do (&Eacute; is É, &eacute; is é),
+ * and every numeric one. Anything else, such as &foo;, is left as it is.
+ */
 export function decodeEntities(s: string): string {
-  return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, ref: string) => {
+  return s.replace(/&(#[xX][0-9a-fA-F]+|#[0-9]+|[A-Za-z][A-Za-z0-9]*);/g, (m, ref: string) => {
     if (ref[0] === "#") {
       const code = ref[1] === "x" || ref[1] === "X" ? parseInt(ref.slice(2), 16) : parseInt(ref.slice(1), 10);
       return Number.isFinite(code) && code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : m;
     }
-    return ENTITIES[ref.toLowerCase()] ?? m;
+    return Object.hasOwn(ENTITIES, ref) ? ENTITIES[ref]! : m;
   });
 }
 

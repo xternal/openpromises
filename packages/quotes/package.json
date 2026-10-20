@@ -39,7 +39,8 @@
     "NOTICE"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "entities": "node scripts/entities.mjs"
   },
   "dependencies": {},
   "publishConfig": {

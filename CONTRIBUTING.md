@@ -26,6 +26,8 @@ Tests run against the TypeScript sources, so they need no build first. `pnpm bui
 
 The JSON Schema files in `packages/core/schema/` are generated from the Zod schemas. After changing a schema, run `pnpm build && pnpm schema` and commit the result; a test fails while they differ.
 
+`packages/quotes/src/entities.ts`, the HTML5 named character references, is generated from the WHATWG list (https://html.spec.whatwg.org/entities.json). `pnpm --filter @openpromises/quotes entities` rewrites it; `node packages/quotes/scripts/entities.mjs <file>` reads a saved copy of the list instead. Do not edit it by hand.
+
 ## Making a change
 
 1. Open an issue first for anything larger than a fix, so we can agree the approach.
