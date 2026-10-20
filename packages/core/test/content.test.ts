@@ -124,6 +124,16 @@ describe("a content folder", () => {
     expect(found(content({ config: withIds, actors: twice }))).toEqual(['actors/ada-two.yaml identifiers.member_id: member_id 7 already belongs to "ada-lovelace"; one id, one actor']);
   });
 
+  it("says, for each version of each card, whether a machine found its words in a stored copy (decision 35)", () => {
+    const stored = "Speech. We will cap bus fares at £2 for every journey in the city. Thank you.";
+    const spanned = card((c) => {
+      c.versions[0]!.source_text = { file: "speech.txt", span: [8, 66] };
+      c.versions.push({ ...structuredClone(c.versions[0]!), version: 2, text: "Other words.", source_text: undefined });
+    });
+    const r = validateContent(content({ cards: [{ file: "promises/test-bus-fares.yaml", where: "promises", data: spanned }], sourceText: () => stored }));
+    expect(r.cards[0]!.quoteMatched).toEqual([true, false]);
+  });
+
   it("checks the editors list", () => {
     const editors = { file: "editors.yaml", data: { editors: [...EDITORS, { handle: "Sam", since: "2026-01-01", party: "red-party" }] } };
     expect(found(content({ editors }))).toEqual(['editors.yaml editors.3.handle: "Sam" is listed twice', 'editors.yaml editors.3.party: is not a party among the actors']);

@@ -150,6 +150,13 @@ This replaces the "no exclusions" rule of CONTRIBUTING.md step 3 and UPGRADING.m
 
 Everything is built from the published cards alone, the same way for every actor (principle 5), in neutral words, with the words carrying the meaning and colour only repeating it. The photo with its credit and licence, and the page's layout, stay each site's own; LedgerGov.UK builds its page from these in its own pull request, after the release. Decided by Pavel Guzhikov on 20 October 2026.
 
+**35. An editor's check of a quote may be recorded after publishing, and every card says what was checked.** On 20 October 2026 USLedger.org published its first twenty cards, the twenty promises of the 2024 Republican Platform. Each quote was matched character for character in a stored copy of the platform (a `source_text` span), which the rules accept for publishing. That evening Pavel Guzhikov checked all twenty against the official PDF himself, but the cards could not record it: `quote_checked_on` was history once a card was published, and `openpromises review --quote-checked` refused and pointed to a correction. A correction fixes our own mistake (FORMAT.md §9); an editor's check made after publishing adds a fact and rewrites none, which is what a late field is for. Meanwhile every one of those pages said "Quote not yet checked against its source", although a machine had found the words in the stored copy. Decided:
+- `versions[n].quote_checked_on` is a late field: it may be filled in once on a published version that has none, with no correction. Once it has a day, changing it is a correction like any other.
+- `openpromises review --quote-checked` records it on a published card too. From an editor who has already approved the card, it records only the check, never a second approval. `--on` gives the day of a check made earlier: never in the future, and never before the version was recorded.
+- Every card says the strongest check that holds: an editor's at the source, with its day; else a machine's word-for-word match in a stored copy of the source (a stored-source span or an exact archive check); else "not yet checked". The same words for every card and every party.
+
+Decided by Pavel Guzhikov on 20 October 2026 ("5 fix if something useful needed, yes").
+
 ## Proposed, waiting for the owner
 
 None.

@@ -30,6 +30,8 @@ import {
   promisesByMonth,
   reviewerName,
   quoteIn,
+  quoteState,
+  quoteStateText,
   shortMonth,
   shownComparisons,
   spotlight,
@@ -315,7 +317,8 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
               </>
             )}
           </span>
-          {!view.current.quote_checked_on && <span>{w.t("card.quote_not_checked")}</span>}
+          {/* What was checked of the words: an editor at the source, else a machine in a stored copy, else nothing yet (decision 35). */}
+          <span>{quoteStateText(quoteState(view), w)}</span>
           {verification && <Verification view={view} {...b} />}
         </p>
         <Ladder view={view} config={config} locale={L} />
@@ -546,13 +549,14 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
               )}
               <Fold title={w.t("card.checks")}>
                 <ul className="op-links">
-                  {f.versions.map((ver) =>
-                    ver.quote_checked_on ? (
+                  {f.versions.map((ver, i) => {
+                    const state = quoteState(view, i);
+                    return state.kind === "none" ? null : (
                       <li key={`q${ver.version}`}>
-                        {w.t("card.version", { n: ver.version, date: longDate(w, ver.recorded_on) })}: {w.t("card.quote_checked", { date: longDate(w, ver.quote_checked_on) })}
+                        {w.t("card.version", { n: ver.version, date: longDate(w, ver.recorded_on) })}: {quoteStateText(state, w)}
                       </li>
-                    ) : null,
-                  )}
+                    );
+                  })}
                   {[...(f.reviews ?? [])].reverse().map((r, i) => (
                     <li key={`r${i}`}>
                       {r.kind === "editor" && r.approves

@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -217,12 +218,78 @@ describe("importing an earlier approval (decision 11)", () => {
     expect(file(d, "drafts/bus-fares.yaml")).toContain('- by: Sam\n    kind: editor\n    "on": "2026-06-12"\n    approves: true\n    note:\n      en: "Approved on GitHub in pull request #12"\n');
   });
 
-  it("refuses a day in the future, a day before the person was an editor, and a quote check on an earlier day", async () => {
+  it("refuses a day in the future, a day before the person was an editor, and a quote check before the words were recorded", async () => {
     const d = site();
     expect((await op(d, "review bus-fares --by Sam --on 2026-12-01")).out).toContain("is in the future");
     expect((await op(d, "review bus-fares --by Sam --on 2025-12-31")).out).toBe("refused: Sam is not an editor on 2025-12-31");
     expect((await op(d, "review bus-fares --by Sam --on 12/06/2026")).code).toBe(2);
-    expect((await op(d, "review bus-fares --by Sam --on 2026-06-12 --quote-checked")).out).toContain("cannot be combined with --on");
+    write(join(d, "content", "drafts", "bus-fares.yaml"), CARD.replace('    quote_checked_on: "2026-05-01"\n', ""));
+    expect((await op(d, "review bus-fares --by Sam --on 2026-04-30 --quote-checked")).out).toBe(
+      "refused: version 1 was recorded on 2026-05-01, after 2026-04-30; a quote is checked on or after the day it was recorded",
+    );
+  });
+
+  it("records a quote check made on an earlier day with the approval", async () => {
+    const d = site();
+    write(join(d, "content", "drafts", "bus-fares.yaml"), CARD.replace('    quote_checked_on: "2026-05-01"\n', ""));
+    const r = await op(d, "review bus-fares --by Sam --on 2026-06-12 --quote-checked");
+    expect(r.out).toBe('Sam approved "bus-fares" (content/drafts/bus-fares.yaml). The quote check of version 1 is recorded for 2026-06-12. It needs 1 more editor\'s approval.');
+    expect(file(d, "drafts/bus-fares.yaml")).toContain('quote_checked_on: "2026-06-12"');
+    expect(file(d, "drafts/bus-fares.yaml")).toContain('"on": "2026-06-12"');
+  });
+});
+
+// ---------------------------------------------------------------- a quote check after publishing
+
+const git = (cwd: string, ...args: string[]) =>
+  execFileSync("git", ["-c", "user.name=Test", "-c", "user.email=test@example.org", "-c", "commit.gpgsign=false", ...args], { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+
+/** The card published by Sam and Alex, its words matched in a stored copy of the speech but not checked by an editor, committed on main. */
+function published(): string {
+  const d = site();
+  rmSync(join(d, "content", "drafts", "bus-fares.yaml"));
+  const words = "We will cap bus fares at £2 for every journey in the city by 2027.";
+  write(join(d, "content", "sources", "speech.txt"), `Thank you. ${words} Thank you.`);
+  const card = CARD.replace('    quote_checked_on: "2026-05-01"\n', `    source_text: { file: speech.txt, span: [11, ${11 + words.length}] }\n`);
+  write(join(d, "content", "promises", "bus-fares.yaml"), `${card}reviews:\n  - { by: Sam, kind: editor, "on": "2026-05-02", approves: true }\n  - { by: Alex, kind: editor, "on": "2026-05-03", approves: true }\n`);
+  git(d, "init", "-q", "-b", "main");
+  git(d, "add", "-A");
+  git(d, "commit", "-q", "-m", "publish");
+  git(d, "checkout", "-q", "-b", "change");
+  return d;
+}
+
+describe("recording a quote check on a published card (decision 35)", () => {
+  it("records only the check, once, from an editor who already approved it, and the append-only check passes", async () => {
+    const d = published();
+    expect((await op(d, "validate --base main")).out).toContain("0 errors, 0 warnings");
+    const r = await op(d, "review bus-fares --by Sam --quote-checked --on 2026-10-08");
+    expect(r).toEqual({
+      code: 0,
+      out: 'Sam recorded a quote check on "bus-fares" (content/promises/bus-fares.yaml). The quote check of version 1 is recorded for 2026-10-08. Sam had already approved it, so no approval was added.',
+    });
+    expect(file(d, "promises/bus-fares.yaml")).toContain('quote_checked_on: "2026-10-08"');
+    expect(file(d, "promises/bus-fares.yaml").match(/approves: true/g)).toHaveLength(2);
+    const v = await op(d, "validate --base main");
+    expect(v.out).toContain("Append-only: compared 1 published card with main");
+    expect(v.out).toContain("0 errors, 0 warnings");
+    // Once recorded, the check is history: the command will not record it again, and changing it by hand needs a correction.
+    expect((await op(d, "review bus-fares --by Alex --quote-checked")).out).toContain("every version already has its quote check");
+    git(d, "commit", "-q", "-am", "check");
+    git(d, "branch", "-q", "-f", "main");
+    write(join(d, "content", "promises", "bus-fares.yaml"), file(d, "promises/bus-fares.yaml").replace("2026-10-08", "2026-10-09"));
+    expect((await op(d, "validate --base main")).out).toContain("versions[0]: was changed; history is append-only");
+  });
+
+  it("refuses a day in the future, a day before the words were recorded, a note, and a second approval", async () => {
+    const d = published();
+    expect((await op(d, "review bus-fares --by Sam --quote-checked --on 2026-10-10")).out).toContain("is in the future");
+    expect((await op(d, "review bus-fares --by Sam --quote-checked --on 2026-04-30")).out).toContain("version 1 was recorded on 2026-05-01, after 2026-04-30");
+    expect((await op(d, "review bus-fares --by Sam --quote-checked --note Checked")).out).toBe("refused: a note goes with an approval, and this records only a quote check; leave out --note");
+    expect((await op(d, "review bus-fares --by Sam")).out).toBe(
+      'refused: Sam has already approved "bus-fares"; a second approval must come from a different editor (to record a quote check you made, add --quote-checked)',
+    );
+    expect(file(d, "promises/bus-fares.yaml")).not.toContain("quote_checked_on");
   });
 });
 

@@ -589,6 +589,19 @@ const quotes: Rule = {
   },
 };
 
+/**
+ * Whether a machine found a version's words, word for word, in a stored copy
+ * of their source (decision 35): a stored-source span that passes its check,
+ * or an `exact` archive check. The same checks the quotes rule accepts as a
+ * machine's confirmation; an editor's quote_checked_on is shown on its own.
+ */
+export function quoteMatched(v: Version, ctx: Pick<CardContext, "config" | "quoteCheck" | "sourceText">): boolean {
+  if (ctx.quoteCheck?.(v)?.match === "exact") return true;
+  if (!v.source_text) return false;
+  const text = ctx.sourceText?.(v.source_text.file);
+  return text !== undefined && !checkSpan(v.text, text, v.source_text.span, { minWords: ctx.config.quotes.minWords }).length;
+}
+
 /** The tier of a quote in a text, using the card's normalisation language. */
 export const quoteTier = (v: Version, text: string, config: Config) => matchQuote(v.text, text, { lang: v.lang ?? config.quotes.normalise ?? config.locales.default });
 

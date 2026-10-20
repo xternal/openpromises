@@ -191,14 +191,15 @@ async function review(args: Args, io: Io): Promise<number> {
   onlyFlags(args, ["config", "content", "by", "on", "quote-checked", "note", "note.*", "editors", "today"], "review");
   const id = args.positional[0];
   const by = text(args, "by");
-  if (!id || !by) throw new UsageError('usage: openpromises review <card id> --by "<editor handle>" [--quote-checked] [--note "…"]');
+  if (!id || !by) throw new UsageError('usage: openpromises review <card id> --by "<editor handle>" [--on YYYY-MM-DD] [--quote-checked] [--note "…"]');
   const site = await loadSite(args, io);
   const { config } = site;
   const now = today(io, config, args);
-  // --on records an approval given earlier, such as one imported from a pull request (decision 11).
+  // --on records an approval given earlier, such as one imported from a pull request (decision 11), or a quote check made earlier (decision 35).
   const day = text(args, "on") ?? now;
   if (!ISO_DAY.test(day) || Number.isNaN(Date.parse(day))) throw new UsageError(`--on is a date written YYYY-MM-DD, not "${day}"`);
-  if (day > now) throw new UsageError(`--on ${day} is in the future; an approval is recorded on or after the day it was given`);
+  if (day > now) throw new UsageError(`--on ${day} is in the future; an approval or a check is recorded on or after the day it was made`);
+  const quoteChecked = !!args.flags["quote-checked"];
   const refuse = (m: string) => {
     io.err(`refused: ${m}`);
     return 1;
@@ -218,30 +219,37 @@ async function review(args: Args, io: Io): Promise<number> {
   if (!editor) return refuse(`"${by}" is not in the editors list`);
   if (day < editor.since || (editor.until && day > editor.until)) return refuse(`${by} is not an editor on ${day}`);
   const ctx = { config, actors: result.actors, editors: result.editors };
-  if (approvers(card, ctx).has(by)) return refuse(`${by} has already approved "${id}"; a second approval must come from a different editor`);
+  // An editor who has already approved the card may still record the quote check they made (decision 35); a second approval, never.
+  const checkOnly = approvers(card, ctx).has(by);
+  if (checkOnly && !quoteChecked) return refuse(`${by} has already approved "${id}"; a second approval must come from a different editor (to record a quote check you made, add --quote-checked)`);
   const actor = result.actors.get(card.actor_id);
   const party = actor?.kind === "party" ? actor.id : actor?.party_id;
   if (editor.party && (editor.party === card.actor_id || editor.party === party)) return refuse(`${by} may not approve a card about their own party; another editor does`);
-  if (args.flags["quote-checked"] && where === "promises") return refuse("a published card's versions are history: record a correction instead of a new quote check");
-  if (args.flags["quote-checked"] && text(args, "on")) return refuse("--quote-checked records a check made today, so it cannot be combined with --on");
+  // The versions whose check is recorded: those without one. A check recorded is history, so changing it is a correction (decision 35).
+  const unchecked = quoteChecked ? card.versions.flatMap((v, i) => (v.quote_checked_on ? [] : [i])) : [];
+  if (checkOnly && !unchecked.length)
+    return refuse(`${by} has already approved "${id}", and every version already has its quote check (quote_checked_on); changing one is a correction (docs/FORMAT.md §9)`);
+  const early = unchecked.map((i) => card.versions[i]!).find((v) => v.recorded_on > day);
+  if (early) return refuse(`version ${early.version} was recorded on ${early.recorded_on}, after ${day}; a quote is checked on or after the day it was recorded`);
 
   // The note, in one language (--note) or several (--note.en, --note.ru).
   const note: Record<string, string> = {};
   const plain = text(args, "note");
   if (plain) note[config.locales.default] = plain;
   for (const [k, v] of Object.entries(args.flags)) if (k.startsWith("note.") && typeof v === "string") note[k.slice(5)] = v;
+  if (checkOnly && Object.keys(note).length) return refuse("a note goes with an approval, and this records only a quote check; leave out --note");
   const r: Review = { by, kind: "editor", on: day, approves: true, ...(Object.keys(note).length ? { note } : {}) };
 
   const path = join(site.contentDir, entry.file);
   let yaml = readFileSync(path, "utf8");
-  if (args.flags["quote-checked"]) card.versions.forEach((v, i) => !v.quote_checked_on && (yaml = setField(yaml, ["versions", i], "quote_checked_on", day)));
-  yaml = appendToList(yaml, "reviews", [r], "review");
+  for (const i of unchecked) yaml = setField(yaml, ["versions", i], "quote_checked_on", day);
+  if (!checkOnly) yaml = appendToList(yaml, "reviews", [r], "review");
 
   const after = readYaml(yaml);
   const need = config.editorial.approvals;
   const check = validateCard(after, { ...ctx, where: "promises", quoteCheck: read.input.quoteCheck!, sourceText: read.input.sourceText! });
   const have = check.card ? approvers(check.card, ctx).size : 0;
-  const publish = where === "drafts" && have >= need;
+  const publish = where === "drafts" && !checkOnly && have >= need;
   if (publish) {
     const errors = check.issues.filter((i) => i.severity === "error");
     if (errors.length) {
@@ -255,14 +263,20 @@ async function review(args: Args, io: Io): Promise<number> {
     }
   }
   writeFileSync(path, yaml);
+  const versions = unchecked.map((i) => card.versions[i]!.version);
+  const checkedWords = versions.length ? ` The quote check of ${versions.length === 1 ? "version" : "versions"} ${versions.join(", ")} is recorded for ${day}.` : "";
+  if (checkOnly) {
+    io.out(`${by} recorded a quote check on "${id}" (${site.shown}${entry.file}).${checkedWords} ${by} had already approved it, so no approval was added.`);
+    return 0;
+  }
   if (publish) {
     const target = join(site.contentDir, "promises", `${id}.yaml`);
     mkdirSync(dirname(target), { recursive: true });
     renameSync(path, target);
-    io.out(`${by} approved "${id}". It now has ${plural(have, "approval")}, so it moved to ${site.shown}promises/${id}.yaml: commit it and open a pull request; it is published when that is merged.`);
+    io.out(`${by} approved "${id}".${checkedWords} It now has ${plural(have, "approval")}, so it moved to ${site.shown}promises/${id}.yaml: commit it and open a pull request; it is published when that is merged.`);
   } else {
     const left = Math.max(need - have, 0);
-    io.out(`${by} approved "${id}" (${site.shown}${entry.file}).${where === "drafts" ? ` It needs ${plural(left, "more editor's approval", "more editors' approvals")}.` : ""}`);
+    io.out(`${by} approved "${id}" (${site.shown}${entry.file}).${checkedWords}${where === "drafts" ? ` It needs ${plural(left, "more editor's approval", "more editors' approvals")}.` : ""}`);
   }
   return 0;
 }
@@ -514,9 +528,12 @@ const HELP: Record<string, string> = {
   Records an editor's approval in the card. Refuses an editor not in the list, a second approval by
   the same editor, and an approval of a card about the editor's own party. On the last approval
   needed, moves the card from drafts/ to promises/ (only if it passes every other rule).
-  --quote-checked also records that the editor checked each version's words at the source today.
-  --on records an approval the editor gave earlier (for example on a pull request, before the site
-  moved to OpenPromises), with that date; say where in --note.`,
+  --quote-checked also records that the editor checked the words at the source (quote_checked_on),
+  on each version that has no check yet, drafts and published cards alike. From an editor who has
+  already approved the card, it records only the check, with no second approval.
+  --on records an approval or a check the editor made earlier (for example an approval on a pull
+  request, before the site moved to OpenPromises, or a check made the day before), with that date;
+  never in the future, and for a check never before the version was recorded. Say where in --note.`,
   "check-quote": `openpromises check-quote <id> --text <file> | --html <file> [--version <n>] [--record]
   Checks a version's words (default: the current one) against a stored copy of its source: exact,
   close (case, punctuation or spacing differ) or none. --record writes the result to quotes.json,

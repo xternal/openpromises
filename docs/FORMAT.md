@@ -167,7 +167,7 @@ A version is the promise as worded once. Rewording a promise, or moving its dead
 | `source_url` | URL | yes | Where the words are. |
 | `archived_url` | URL | if `quotes.archive` is `required` | An archived copy holding these words. |
 | `page` | number or `null` | no | The page in a printed or PDF source. |
-| `quote_checked_on` | date or `null` | no | When an editor confirmed the words at the source. |
+| `quote_checked_on` | date or `null` | no | When an editor confirmed the words at the source. It may be filled in once after the card is published (§9). |
 | `source_text` | `{ file, span }` | no | The words in a stored copy of the source: `file` names `sources/<file>`, and `span: [start, end]` are the character positions of the quote in it (JavaScript string offsets). |
 | `parameters` | parameters or `null` | yes | What the promise says. `null` only when the card is `unscoreable`. |
 
@@ -333,13 +333,14 @@ corrections:
 
 Two checks hold every correction to account: the card's field must equal the `now` of its last correction, and undoing the new corrections, newest first, must give back exactly the published entry (§13).
 
-**Late fields.** A field added to the format after cards were published may be filled in once on a published version, event or reply that never had it, without a correction: that adds a fact, it does not rewrite one. Once it has a value, changing it is a correction like any other. The late fields so far:
+**Late fields.** Some fields may be filled in once on a published version, event or reply that never had them (absent, or `null`), without a correction: that adds a fact, it does not rewrite one. They are the fields added to the format after cards were published, and an editor's check of the words at their source, which may come after the card is published (decision 35). Once one has a value, changing it is a correction like any other. The late fields so far:
 
 | Field | Added |
 |---|---|
 | `versions[n].parameters.cost.by` | 9 October 2026 (decision 14) |
 | `versions[n].parameters.cost.method` | 18 October 2026 (decision 28) |
 | `versions[n].parameters.estimate` | 19 October 2026 (decision 28) |
+| `versions[n].quote_checked_on` | 20 October 2026 (decision 35): a check made after the card was published, recorded with `openpromises review --quote-checked` (`--on` for the day it was made, never before the version was recorded) |
 
 A site converted from an older format (its `legacy` setting) may also fill in, once, the fields that format had no place for (decision 15). The list is the engine's, per format, so no site can make its own history editable. Keep `legacy` in the configuration after converting, so these stay allowed.
 

@@ -63,17 +63,20 @@ export function parseCorrectionPath(path: string): ParsedPath | null {
 const HISTORY = ["versions", "events", "replies"] as const;
 
 /**
- * Fields added to the format after cards were published (decision 13.1).
- * Filling one in on a published entry that never had it is not a rewrite of
- * history, so it needs no correction; once it has a value, changing it is a
+ * Fields that may be filled in once on a published entry that never had them
+ * (decision 13.1): fields added to the format after cards were published, and
+ * an editor's check of the words at their source, which may come after the
+ * card is published (decision 35). Filling one in adds a fact and rewrites
+ * none, so it needs no correction; once it has a value, changing it is a
  * correction like any other. Listed in docs/FORMAT.md §9, with the date each
  * was added.
  */
 export const LATE_FIELDS: Readonly<Record<(typeof HISTORY)[number], readonly string[]>> = {
   // Who made a cost's central figure (decision 14), added 9 October 2026;
   // how it was worked out (decision 28), added 18 October 2026; what
-  // delivery takes (decision 28), added 19 October 2026.
-  versions: [".parameters.cost.by", ".parameters.cost.method", ".parameters.estimate"],
+  // delivery takes (decision 28), added 19 October 2026; when an editor
+  // checked the words at their source (decision 35), from 20 October 2026.
+  versions: [".parameters.cost.by", ".parameters.cost.method", ".parameters.estimate", ".quote_checked_on"],
   events: [],
   replies: [],
 };
@@ -95,10 +98,21 @@ export const LEGACY_LATE_FIELDS: Readonly<Record<string, LateFields>> = {
   "borough-book": { versions: [".parameters.cost.sources"] },
 };
 
-/** The entry as it stands, without any late field the published entry did not have. */
+/**
+ * The entry as it stands, with each late field the published entry did not
+ * have put back as it was there: absent, or written as null (a draft starts
+ * with `quote_checked_on: null`).
+ */
 function withoutLateFields(tails: readonly string[], published: unknown, now: unknown): unknown {
   let out = now;
-  for (const tail of tails) if (fieldAt(published, tail) === null && fieldAt(out, tail) !== null) out = withField(out, tail, null);
+  for (const tail of tails) {
+    if (fieldAt(published, tail) !== null || fieldAt(out, tail) === null) continue;
+    out = withField(out, tail, null);
+    const parent = tail.slice(0, tail.lastIndexOf("."));
+    const key = tail.slice(tail.lastIndexOf(".") + 1);
+    const was = fieldAt(published, parent);
+    if (was && typeof was === "object" && Object.hasOwn(was, key)) (fieldAt(out, parent) as Record<string, unknown>)[key] = null;
+  }
   return out;
 }
 

@@ -45,6 +45,25 @@ describe("PromiseCard", () => {
     expect(html(<PromiseCard view={v} config={s.config} today={s.today} />)).not.toContain("op-verified");
   });
 
+  it("says what was checked of the quote: an editor's check at the source, else a machine's match in a stored copy, else not yet (decision 35)", async () => {
+    const s = await site("public-ledger");
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const versions = v.card.versions.map(({ quote_checked_on: _, ...x }) => x);
+    const unchecked = { ...v, card: { ...v.card, versions }, current: versions.at(-1)! };
+    const out = (view: typeof v, locale?: string) => html(<PromiseCard view={view} config={s.config} today={s.today} {...(locale ? { locale } : {})} />);
+    const checked = out(v);
+    expect(checked).toContain("<span>Quote checked word for word at its source on 6 October 2026</span>");
+    expect(checked).toContain("<li>Version 1, 22 July 2026: Quote checked word for word at its source on 6 October 2026</li>");
+    const matched = out({ ...unchecked, quoteMatched: [true] });
+    expect(matched).toContain("<span>Quote matches a stored copy of its source word for word</span>");
+    expect(matched).toContain("<li>Version 1, 22 July 2026: Quote matches a stored copy of its source word for word</li>");
+    expect(matched).not.toContain("not yet checked");
+    const neither = out(unchecked);
+    expect(neither).toContain("<span>Quote not yet checked against its source</span>");
+    expect(neither).not.toContain("<li>Version 1");
+    expect(out({ ...unchecked, quoteMatched: [true] }, "ru")).toContain("Цитата дословно совпадает с сохранённой копией источника");
+  });
+
   it("says who brought the outcome about, beside the status", async () => {
     const s = await site("public-ledger");
     const out = html(<PromiseCard view={s.views.find((x) => x.id === "uk-snp-two-child-cap-2024")!} config={s.config} today={s.today} />);

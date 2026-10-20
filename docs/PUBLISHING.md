@@ -48,6 +48,18 @@ Make the views with the editors list, `cardViews(cards, actors, editors)`, and e
 - The card's own feed: at the end of its subtitle. Entries are not changed, so followers are not sent old entries again.
 - Open data: `verification` in `promises.json`, by card id, with the level, the named editors, the count and the words in every language; the CSV columns `verification_level` and `verification`.
 
+## What was checked of a quote
+
+Decision 35. Beside the quote's source, every card says the strongest check that holds, from `quoteState(view)` and `quoteStateText(state, words)` in `@openpromises/publish`, so the page and the Markdown agree. The card's list of checks says the same for each version.
+
+| Check | Words (English default) |
+|---|---|
+| An editor checked the words at the source (`quote_checked_on`) | Quote checked word for word at its source on 20 October 2026 |
+| A machine found them, word for word, in a stored copy: a `source_text` span, or an `exact` archive check in `quotes.json` | Quote matches a stored copy of its source word for word |
+| Neither | Quote not yet checked against its source |
+
+The machine's match is worked out when the content is validated (`quoteMatched` on each card that `validateContent()` returns), so make the views from those cards, `cardViews(result.cards, actors, editors)`; views made from bare cards know only the editor's check. Change the words with `messages`: `card.quote_checked` (`{date}`), `card.quote_matched` and `card.quote_not_checked`, and `md.quote_checked`, `md.quote_matched` and `md.quote_not_checked` for the Markdown.
+
 ## What a cost compares with
 
 Decision 28 ([RFC-0002](RFC-0002.md)). A site that sets a basket (`comparisons` in its configuration, FORMAT.md §2) shows what each cost compares with. It is worked out by `compare()` in `@openpromises/core` and put in words by `comparisonLines()` in `@openpromises/publish`; nothing is stored on the card.
