@@ -4,9 +4,13 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+## 0.13.0 (20 October 2026)
+
+The default dark mode in dark brown.
+
 - **Dark mode is dark brown**: the optional stylesheet (`@openpromises/react/styles.css`) now draws dark mode in a warm dark brown, lifted off black, instead of navy slate. The page is `#241f1a` with raised surfaces `#2e2822` and `#39322b`, lines are see-through cream, text is `#efe7da` at about 13:1 (the old near-white glared), and links and the focus ring are amber `#e2b26f`. Blue and red appear only where they carry meaning: a promise at the top of its ladder and added words are blue `#8aa3ec` (they were green), promises that are late or not met and removed words are red `#ec9286`, and promises in progress and unverified cards are pale amber `#f0dcaa`. Light mode is unchanged. The contrast test now also checks that marks (the ladder's current step, the timeline's dots, the focus ring, pill colours) pass 3:1, that no dark-mode text is above 14:1 and that the chrome has no blue in it.
 
-### Upgrading
+### Upgrading from 0.12.0
 
 - **Sites that rely on the default styles** see the new dark mode as soon as they take the release; there is nothing to change. Check that the site's own dark parts around the components (header, footer) still sit well with brown.
 - **Sites that set their own `--op-*` tokens** are unaffected: only the stylesheet's default values change, not its selectors, so a site's own values still win.
