@@ -4,6 +4,8 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+## 0.15.0 (21 October 2026)
+
 Decision 35, and the editors line in the Markdown.
 
 - **An editor's quote check can be recorded on a published card** (decision 35). `versions[n].quote_checked_on` is now a late field (docs/FORMAT.md §9): it may be filled in once on a published version that has none (absent or `null`), with no correction; once it has a day, changing it is a correction as before. `openpromises review --quote-checked`:

@@ -1,0 +1,13 @@
+format: openpromises/1
+id: conservatives
+kind: party
+name:
+  en: Conservative Party
+short_name:
+  en: Conservatives
+standing: opposition
+roles: []
+identifiers:
+  parliament_party_id: 4
+same_as:
+  - https://www.conservatives.com/
