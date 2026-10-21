@@ -23,6 +23,8 @@ export interface CardView {
   responsible?: Actor | null;
   /** How far the card has been verified (decision 23); absent when the views were made without the editors list. */
   verification?: Verification;
+  /** For each version, by index: whether a machine found its words in a stored copy of their source (decision 35); absent when the views were made from cards alone. */
+  quoteMatched?: readonly boolean[];
 }
 
 /**
@@ -43,6 +45,7 @@ export function cardViews(cards: readonly (ValidCard | Card)[], actors: Readonly
     const broughtAboutBy = card.brought_about_by ? actors.get(card.brought_about_by.actor_id) : undefined;
     const responsible = card.responsible === null ? null : card.responsible ? actors.get(card.responsible.actor_id) : undefined;
     const verified = editors ? verification(card, { actors, editors }) : null;
+    const quoteMatched = "card" in c ? c.quoteMatched : undefined;
     out.push({
       id: card.id,
       card,
@@ -54,6 +57,7 @@ export function cardViews(cards: readonly (ValidCard | Card)[], actors: Readonly
       ...(broughtAboutBy ? { broughtAboutBy } : {}),
       ...(responsible !== undefined ? { responsible } : {}),
       ...(verified ? { verification: verified } : {}),
+      ...(quoteMatched ? { quoteMatched } : {}),
     });
   }
   return out.sort((a, b) => b.card.made_on.localeCompare(a.card.made_on) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
@@ -84,6 +88,28 @@ export function quoteIn(v: Version, locale: string, config: Pick<Config, "locale
   if (base(originalLang) === base(locale)) return { text: original, lang: originalLang, translated: false, original, originalLang };
   const t = v.translations?.[locale];
   return t ? { text: t, lang: locale, translated: true, original, originalLang } : { text: original, lang: originalLang, translated: false, original, originalLang };
+}
+
+/** What was checked of a version's words (decision 35). */
+export type QuoteState = { kind: "checked"; on: string } | { kind: "matched" } | { kind: "none" };
+
+/**
+ * What was checked of a version's words, the strongest that holds (decision
+ * 35): an editor's check at the source, with its day (quote_checked_on); else
+ * a machine's word-for-word match in a stored copy of the source (a
+ * stored-source span or an exact archive check); else nothing yet. The
+ * current version by default.
+ */
+export function quoteState(v: Pick<CardView, "card" | "current" | "quoteMatched">, index?: number): QuoteState {
+  const on = (index === undefined ? v.current : v.card.versions[index])?.quote_checked_on;
+  if (on) return { kind: "checked", on };
+  return v.quoteMatched?.[index ?? v.card.versions.length - 1] ? { kind: "matched" } : { kind: "none" };
+}
+
+/** A quote's check in words: "Quote checked word for word at its source on 20 October 2026", or the Markdown form inside a line ("checked word for word…"). */
+export function quoteStateText(state: QuoteState, w: Words, form: "card" | "md" = "card"): string {
+  if (state.kind === "checked") return w.t(`${form}.quote_checked`, { date: longDate(w, state.on) });
+  return w.t(state.kind === "matched" ? `${form}.quote_matched` : `${form}.quote_not_checked`);
 }
 
 /** Cut text to at most `max` characters at a word boundary, with "…" when cut. */

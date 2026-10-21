@@ -1,6 +1,6 @@
 import type { Config } from "./config";
 import { issue, zodIssues, type FileIssue, type Issue } from "./issues";
-import { langMapIssues, RULES, type CardContext, type QuoteCheck } from "./rules";
+import { langMapIssues, quoteMatched, RULES, type CardContext, type QuoteCheck } from "./rules";
 import { Actor, Card, EditorsFile, type Editor, type LangMap, type Version } from "./schema";
 
 /**
@@ -32,6 +32,12 @@ export interface ValidCard {
   file: string;
   where: "promises" | "drafts";
   card: Card;
+  /**
+   * For each version, by index: whether a machine found its words in a
+   * stored copy of their source (quoteMatched, decision 35), so pages can say
+   * what was checked. Set by validateContent.
+   */
+  quoteMatched?: boolean[];
 }
 
 export interface ContentResult {
@@ -162,7 +168,7 @@ export function validateContent(input: ContentInput): ContentResult {
     const other = cardFiles.get(r.card.id);
     if (other) issues.push({ file: f.file, ...issue("files", ["id"], `"${r.card.id}" is also ${other}; cards and drafts share one set of ids`) });
     else cardFiles.set(r.card.id, f.file);
-    cards.push({ file: f.file, where: f.where, card: r.card });
+    cards.push({ file: f.file, where: f.where, card: r.card, quoteMatched: r.card.versions.map((v) => quoteMatched(v, ctx)) });
   }
 
   return { issues, cards, actors, editors };

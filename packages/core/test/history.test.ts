@@ -156,6 +156,38 @@ describe("late fields (decision 13.1)", () => {
   });
 });
 
+describe("a quote check recorded after publishing (decision 35)", () => {
+  const unchecked = card((c) => delete c.versions[0]!.quote_checked_on);
+  const asNull = card((c) => (c.versions[0]!.quote_checked_on = null));
+  const checked = card((c) => (c.versions[0]!.quote_checked_on = "2026-10-20"));
+
+  it("may be filled in once on a published version that has none, absent or null, with no correction", () => {
+    expect(messages(unchecked, checked)).toEqual([]);
+    expect(messages(asNull, checked)).toEqual([]);
+    expect(messages(asNull, asNull)).toEqual([]);
+  });
+
+  it("is history once recorded: a new day or its removal needs a correction", () => {
+    const later = card((c) => (c.versions[0]!.quote_checked_on = "2026-10-21"));
+    expect(messages(checked, later)).toEqual(["versions.0: was changed; history is append-only (add a new entry, or record our own mistake as a correction)"]);
+    expect(messages(checked, unchecked)).toHaveLength(1);
+    expect(messages(checked, asNull)).toHaveLength(1);
+    const corrected = card((c) => {
+      c.versions[0]!.quote_checked_on = "2026-10-21";
+      c.corrections = [{ date: "2026-10-22", path: "versions[0].quote_checked_on", was: "2026-10-20", now: "2026-10-21", reason: { en: "The check was made a day later." } }];
+    });
+    expect(messages(checked, corrected)).toEqual([]);
+  });
+
+  it("does not let anything else in the version change with it", () => {
+    const reworded = card((c) => {
+      c.versions[0]!.quote_checked_on = "2026-10-20";
+      c.versions[0]!.text = "Other words.";
+    });
+    expect(messages(unchecked, reworded)).toHaveLength(1);
+  });
+});
+
 describe("LedgerGov.UK's fields of 9 October 2026 (decision 14)", () => {
   const legacy = {
     id: "uk-test-2026",

@@ -5,7 +5,7 @@ import { estimateWords } from "./estimate";
 import { costFacts, costText, longDate } from "./format";
 import type { Words } from "./messages";
 import { absolute, paths } from "./urls";
-import { actorName, areaLabel, cardCostText, climb, countedEditor, eventLabel, headline, lastUpdated, metricText, pick, quoteIn, quoteLicence, reviewerName, statusMix, verificationText, type CardView } from "./view";
+import { actorName, areaLabel, cardCostText, climb, countedEditor, eventLabel, headline, lastUpdated, metricText, pick, quoteIn, quoteLicence, quoteState, quoteStateText, reviewerName, statusMix, verificationText, type CardView } from "./view";
 
 /**
  * Promise cards as Markdown, for AI assistants and anyone who reads plain
@@ -106,7 +106,7 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
       "card.quote_source",
       `${v.current.source_url} (${[
         ...(v.current.archived_url ? [link(w.t("card.archive"), v.current.archived_url)] : []),
-        v.current.quote_checked_on ? w.t("md.quote_checked", { date: longDate(w, v.current.quote_checked_on) }) : w.t("md.quote_not_checked"),
+        quoteStateText(quoteState(v), w, "md"),
         ...[quoteLicence(config, v.current.source_url)].filter((x): x is string => !!x),
       ].join("; ")})`,
     ],
@@ -199,8 +199,23 @@ export function methodMarkdown(ctx: MdContext): string[] {
     w.t("md.method.ladder", { ladder: ladder.join(" → ") }),
     w.t("md.method.cost"),
     w.t("md.method.history"),
-    w.t("md.method.editors"),
+    editorsMethod(config, w),
   ].map((x) => `- ${x}`);
+}
+
+/**
+ * Who approves a card, from the site's settings: how many approvals it needs
+ * (editorial.approvals) and whether its checks alone may publish it
+ * (editorial.publish, decision 22); then the party rule, which no site turns
+ * off. A site that sets its own "md.method.editors" message gets it as written.
+ */
+function editorsMethod(config: Pick<Config, "editorial">, w: Words): string {
+  if (w.m["md.method.editors"] !== undefined) return w.t("md.method.editors");
+  const n = config.editorial.approvals;
+  // "one editor", "two editors" where the language has words for them; "3 editors" otherwise.
+  const exact = `md.method.editors.count.${n}`;
+  const editors = w.m[exact] !== undefined ? w.t(exact) : w.n("md.method.editors.count", n);
+  return `${w.t(`md.method.editors.${config.editorial.publish}`, { editors })} ${w.t("md.method.editors.party")}`;
 }
 
 /** llms.txt: a short guide to the promises for AI assistants (llmstxt.org): what the site is, where everything is, every card. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveConfig, validateActor, type Card, type QuoteCheck } from "@openpromises/core";
+import { quoteMatched, resolveConfig, validateActor, type Card, type QuoteCheck } from "@openpromises/core";
 import { actors, BASE, card, check, CONFIG_INPUT, ruleIssues } from "./helpers";
 
 describe("the base card", () => {
@@ -513,6 +513,17 @@ describe("quotes", () => {
     const close: QuoteCheck = { match: "close", url: "https://web.archive.org/scan" };
     expect(ruleIssues("quotes", BASE, { quoteCheck: () => close })).toEqual([]);
     expect(ruleIssues("quotes", card((c) => delete c.versions[0]!.quote_checked_on), { quoteCheck: () => close })[0]).toContain("only nearly match");
+  });
+
+  it("says whether a machine found the words in a stored copy, apart from an editor's check (decision 35)", () => {
+    const ctx = { config: resolveConfig(CONFIG_INPUT) };
+    const v = spanned.versions[0]!;
+    expect(quoteMatched(v, { ...ctx, sourceText: () => stored })).toBe(true);
+    expect(quoteMatched(v, { ...ctx, sourceText: () => stored.replace("£2", "£3") })).toBe(false);
+    expect(quoteMatched(v, { ...ctx, sourceText: () => undefined })).toBe(false);
+    expect(quoteMatched(BASE.versions[0]!, ctx)).toBe(false);
+    for (const [match, found] of [["exact", true], ["close", false], ["none", false]] as const)
+      expect(quoteMatched(BASE.versions[0]!, { ...ctx, quoteCheck: () => ({ match, url: "https://web.archive.org/x" }) })).toBe(found);
   });
 
   it("needs a machine check when the site says so, and an archive copy when required", () => {

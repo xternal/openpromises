@@ -20,6 +20,7 @@ import {
   jsonLdText,
   llmsTxt,
   longDate,
+  methodMarkdown,
   money,
   openDataCsv,
   openDataJson,
@@ -27,6 +28,7 @@ import {
   plural,
   publishFiles,
   quoteIn,
+  quoteState,
   sitemapEntries,
   sitemapXml,
   slugify,
@@ -34,6 +36,7 @@ import {
   wordDiff,
   words,
   xmlEscape,
+  type CardView,
 } from "@openpromises/publish";
 import { ROOT, site } from "./helpers";
 
@@ -303,6 +306,55 @@ describe("Markdown", () => {
     const text = llmsTxt(s.views, { config: s.config, w: words(s.config, "en"), today: s.today });
     expect(text.startsWith("# Public Ledger\n\n> What UK governments")).toBe(true); // the fixture's site name, as the site had it
     expect(text.match(/^- \[.*\]\(https:\/\/ledgergov\.uk\/promise\//gm)).toHaveLength(54);
+  });
+});
+
+describe("what was checked of a quote, and who approves (decision 35)", () => {
+  /** The view with no editor's check on any version, and a machine's match on each, or none. */
+  const unchecked = (v: CardView, matched: boolean | null): CardView => {
+    const versions = v.card.versions.map(({ quote_checked_on: _, ...x }) => x);
+    return { ...v, card: { ...v.card, versions }, current: versions.at(-1)!, ...(matched === null ? {} : { quoteMatched: versions.map(() => matched) }) };
+  };
+  const line = (md: string) => md.split("\n").find((l) => l.includes("https://www.gov.uk/government/news/cheaper-travel-for-millions"));
+
+  it("says the strongest check that holds: an editor's at the source, a machine's in a stored copy, or not yet", async () => {
+    const s = await site("public-ledger");
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const md = (x: CardView, locale = "en") => line(cardMarkdown(x, { config: s.config, w: words(s.config, locale), today: s.today }));
+    expect(quoteState(v)).toEqual({ kind: "checked", on: "2026-10-06" });
+    expect(md(v)).toContain("(checked word for word at its source on 6 October 2026)");
+    expect(md({ ...v, quoteMatched: [true] })).toContain("(checked word for word at its source on 6 October 2026)");
+    expect(md(unchecked(v, true))).toContain("(matches a stored copy of its source word for word)");
+    expect(md(unchecked(v, false))).toContain("(not yet checked against its source)");
+    expect(md(unchecked(v, null))).toContain("(not yet checked against its source)");
+    expect(md(unchecked(v, true), "ru")).toContain("дословно совпадает с сохранённой копией источника");
+  });
+
+  it("carries each version's machine match from validation into the views", async () => {
+    const s = await site("public-ledger");
+    const { card, actor } = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const actors = new Map([[actor.id, actor]]);
+    expect(cardViews([{ file: "promises/x.yaml", where: "promises", card, quoteMatched: [true] }], actors)[0]!.quoteMatched).toEqual([true]);
+    expect(cardViews([card], actors)[0]!.quoteMatched).toBeUndefined();
+  });
+
+  it("words the editors line from the site's own settings", () => {
+    const method = (editorial: Record<string, unknown>, locale = "en", messages?: Record<string, Record<string, string>>) => {
+      const config = resolveConfig({ site: { name: "T" }, editorial, ...(messages ? { messages } : {}) });
+      return methodMarkdown({ config, w: words(config, locale), today: "2026-10-20" }).at(-1);
+    };
+    expect(method({})).toBe("- Every card needs the approval of two editors before it is published. No editor approves a card about their own party.");
+    expect(method({ approvals: 1 })).toBe("- Every card needs the approval of one editor before it is published. No editor approves a card about their own party.");
+    expect(method({ approvals: 3 })).toBe("- Every card needs the approval of 3 editors before it is published. No editor approves a card about their own party.");
+    expect(method({ approvals: 1, publish: "checked" })).toBe(
+      "- A card is published once it passes every automatic check, which includes finding its words, word for word, in a stored copy of its source; a card sent in by a reader also needs the approval of one editor. No editor approves a card about their own party.",
+    );
+    expect(method({ approvals: 1 }, "ru")).toBe("- Каждой карточке перед публикацией нужно одобрение одного редактора. Ни один редактор не одобряет карточку о своей партии.");
+    expect(method({ approvals: 2 }, "ru")).toContain("одобрение двух редакторов.");
+    expect(method({ approvals: 5 }, "ru")).toContain("одобрение 5 редакторов.");
+    expect(method({ approvals: 21 }, "ru")).toContain("одобрение 21 редактора.");
+    // A site that sets its own line gets it as written.
+    expect(method({ approvals: 1 }, "en", { en: { "md.method.editors": "One editor approves each card." } })).toBe("- One editor approves each card.");
   });
 });
 

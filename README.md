@@ -121,7 +121,7 @@ From then on its history only grows: a status change is a new event with an `evi
 |---|---|
 | `openpromises validate` | Checks every card, draft, actor and the editors list against the format and the rules; compares published cards with the base branch (`VALIDATE_BASE`, then `origin/$GITHUB_BASE_REF`, then `origin/main`). Exits non-zero on any error. |
 | `openpromises new <id>` | Writes a new draft card to fill in. |
-| `openpromises review <id> --by <editor>` | Records an editor's approval in the card (`--on` for one given earlier); on the last approval needed, moves it from `drafts/` to `promises/`. |
+| `openpromises review <id> --by <editor>` | Records an editor's approval in the card (`--on` for one given earlier); on the last approval needed, moves it from `drafts/` to `promises/`. `--quote-checked` also records that the editor checked the words at the source, on a published card too, and from an editor who already approved it records only that check. |
 | `openpromises check-quote <id> --text <file>` | Checks a card's quote against a stored copy of its source: exact, close or none. |
 | `openpromises deadlines` | Appends an automatic `deadline_missed` event to every open card whose deadline has passed. |
 | `openpromises lint` | Finds judgement words in our own text, per language; quotes are skipped. |

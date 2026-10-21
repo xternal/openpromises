@@ -4,6 +4,22 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+Decision 35, and the editors line in the Markdown.
+
+- **An editor's quote check can be recorded on a published card** (decision 35). `versions[n].quote_checked_on` is now a late field (docs/FORMAT.md §9): it may be filled in once on a published version that has none (absent or `null`), with no correction; once it has a day, changing it is a correction as before. `openpromises review --quote-checked`:
+  - works on published cards, filling in `quote_checked_on` on each version that has none (it used to refuse and ask for a correction);
+  - from an editor who has already approved the card, records only the check, with no second approval (it used to refuse), and then refuses `--note`, since a note belongs to an approval;
+  - takes `--on YYYY-MM-DD` for a check made earlier: never in the future, and never before the version was recorded (it used to refuse `--on` with `--quote-checked`).
+- **Every card says what was checked of its quote** (decision 35). Beside the quote's source, `PromiseCard` and the Markdown's quote-source line say the strongest check that holds: "Quote checked word for word at its source on 20 October 2026" (an editor's `quote_checked_on`; the page used to say nothing here), else the new "Quote matches a stored copy of its source word for word" (a `source_text` span or an `exact` archive check, both of which the quotes rule already accepted), else "Quote not yet checked against its source", as before. The card's list of checks says the same for each version. New in `@openpromises/core`: `quoteMatched()`, and `quoteMatched` on each card `validateContent()` returns; in `@openpromises/publish`: `quoteMatched` on each view, `quoteState()` and `quoteStateText()`; messages `card.quote_matched` and `md.quote_matched`, in English and Russian.
+- **The editors line follows the site's settings.** The method in each card's Markdown and in `llms-full.txt` said "Two editors approve every card…" on every site. It is now worded from `editorial.approvals` and `editorial.publish`: "Every card needs the approval of one editor before it is published. No editor approves a card about their own party.", or two editors, or "3 editors"; with `publish: "checked"`, that a card is published once it passes every automatic check and that a reader's submission also needs the approval. New messages `md.method.editors.approved`, `md.method.editors.checked`, `md.method.editors.party` and `md.method.editors.count.*` (English `.1`, `.2`, `.one`, `.other`; Russian also `.few` and `.many`). `md.method.editors` is no longer built in; a site that sets it still gets its own words.
+
+### Upgrading from 0.14.1
+
+- **No configuration needed.** The card format is unchanged: every valid card stays valid.
+- **New words on card pages.** A card whose quote an editor checked now says so beside its source, where it said nothing; a card whose words a machine matched in a stored copy says "Quote matches a stored copy of its source word for word" instead of "Quote not yet checked against its source". The match comes with the cards `validateContent()` returns, so views made with `cardViews(result.cards, …)` carry it; views made from bare cards fall back to the editor's check alone. A site with its own `messages` may set `card.quote_matched` and `md.quote_matched`.
+- **The editors line in the Markdown** now matches each site's `editorial` settings. **USLedger.org** can remove its `md.method.editors` override from `messages`: the built-in line now says one editor approves every card. Its override also says the editor is named on every card and declares no US party; keep it only to keep those words.
+- **To record a quote check made after publishing:** `openpromises review <card id> --by "<editor>" --quote-checked --on YYYY-MM-DD`, in a pull request of its own; `validate` passes it, since filling in the check once needs no correction.
+
 ## 0.14.1 (20 October 2026)
 
 A fix to quote checks.
