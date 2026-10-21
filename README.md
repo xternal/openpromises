@@ -150,4 +150,4 @@ OpenPromises is extracted from three promise trackers that wrote the same rules 
 
 [Apache License 2.0](LICENSE). The test fixtures copied from LedgerGov.UK and BoroughBook.UK are under CC BY 4.0 ([fixtures/README.md](fixtures/README.md)).
 
-Made by [Pavel Guzhikov](https://guzh.uk) · [Buy me a coffee](https://ko-fi.com/pavelg)
+Made by [Pavel Guzhikov](https://guzh.uk) · [Buy me a matcha](https://ko-fi.com/pavelg)
