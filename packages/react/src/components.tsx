@@ -452,12 +452,6 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
                   <strong>{w.t("card.cost_method")}:</strong> {pick(cost.method, L, config)}
                 </p>
               )}
-
-          {config.comparisons && (cost?.range || params?.capital_cost?.range) && (
-            <Section id={id("compare")} title={w.t("compare.title")}>
-              <Comparisons view={view} config={config} locale={L} />
-            </Section>
-          )}
               {cost.sources?.length ? (
                 <ul className="op-links" aria-label={w.t("card.cost_sources")}>
                   {cost.sources.map((s) => (
@@ -469,6 +463,12 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
                   ))}
                 </ul>
               ) : null}
+            </Section>
+          )}
+
+          {config.comparisons && (cost?.range || params?.capital_cost?.range) && (
+            <Section id={id("compare")} title={w.t("compare.title")}>
+              <Comparisons view={view} config={config} locale={L} />
             </Section>
           )}
 

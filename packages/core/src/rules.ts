@@ -648,6 +648,16 @@ const modules: Rule = {
       ...card.versions.flatMap((v, i): [Path, NonNullable<Card["sources"]>[number]][] =>
         v.parameters?.baseline ? [[["versions", i, "parameters", "baseline", "source"], v.parameters.baseline.source]] : [],
       ),
+      ...card.versions.flatMap((v, i) => {
+        const e = v.parameters?.estimate;
+        const at: Path = ["versions", i, "parameters", "estimate"];
+        const lists: [Path, NonNullable<Card["sources"]> | undefined][] = [
+          [[...at, "people", "staff", "sources"], e?.people?.staff?.sources],
+          [[...at, "people", "reached", "sources"], e?.people?.reached?.sources],
+          [[...at, "time", "lead", "sources"], e?.time?.lead.sources],
+        ];
+        return lists.flatMap(([path, list]) => (list ?? []).map((s, j): [Path, typeof s] => [[...path, j], s]));
+      }),
     ];
     for (const [path, s] of sources) {
       if ((s.kind || s.designation) && !on.has("designations")) off("designations", path);

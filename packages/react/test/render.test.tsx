@@ -199,6 +199,32 @@ describe("Comparisons (decision 28)", () => {
     expect(renderToStaticMarkup(<PromiseCard view={v} config={{ ...s.config, comparisons }} today={s.today} />)).toContain("What the cost compares with");
     expect(renderToStaticMarkup(<Comparisons view={v} config={s.config} />)).toBe("");
   });
+
+  it("puts the comparisons beside the cost section, not inside it, and shows them for a bare range", async () => {
+    const { resolveConfig } = await import("@openpromises/core");
+    const s = await site("public-ledger");
+    const source = { title: "Pay scales", url: "https://example.org/pay", quality: "sourced" };
+    const comparisons = resolveConfig({
+      site: { name: "T" },
+      comparisons: {
+        units: (["nurse", "teacher", "pension"] as const).map((id) => ({ id, label: { en: { one: id, other: `${id}s` } }, cost: [32_000, 35_000, 39_000] as [number, number, number], type: "recurring" as const, price_year: "2026-27", source })),
+      },
+    }).comparisons;
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const config = { ...s.config, comparisons };
+    const out = renderToStaticMarkup(<PromiseCard view={v} config={config} today={s.today} />);
+    const cost = out.indexOf(`<h2 id="op-cost-${v.id}">`);
+    const compare = out.indexOf(`<h2 id="op-compare-${v.id}">`);
+    expect(cost).toBeGreaterThan(-1);
+    expect(compare).toBeGreaterThan(out.indexOf("</section>", cost));
+
+    const { note, method, sources, ...range } = v.current.parameters!.cost!;
+    void note, void method, void sources;
+    const bare = { ...v, current: { ...v.current, parameters: { ...v.current.parameters, cost: range } } };
+    const shown = renderToStaticMarkup(<PromiseCard view={bare} config={config} today={s.today} />);
+    expect(shown).not.toContain(`id="op-cost-${v.id}"`);
+    expect(shown).toContain("What the cost compares with");
+  });
 });
 
 describe("what delivery takes (decision 28)", () => {

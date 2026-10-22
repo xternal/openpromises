@@ -19,6 +19,7 @@ import {
   eventLabel,
   indexNowPayload,
   jsonLdText,
+  lastUpdated,
   llmsTxt,
   longDate,
   methodMarkdown,
@@ -399,6 +400,15 @@ describe("sitemap and IndexNow", () => {
     expect(entries[0]).toMatchObject({ loc: "https://example.org/promises", alternates: { ru: "https://example.org/promises", en: "https://example.org/en/promises" } });
     expect(entries.some((e) => e.loc.includes("example-party-c-tax-2026"))).toBe(false);
     expect(xmlOk(sitemapXml(entries))).toBe(true);
+  });
+
+  it("counts a quote check recorded on its own as a change (decision 35)", async () => {
+    const s = await site("public-ledger");
+    const c = s.views.find((v) => v.id === "uk-bus-cap-2-2026")!.card;
+    const before = lastUpdated(c, "2099-01-01")!;
+    const checked = { ...c, versions: c.versions.map((v, i) => (i === 0 ? { ...v, quote_checked_on: "2098-12-31" } : v)) };
+    expect(lastUpdated(checked, "2099-01-01")).toBe("2098-12-31");
+    expect(lastUpdated(checked, "2098-12-30")).toBe(before <= "2098-12-30" ? before : undefined);
   });
 
   it("names the pages a change touches, and submits only the site's own", async () => {
