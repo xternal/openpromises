@@ -635,7 +635,7 @@ describe("modules", () => {
     ]);
   });
 
-  it("checks the sources of an estimate too", () => {
+  it("checks the sources of an estimate too, with warnings until 0.17.0", () => {
     const designations = resolveConfig({ ...CONFIG_INPUT, modules: ["designations"] });
     const off = resolveConfig({ ...CONFIG_INPUT, modules: [] });
     const media = { title: "Outlet", url: "https://example.org/o", kind: "media" as const };
@@ -647,12 +647,14 @@ describe("modules", () => {
       };
     });
     const at = "versions.0.parameters.estimate";
-    expect(check(c, { config: designations }).filter((i) => i.rule === "modules").map((i) => i.path.join("."))).toEqual([
-      `${at}.people.staff.sources.0.designation`,
-      `${at}.people.reached.sources.0.designation`,
-      `${at}.time.lead.sources.0.designation`,
+    expect(check(c, { config: designations }).filter((i) => i.rule === "modules").map((i) => `${i.severity} ${i.path.join(".")}`)).toEqual([
+      `warning ${at}.people.staff.sources.0.designation`,
+      `warning ${at}.people.reached.sources.0.designation`,
+      `warning ${at}.time.lead.sources.0.designation`,
     ]);
-    expect(ruleIssues("modules", c, { config: off })).toContain(`${at.replaceAll(".0.", "[0].")}.people.staff.sources[0]: uses the "designations" module, which the configuration does not turn on (modules)`);
+    expect(ruleIssues("modules", c, { config: off })).toContain(
+      `${at.replaceAll(".0.", "[0].")}.people.staff.sources[0]: uses the "designations" module, which the configuration does not turn on (modules); this becomes an error in 0.17.0`,
+    );
   });
 });
 

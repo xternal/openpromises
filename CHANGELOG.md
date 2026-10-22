@@ -4,7 +4,9 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
-Decision 36: the forecast at the time, and circumstances changed.
+## 0.16.0 (22 October 2026)
+
+Decision 36: the forecast at the time, and circumstances changed; five fixes from an outside audit.
 
 - **A baseline on each version** (decision 36). `versions[n].parameters.baseline` records what an official or independent forecaster expected for the promise's measure, published before the promise: `value`, `unit`, `for` (the date it is for), `by` (`{ kind: official | independent, name }`), `published_on`, `source` and an optional `note`. A new rule, `baseline`, refuses one published after the version was recorded, and one in another unit than the version's target. It is a late field (docs/FORMAT.md §9): it may be added once to a published version with no correction. With the designations module, its source needs a kind like any other.
 - **A new event type, `circumstances_changed`** (decision 36): something outside the speaker's hands changed what the promise could mean. It needs an `evidence_url` and never moves the status. Shown as "Circumstances changed" ("Обстоятельства изменились").
@@ -13,14 +15,14 @@ Decision 36: the forecast at the time, and circumstances changed.
 Fixes:
 
 - **"What the cost compares with" is its own section again.** In `PromiseCard` it sat inside "About the cost": a card whose cost had a range but no note, method or sources lost its comparisons, and otherwise they were nested in the cost section, ahead of its sources. It now follows "About the cost", as in the card's Markdown. Only sites that set `comparisons` see the change.
-- **The designations module checks an estimate's sources too**: `estimate.people.staff`, `estimate.people.reached` and `estimate.time.lead`. They were skipped, so a source there could miss its kind and designation, or carry one with the module off.
+- **The designations module checks an estimate's sources too**: `estimate.people.staff`, `estimate.people.reached` and `estimate.time.lead`. They were skipped, so a source there could miss its kind and designation, or carry one with the module off. New warnings: these issues on an estimate's sources become errors in 0.17.0.
 - **The YAML writer orders the newer fields**: a cost's `method`, a version's `estimate` and `baseline` and what is inside them, and an editor's `named`. They were written last, in whatever order they came.
 - **`check-quote --record` explains a broken `quotes.json`** (not JSON, or not an object) and says to fix or remove it, instead of passing on the parser's message. A blank file is taken as empty.
 - **A quote check counts as a change to the card.** A `quote_checked_on` recorded on its own (`review --quote-checked` by an editor who has already approved) now moves the card's "Last updated", its `dateModified` and its sitemap `lastmod`.
 
 ### Upgrading from 0.15.0
 
-- **A site with the designations module and sources on an estimate** may now see `modules` errors for those sources; give each a `kind` and, unless it is official, a `designation`. RussiaLedger.com, the one site with the module, has no estimates.
+- **A site with the designations module and sources on an estimate** may now see `modules` warnings for those sources, which become errors in 0.17.0; give each a `kind` and, unless it is official, a `designation`. RussiaLedger.com, the one site with the module, has no estimates.
 - **No configuration needed.** The card format only grows: every valid card stays valid. A site with a custom ladder that has a status called `circumstances_changed` must rename it, since that is now an event type.
 - **The open-data CSV has six more columns at the end**; no column moves.
 
