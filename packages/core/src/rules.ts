@@ -82,6 +82,7 @@ export function* langMaps(card: Card, defaultLocale: string): Generator<LangMapA
     yield* ours(["versions", i, "parameters", "cost", "method"], p.cost?.method);
     yield* ours(["versions", i, "parameters", "capital_cost", "note"], p.capital_cost?.note);
     yield* ours(["versions", i, "parameters", "capital_cost", "method"], p.capital_cost?.method);
+    yield* ours(["versions", i, "parameters", "baseline", "note"], p.baseline?.note);
     yield* ours(["versions", i, "parameters", "estimate", "people", "staff", "unit"], p.estimate?.people?.staff?.unit);
     yield* ours(["versions", i, "parameters", "estimate", "people", "reached", "unit"], p.estimate?.people?.reached?.unit);
   }
@@ -175,7 +176,7 @@ const headline: Rule = {
 
 /** Whether an event of this type needs an evidence link (principle 2). */
 export function needsEvidence(config: Config, type: string): boolean {
-  if (type === "reworded" || type === "restated" || type === "reply") return true;
+  if (type === "reworded" || type === "restated" || type === "reply" || type === "circumstances_changed") return true;
   const category = categoryOf(config, type);
   return category === "progress" || category === "finished";
 }
@@ -644,6 +645,9 @@ const modules: Rule = {
       ...card.versions.flatMap((v, i) =>
         (["cost", "capital_cost"] as const).flatMap((k) => (v.parameters?.[k]?.sources ?? []).map((s, j): [Path, typeof s] => [["versions", i, "parameters", k, "sources", j], s])),
       ),
+      ...card.versions.flatMap((v, i): [Path, NonNullable<Card["sources"]>[number]][] =>
+        v.parameters?.baseline ? [[["versions", i, "parameters", "baseline", "source"], v.parameters.baseline.source]] : [],
+      ),
     ];
     for (const [path, s] of sources) {
       if ((s.kind || s.designation) && !on.has("designations")) off("designations", path);
@@ -656,6 +660,27 @@ const modules: Rule = {
     }
     return out;
   },
+};
+
+// ---------------------------------------------------------------- the forecast at the time
+
+const baseline: Rule = {
+  id: "baseline",
+  summary: "A baseline (the independent forecast at the time) was published on or before the day its version was recorded, and is in the same unit as the target.",
+  check: (card) =>
+    card.versions.flatMap((v, i) => {
+      const b = v.parameters?.baseline;
+      if (!b) return [];
+      const at = ["versions", i, "parameters", "baseline"];
+      const out: Issue[] = [];
+      if (b.published_on > v.recorded_on)
+        out.push(
+          issue("baseline", [...at, "published_on"], `is after the promise (${v.recorded_on}); a baseline is a forecast published before it, so nobody can choose it with hindsight`),
+        );
+      const metric = v.parameters?.metric;
+      if (metric && b.unit !== metric.unit) out.push(issue("baseline", [...at, "unit"], `is "${b.unit}", but the target is in "${metric.unit}"; a baseline is for the same measure`));
+      return out;
+    }),
 };
 
 // ---------------------------------------------------------------- who must deliver, and who brought it about
@@ -721,6 +746,7 @@ export const RULES: readonly Rule[] = [
   scoreable,
   cost,
   estimate,
+  baseline,
   corrections,
   approvals,
   standing,

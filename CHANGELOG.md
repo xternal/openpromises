@@ -4,6 +4,17 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+Decision 36: the forecast at the time, and circumstances changed.
+
+- **A baseline on each version** (decision 36). `versions[n].parameters.baseline` records what an official or independent forecaster expected for the promise's measure, published before the promise: `value`, `unit`, `for` (the date it is for), `by` (`{ kind: official | independent, name }`), `published_on`, `source` and an optional `note`. A new rule, `baseline`, refuses one published after the version was recorded, and one in another unit than the version's target. It is a late field (docs/FORMAT.md §9): it may be added once to a published version with no correction. With the designations module, its source needs a kind like any other.
+- **A new event type, `circumstances_changed`** (decision 36): something outside the speaker's hands changed what the promise could mean. It needs an `evidence_url` and never moves the status. Shown as "Circumstances changed" ("Обстоятельства изменились").
+- **Cards show the baseline** as "Forecast at the time" beside the target, with its source and note, in `PromiseCard` and the card's Markdown. New in `@openpromises/publish`: `baselineText()`; messages `card.baseline`, `baseline.text`, `event.circumstances_changed` and `field.baseline`, in English and Russian. The open-data CSV gains six columns at the end: `baseline_value`, `baseline_unit`, `baseline_for`, `baseline_by`, `baseline_published_on` and `baseline_source_url`.
+
+### Upgrading from 0.15.0
+
+- **No configuration needed.** The card format only grows: every valid card stays valid. A site with a custom ladder that has a status called `circumstances_changed` must rename it, since that is now an event type.
+- **The open-data CSV has six more columns at the end**; no column moves.
+
 ## 0.15.0 (21 October 2026)
 
 Decision 35, and the editors line in the Markdown.

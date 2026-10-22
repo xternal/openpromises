@@ -88,7 +88,8 @@ describe("the label in every output", async () => {
     expect(data.verification?.[one.id]?.text.ru).toBe(verificationText(one, c, words(c, "ru")));
     expect(openDataJson(bare, c, "2026-10-12").verification).toBeUndefined();
     const [head, row] = openDataCsv(views, c, w, "2026-10-12").split("\r\n");
-    expect(head!.split(",").slice(-3, -1)).toEqual(["verification_level", "verification"]);
+    const cols = head!.split(",");
+    expect(cols.slice(cols.indexOf("verification_level"), cols.indexOf("verification_level") + 3)).toEqual(["verification_level", "verification", "comparisons"]);
     expect(row).toContain(`,${one.verification!.level},${label}`);
   });
 

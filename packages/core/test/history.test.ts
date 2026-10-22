@@ -156,6 +156,24 @@ describe("late fields (decision 13.1)", () => {
   });
 });
 
+describe("a baseline added after publishing (decision 36)", () => {
+  const baseline = {
+    value: 2.4,
+    unit: "£",
+    for: "2027-01-01",
+    by: { kind: "independent", name: "Transport Research Unit" },
+    published_on: "2026-04-15",
+    source: { title: "Fares outlook", url: "https://example.org/outlook" },
+  };
+  const withBaseline = card((c) => (c.versions[0]!.parameters!.baseline = baseline as never));
+
+  it("may be filled in once on a published version, and is history after that", () => {
+    expect(messages(BASE, withBaseline)).toEqual([]);
+    const changed = card((c) => (c.versions[0]!.parameters!.baseline = { ...baseline, value: 3 } as never));
+    expect(messages(withBaseline, changed)).toHaveLength(1);
+  });
+});
+
 describe("a quote check recorded after publishing (decision 35)", () => {
   const unchecked = card((c) => delete c.versions[0]!.quote_checked_on);
   const asNull = card((c) => (c.versions[0]!.quote_checked_on = null));

@@ -40,8 +40,13 @@ export const PRESETS = {
 } as const satisfies Record<string, readonly LadderStatus[]>;
 export type Preset = keyof typeof PRESETS;
 
-/** Event types that are not statuses. */
-export const EVENT_TYPES = ["promised", "reworded", "restated", "deadline", "deadline_missed", "reply"] as const;
+/**
+ * Event types that are not statuses. `circumstances_changed` records
+ * something outside the speaker's hands that changed what the promise could
+ * mean (a war, a pandemic, a price shock), with its evidence; it never moves
+ * the status (decision 36).
+ */
+export const EVENT_TYPES = ["promised", "reworded", "restated", "deadline", "deadline_missed", "reply", "circumstances_changed"] as const;
 
 /** Status ids the rules give a meaning to. */
 export const PROMISED = "promised";

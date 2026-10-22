@@ -981,6 +981,124 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "baseline": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "number"
+                      },
+                      "unit": {
+                        "type": "string",
+                        "pattern": "\\S"
+                      },
+                      "for": {
+                        "type": "string",
+                        "format": "date",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                      },
+                      "by": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "enum": [
+                              "official",
+                              "independent"
+                            ]
+                          },
+                          "name": {
+                            "type": "string",
+                            "pattern": "\\S"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "name"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "published_on": {
+                        "type": "string",
+                        "format": "date",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                      },
+                      "source": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "pattern": "\\S"
+                          },
+                          "url": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "archived_url": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": [
+                              "official",
+                              "party",
+                              "media",
+                              "independent"
+                            ]
+                          },
+                          "designation": {
+                            "type": "object",
+                            "properties": {
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "none",
+                                  "foreign_agent",
+                                  "undesirable",
+                                  "extremist",
+                                  "unchecked"
+                                ]
+                              },
+                              "checked_on": {
+                                "type": "string",
+                                "format": "date",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                              }
+                            },
+                            "required": [
+                              "status"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "url"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "note": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "pattern": "^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+                        },
+                        "additionalProperties": {
+                          "type": "string",
+                          "pattern": "\\S"
+                        }
+                      }
+                    },
+                    "required": [
+                      "value",
+                      "unit",
+                      "for",
+                      "by",
+                      "published_on",
+                      "source"
+                    ],
+                    "additionalProperties": false
                   }
                 },
                 "additionalProperties": false
