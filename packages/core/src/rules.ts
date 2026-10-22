@@ -640,6 +640,8 @@ const modules: Rule = {
       else if (!card.events.some((e) => e.type === d.event)) add(["links", "decisions", i, "event"], `the card has no "${d.event}" event for this decision`);
     });
 
+    // An estimate's sources were not checked before 0.16.0: their issues are warnings in 0.16.0, errors from 0.17.0 (decision 13.2).
+    const isEstimate = (path: Path) => path[3] === "estimate";
     const sources: [Path, NonNullable<Card["sources"]>[number]][] = [
       ...(card.sources ?? []).map((s, i): [Path, typeof s] => [["sources", i], s]),
       ...card.versions.flatMap((v, i) =>
@@ -660,11 +662,12 @@ const modules: Rule = {
       }),
     ];
     for (const [path, s] of sources) {
-      if ((s.kind || s.designation) && !on.has("designations")) off("designations", path);
+      const [sev, later] = isEstimate(path) ? (["warning", "; this becomes an error in 0.17.0"] as const) : (["error", ""] as const);
+      if ((s.kind || s.designation) && !on.has("designations")) add(path, `uses the "designations" module, which the configuration does not turn on (modules)${later}`, sev);
       else if (on.has("designations")) {
-        if (!s.kind) add([...path, "kind"], "is missing: with the designations module, every source says what kind of publisher it is");
-        else if (s.kind !== "official" && !s.designation) add([...path, "designation"], "is missing: a source that is not official records its designation status");
-        if (s.designation && s.designation.status !== "unchecked" && !s.designation.checked_on) add([...path, "designation", "checked_on"], "is missing: a designation status records when it was checked");
+        if (!s.kind) add([...path, "kind"], `is missing: with the designations module, every source says what kind of publisher it is${later}`, sev);
+        else if (s.kind !== "official" && !s.designation) add([...path, "designation"], `is missing: a source that is not official records its designation status${later}`, sev);
+        if (s.designation && s.designation.status !== "unchecked" && !s.designation.checked_on) add([...path, "designation", "checked_on"], `is missing: a designation status records when it was checked${later}`, sev);
         if (s.designation?.status === "unchecked") add([...path, "designation", "status"], "is still unchecked", "warning");
       }
     }
