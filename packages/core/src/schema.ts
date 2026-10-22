@@ -119,6 +119,34 @@ export const Estimate = z.strictObject({
 });
 export type Estimate = z.infer<typeof Estimate>;
 
+/**
+ * Who made a baseline (decision 36): an official forecaster (OBR, a central
+ * bank, a statistics office) or an independent one (IFS, IMF). Never a party
+ * or the site itself: the point is a yardstick neither side chose.
+ */
+export const BASELINE_MAKERS = ["official", "independent"] as const;
+
+/**
+ * What an independent forecast expected for the promise's measure, published
+ * before the promise was made (decision 36): the yardstick an outcome is read
+ * against, so "it would have been worse without us" can be checked rather
+ * than claimed with hindsight.
+ */
+export const Baseline = z.strictObject({
+  value: z.number(),
+  /** The unit of value, the same as the target's: "%", "weeks". */
+  unit: Text,
+  /** The date the forecast is for. */
+  for: IsoDate,
+  by: z.strictObject({ kind: z.enum(BASELINE_MAKERS), name: Text }),
+  /** When the forecast was published: on or before the day this version was recorded. */
+  published_on: IsoDate,
+  source: Source,
+  /** What the forecast assumes, in the editors' words: "before the measures in the Budget". */
+  note: LangMap.optional(),
+});
+export type Baseline = z.infer<typeof Baseline>;
+
 export const Parameters = z.strictObject({
   who: LangMap.optional(),
   cost: Cost.optional(),
@@ -130,6 +158,8 @@ export const Parameters = z.strictObject({
   metric: Metric.optional(),
   /** What delivery takes: people, time and steps (decision 28). Added 19 October 2026, so a late field (FORMAT.md §9). */
   estimate: Estimate.optional(),
+  /** The independent forecast at the time, without the promise (decision 36). Added 22 October 2026, so a late field (FORMAT.md §9). */
+  baseline: Baseline.optional(),
 });
 export type Parameters = z.infer<typeof Parameters>;
 

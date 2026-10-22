@@ -75,8 +75,9 @@ export const LATE_FIELDS: Readonly<Record<(typeof HISTORY)[number], readonly str
   // Who made a cost's central figure (decision 14), added 9 October 2026;
   // how it was worked out (decision 28), added 18 October 2026; what
   // delivery takes (decision 28), added 19 October 2026; when an editor
-  // checked the words at their source (decision 35), from 20 October 2026.
-  versions: [".parameters.cost.by", ".parameters.cost.method", ".parameters.estimate", ".quote_checked_on"],
+  // checked the words at their source (decision 35), from 20 October 2026;
+  // the forecast at the time (decision 36), added 22 October 2026.
+  versions: [".parameters.cost.by", ".parameters.cost.method", ".parameters.estimate", ".quote_checked_on", ".parameters.baseline"],
   events: [],
   replies: [],
 };

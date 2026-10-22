@@ -5,7 +5,7 @@ import { estimateWords } from "./estimate";
 import { costFacts, costText, longDate } from "./format";
 import type { Words } from "./messages";
 import { absolute, paths } from "./urls";
-import { actorName, areaLabel, cardCostText, climb, countedEditor, eventLabel, headline, lastUpdated, metricText, pick, quoteIn, quoteLicence, quoteState, quoteStateText, reviewerName, statusMix, verificationText, type CardView } from "./view";
+import { actorName, areaLabel, baselineText, cardCostText, climb, countedEditor, eventLabel, headline, lastUpdated, metricText, pick, quoteIn, quoteLicence, quoteState, quoteStateText, reviewerName, statusMix, verificationText, type CardView } from "./view";
 
 /**
  * Promise cards as Markdown, for AI assistants and anyone who reads plain
@@ -96,6 +96,12 @@ export function cardMarkdown(v: CardView, ctx: MdContext, level: 1 | 2 = 1): str
       "card.target",
       metric
         ? `${metricText(metric, w)}${measurement ? `. ${w.t(`card.measurement.${measurement.status}`)}${measurement.since ? ` ${w.t("card.measurement_since", { date: longDate(w, measurement.since) })}` : ""}${measurement.note ? `: ${pick(measurement.note, L, config)}` : ""}` : ""}`
+        : null,
+    ],
+    [
+      "card.baseline",
+      params?.baseline
+        ? `${baselineText(params.baseline, w)} (${link(params.baseline.source.title, params.baseline.source.url)})${params.baseline.note ? `: ${pick(params.baseline.note, L, config)}` : ""}`
         : null,
     ],
     ["card.who", pick(params?.who, L, config) ?? null],

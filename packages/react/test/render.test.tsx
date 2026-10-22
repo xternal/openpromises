@@ -7,6 +7,23 @@ import { site } from "../../publish/test/helpers";
 const html = (node: React.ReactNode) => renderToStaticMarkup(<>{node}</>);
 
 describe("PromiseCard", () => {
+  it("shows the forecast at the time beside the target (decision 36)", async () => {
+    const s = await site("public-ledger");
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const baseline = {
+      value: 2.8,
+      unit: "£",
+      for: "2027-03-31",
+      by: { kind: "independent" as const, name: "Transport Research Unit" },
+      published_on: "2026-07-01",
+      source: { title: "Bus fares outlook", url: "https://example.org/outlook" },
+    };
+    const current = { ...v.current, parameters: { ...v.current.parameters!, baseline } };
+    const out = html(<PromiseCard view={{ ...v, current, card: { ...v.card, versions: [...v.card.versions.slice(0, -1), current] } }} config={s.config} today={s.today} />);
+    expect(out).toContain("Forecast at the time");
+    expect(out).toContain('2.8 £ by 31 March 2027, as forecast by Transport Research Unit on 1 July 2026, before the promise (<a href="https://example.org/outlook">Bus fares outlook</a>)');
+  });
+
   it("renders a LedgerGov.UK card in its reading order, with no script", async () => {
     const s = await site("public-ledger");
     const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;

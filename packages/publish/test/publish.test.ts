@@ -16,6 +16,7 @@ import {
   costText,
   csvField,
   endings,
+  eventLabel,
   indexNowPayload,
   jsonLdText,
   llmsTxt,
@@ -239,6 +240,39 @@ describe("structured data", () => {
 
   it("is safe inside a script element", () => {
     expect(jsonLdText({ text: "</script><script>alert(1)" })).toBe('{"text":"\\u003c/script>\\u003cscript>alert(1)"}');
+  });
+});
+
+describe("the forecast at the time, and circumstances changed (decision 36)", () => {
+  const baseline = {
+    value: 2.8,
+    unit: "£",
+    for: "2027-03-31",
+    by: { kind: "independent" as const, name: "Transport Research Unit" },
+    published_on: "2026-07-01",
+    source: { title: "Bus fares outlook", url: "https://example.org/outlook" },
+    note: { en: "Fares with no cap" },
+  };
+
+  it("shows the forecast on the card, in the Markdown and in the open data", async () => {
+    const s = await site("public-ledger");
+    const v = s.views.find((x) => x.id === "uk-bus-cap-2-2026")!;
+    const current = { ...v.current, parameters: { ...v.current.parameters!, baseline } };
+    const with36 = { ...v, current, card: { ...v.card, versions: [...v.card.versions.slice(0, -1), current] } };
+    const w = words(s.config, "en");
+    const md = cardMarkdown(with36, { config: s.config, w, today: s.today });
+    expect(md).toContain(
+      "- **Forecast at the time:** 2.8 £ by 31 March 2027, as forecast by Transport Research Unit on 1 July 2026, before the promise ([Bus fares outlook](https://example.org/outlook)): Fares with no cap",
+    );
+    const [head, row] = openDataCsv([with36], s.config, w, s.today).split("\r\n");
+    expect(head!.split(",").slice(-6)).toEqual(["baseline_value", "baseline_unit", "baseline_for", "baseline_by", "baseline_published_on", "baseline_source_url"]);
+    expect(row!.endsWith(",2.8,£,2027-03-31,Transport Research Unit,2026-07-01,https://example.org/outlook")).toBe(true);
+  });
+
+  it("names the event in neutral words, in every language", async () => {
+    const s = await site("public-ledger");
+    expect(eventLabel(s.config, words(s.config, "en"), "circumstances_changed")).toBe("Circumstances changed");
+    expect(eventLabel(s.config, words(s.config, "ru"), "circumstances_changed")).toBe("Обстоятельства изменились");
   });
 });
 
@@ -493,6 +527,21 @@ describe("what LedgerGov.UK showed the dry run was missing", () => {
   it("adds the new open-data columns at the end, so no column moves", async () => {
     const s = await site("public-ledger");
     const header = openDataCsv(s.views, s.config, words(s.config, "en"), s.today).split("\r\n")[0]!.split(",");
-    expect(header.slice(-8)).toEqual(["last_updated", "cost_by_kind", "cost_by_name", "responsible_id", "brought_about_by_id", "verification_level", "verification", "comparisons"]);
+    expect(header.slice(-14)).toEqual([
+      "last_updated",
+      "cost_by_kind",
+      "cost_by_name",
+      "responsible_id",
+      "brought_about_by_id",
+      "verification_level",
+      "verification",
+      "comparisons",
+      "baseline_value",
+      "baseline_unit",
+      "baseline_for",
+      "baseline_by",
+      "baseline_published_on",
+      "baseline_source_url",
+    ]);
   });
 });

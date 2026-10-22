@@ -157,6 +157,15 @@ Everything is built from the published cards alone, the same way for every actor
 
 Decided by Pavel Guzhikov on 20 October 2026 ("5 fix if something useful needed, yes").
 
+## Accepted on 22 October 2026
+
+**36. A promise is read against the forecast made at the time, and a card can say when circumstances changed.** On 22 October 2026 Pavel Guzhikov brought a critique from a public discussion: a promise tracker punishes a government that promised 3% inflation and got 5%, though without its measures it might have been 12%; promises are made with incomplete information; and a tracker of targets risks becoming a Gosplan, where boxes are ticked and life is ignored. Two of these are gaps in the format: a card had no way to show what was expected without the promise, and no way to record that the world changed after it. A counterfactual offered after the fact ("without us it would have been 12%") cannot be checked and excuses any failure; a forecast published before the promise can be. Decided:
+- `versions[n].parameters.baseline`: what an official or independent forecaster expected for the promise's measure, published on or before the day the version was recorded, with its value, unit, the date it is for, who made it, when, its source and an optional note on what it assumes. Never a party's figure or the site's own: the point is a yardstick neither side chose. In the target's unit when the version has one. A late field (FORMAT.md §9), so it can be added to published cards.
+- A new engine event type, `circumstances_changed`: something outside the speaker's hands that changed what the promise could mean (a war, a pandemic, a price shock), dated, in neutral words, with its evidence. It never moves the status: the reader sees what changed and when, and judges.
+- Cards show the baseline as "Forecast at the time" beside the target, with its source, in the page, the Markdown and six new open-data columns. The engine never scores a promise against it, and never says whether a change of circumstances excuses anything (principle 5).
+
+The answer to the Gosplan worry stays what it was: the targets are the speakers' own words, the site sets none, and every figure has its source. Decided by Pavel Guzhikov on 22 October 2026 ("Draft decision 36: a baseline field (the independent forecast made at the time of the promise, with its source and date) and an 'overtaken by events' note. Branch and PR, no release yet.").
+
 ## Proposed, waiting for the owner
 
 None.

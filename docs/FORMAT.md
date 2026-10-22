@@ -184,6 +184,7 @@ A version is the promise as worded once. Rewording a promise, or moving its dead
 | `funding_verifiable` | `true` or `false` | `false` when the money sits where open documents cannot show it. |
 | `metric` | metric | With the `metrics` module: an indicator target (§10). |
 | `estimate` | estimate | What delivery takes (decision 28): people, time and steps. See below. |
+| `baseline` | baseline | The independent forecast at the time, without the promise (decision 36). See below. |
 
 A **cost** is a range, never a single figure:
 
@@ -230,6 +231,21 @@ estimate:
 ```
 
 People and months are low–high ranges in order, and a count of people names its sources, as does a time taken from an official plan. A `path` step is one of the configured delivery steps (`delivery.steps`, §2; built in: `primary_legislation`, `secondary_legislation`, `budget_line`, `procurement`, `planning_consent`, `new_body`, `recruitment`), listed once; a step is met only by a timeline event with evidence (`met_by_event`, its index in `events`), so the path never moves on our say-so. `referenceClass(cards, area, config)` in `@openpromises/core` gives how long similar promises took: how many cards in the area, how many finished and their median months, and nothing below 10 cards. Added 19 October 2026, so a late field (§9).
+
+A **baseline** is what an official or independent forecaster expected for the promise's measure, published before the promise was made (decision 36). It is the yardstick an outcome is read against: promised 3%, forecast at the time 6%, now 5%. A forecast made after the promise could be chosen to fit the outcome, so the engine accepts only one published on or before the day the version was recorded.
+
+```yaml
+baseline:
+  value: 6
+  unit: "%"                    # the same unit as the target (metric.unit)
+  for: "2027-03-31"            # the date the forecast is for
+  by: { kind: official, name: OBR }   # official or independent; never a party or the site itself
+  published_on: "2026-03-03"   # on or before the version's recorded_on
+  source: { title: "OBR: Economic and fiscal outlook, March 2026", url: "https://obr.uk/…" }
+  note: { en: "CPI inflation before the measures in the Budget." }
+```
+
+The card shows it beside the target as "Forecast at the time", with its source, and the open data has it in six CSV columns (`baseline_value` to `baseline_source_url`). The engine records it and never scores against it: whether the gap between forecast and outcome is the promise's doing is for the reader. Added 22 October 2026, so a late field (§9).
 
 ## 6. Status ladder
 
@@ -292,6 +308,7 @@ The timeline, oldest first.
 | `reply` | The actor replied (§8). | **yes** |
 | `deadline` | A marker for the day the promise is due. It may be dated in the future. | no |
 | `deadline_missed` | The deadline passed with no evidence of delivery (automatic). | no |
+| `circumstances_changed` | Something outside the speaker's hands changed what the promise could mean: a war, a pandemic, a price shock (decision 36). It never moves the status, and its text says what changed, not whether it excuses anything. | **yes** |
 
 ## 8. Replies
 
@@ -341,6 +358,7 @@ Two checks hold every correction to account: the card's field must equal the `no
 | `versions[n].parameters.cost.method` | 18 October 2026 (decision 28) |
 | `versions[n].parameters.estimate` | 19 October 2026 (decision 28) |
 | `versions[n].quote_checked_on` | 20 October 2026 (decision 35): a check made after the card was published, recorded with `openpromises review --quote-checked` (`--on` for the day it was made, never before the version was recorded) |
+| `versions[n].parameters.baseline` | 22 October 2026 (decision 36) |
 
 A site converted from an older format (its `legacy` setting) may also fill in, once, the fields that format had no place for (decision 15). The list is the engine's, per format, so no site can make its own history editable. Keep `legacy` in the configuration after converting, so these stay allowed.
 
@@ -457,6 +475,7 @@ error  content/promises/uk-bus-cap.yaml  events[1].evidence_url: an "in_plan" ev
 | `scoreable` | The current version has parameters, unless the card is `unscoreable`; an `unscoreable` card has none. |
 | `cost` | Every cost with a range has low less than high, the central figure between them, a quality label from `money.qualities` and at least one source; a cost without a range has a note. `by` goes only with a range, and every yearly cost with a range has one when `money.costedBy` is `required`. |
 | `estimate` | People and months are ranges in order, with sources for people and an official plan; every delivery-path step is configured and listed once; a step met by an event points to an event with evidence. |
+| `baseline` | A baseline was published on or before the day its version was recorded, and is in the same unit as the target. |
 | `corrections` | Each correction names a field that exists, and the field equals the `now` of its last correction. |
 | `approvals` | A published card has enough approvals, from listed editors, made while they were editors, none from an editor about their own party; automated reviews never approve. With `editorial.publish: checked`, only a reader's submission or a card with no `origin` needs them (decision 22). |
 | `standing` | The `not_in_power` rule (§11). |

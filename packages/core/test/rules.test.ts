@@ -60,7 +60,7 @@ describe("vocabulary", () => {
       'venue: "tv" is not a venue in the configuration (manifesto, speech)',
       'area: "defence" is not an area in the configuration (health, transport)',
       'status: "budgeted" is not a status on the national ladder (promised, in_plan, legislated, funded, delivering, delivered, failed, quietly_dropped, unscoreable)',
-      'events[1].type: "approved" is not an event type: use a status on the national ladder or one of promised, reworded, restated, deadline, deadline_missed, reply',
+      'events[1].type: "approved" is not an event type: use a status on the national ladder or one of promised, reworded, restated, deadline, deadline_missed, reply, circumstances_changed',
     ]);
   });
 
@@ -357,6 +357,53 @@ describe("estimate (decision 28)", () => {
   it("takes a site's own steps", () => {
     const own = resolveConfig({ ...CONFIG_INPUT, delivery: { steps: { council_vote: { en: "Council vote" } } } });
     expect(ruleIssues("estimate", est({ path: [{ step: "council_vote" }, { step: "procurement" }] }), { config: own })).toEqual([]);
+  });
+});
+
+describe("baseline (decision 36)", () => {
+  const good = {
+    value: 2.4,
+    unit: "£",
+    for: "2027-01-01",
+    by: { kind: "independent", name: "Transport Research Unit" },
+    published_on: "2026-04-15",
+    source: { title: "Fares outlook, April 2026", url: "https://example.org/outlook" },
+    note: { en: "Fares if nothing changes" },
+  };
+  const withBaseline = (b: Record<string, unknown>, metric?: Record<string, unknown>) =>
+    card((c) => {
+      c.versions[0]!.parameters!.baseline = b as never;
+      if (metric) c.versions[0]!.parameters!.metric = metric as never;
+    });
+
+  it("passes a forecast published before the promise, in the target's unit", () => {
+    expect(ruleIssues("baseline", withBaseline(good, { series_id: "fares", target: 2, direction: "at_most", unit: "£", by: "2027-01-01" }))).toEqual([]);
+    expect(check(withBaseline(good))).toEqual([]);
+  });
+
+  it("fails a forecast chosen with hindsight, or for another measure", () => {
+    expect(ruleIssues("baseline", withBaseline({ ...good, published_on: "2026-06-01" }, { series_id: "fares", target: 2, direction: "at_most", unit: "pence", by: "2027-01-01" }))).toEqual([
+      "versions[0].parameters.baseline.published_on: is after the promise (2026-05-02); a baseline is a forecast published before it, so nobody can choose it with hindsight",
+      'versions[0].parameters.baseline.unit: is "£", but the target is in "pence"; a baseline is for the same measure',
+    ]);
+  });
+
+  it("is made by an official or independent forecaster, never a party or the site", () => {
+    expect(ruleIssues("schema", withBaseline({ ...good, by: { kind: "party", name: "Labour" } }))).toHaveLength(1);
+    expect(ruleIssues("schema", withBaseline({ ...good, by: { kind: "editorial", name: "Us" } }))).toHaveLength(1);
+  });
+
+  it("writes its note in every language", () => {
+    expect(ruleIssues("languages", withBaseline({ ...good, note: { ru: "Тарифы" } }))).toContain('versions[0].parameters.baseline.note.en: has no "en" text; every text we write has en');
+  });
+});
+
+describe("circumstances changed (decision 36)", () => {
+  it("needs its evidence, and leaves the status alone", () => {
+    const c = card((c) => c.events.push({ date: "2026-07-01", type: "circumstances_changed", text: { en: "Fuel prices doubled" } }));
+    expect(ruleIssues("evidence", c)).toEqual(['events[2].evidence_url: a "circumstances_changed" event needs an evidence_url: the document that shows it happened']);
+    const ok = card((c) => c.events.push({ date: "2026-07-01", type: "circumstances_changed", text: { en: "Fuel prices doubled" }, evidence_url: "https://example.org/fuel" }));
+    expect(check(ok)).toEqual([]);
   });
 });
 

@@ -96,7 +96,7 @@ describe("comparisons in every output", async () => {
     expect(data.comparisons?.[v.id]?.cost.map((x) => x.text.en)).toEqual(lines);
     expect(openDataJson(s.views, s.config, s.today).comparisons).toBeUndefined();
     const [head, ...rows] = openDataCsv(s.views, c, w, s.today).split("\r\n");
-    expect(head!.split(",").at(-1)).toBe("comparisons");
+    expect(head!.split(",").at(-7)).toBe("comparisons");
     expect(rows.find((r) => r.startsWith(`${v.id},`))).toContain(`"${lines.join("; ")}"`);
   });
 });

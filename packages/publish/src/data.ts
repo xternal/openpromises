@@ -122,6 +122,13 @@ export const CSV_COLUMNS = [
   "verification",
   // Added in 0.8.0 (decision 28); empty without a basket.
   "comparisons",
+  // Added in 0.16.0 (decision 36): the forecast at the time, without the promise.
+  "baseline_value",
+  "baseline_unit",
+  "baseline_for",
+  "baseline_by",
+  "baseline_published_on",
+  "baseline_source_url",
 ] as const;
 
 /** Every published card as CSV, one row each, in the language of `w` for headlines and labels. */
@@ -169,6 +176,12 @@ export function openDataCsv(views: readonly CardView[], config: Config, w: Words
         comparisons: comparisonLines(p?.cost, config, w)
           .map((l) => l.text)
           .join("; "),
+        baseline_value: p?.baseline?.value,
+        baseline_unit: p?.baseline?.unit ?? "",
+        baseline_for: p?.baseline?.for ?? "",
+        baseline_by: p?.baseline?.by.name ?? "",
+        baseline_published_on: p?.baseline?.published_on ?? "",
+        baseline_source_url: p?.baseline?.source.url ?? "",
       };
       return CSV_COLUMNS.map((c) => csvField(row[c])).join(",");
     });

@@ -6,6 +6,7 @@ import {
   actorTimeline,
   areaCoverage,
   areaLabel,
+  baselineText,
   cardStory,
   clip,
   climb,
@@ -385,6 +386,14 @@ export function PromiseCard({ view, today, markToday, related = [], actions, chi
                       {f.links.measurement.since ? ` ${w.t("card.measurement_since", { date: longDate(w, f.links.measurement.since) })}` : ""}
                     </dd>
                   )}
+                </Fact>
+              )}
+              {params?.baseline && (
+                <Fact label={w.t("card.baseline")}>
+                  <dd>
+                    {baselineText(params.baseline, w)} (<a href={params.baseline.source.url}>{params.baseline.source.title}</a>)
+                  </dd>
+                  {params.baseline.note && <dd className="op-muted">{pick(params.baseline.note, L, config)}</dd>}
                 </Fact>
               )}
               {params && (

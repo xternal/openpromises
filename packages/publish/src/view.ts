@@ -1,4 +1,4 @@
-import { categoryOf, climb, statusLabel, verification, type Actor, type Card, type Config, type Editor, type LangMap, type ValidCard, type Verification, type Version } from "@openpromises/core";
+import { categoryOf, climb, statusLabel, verification, type Actor, type Baseline, type Card, type Config, type Editor, type LangMap, type ValidCard, type Verification, type Version } from "@openpromises/core";
 import { costText, longDate } from "./format";
 import type { Words } from "./messages";
 
@@ -236,6 +236,11 @@ export const endings = (config: Config) => config.ladder.statuses.filter((s) => 
 /** An indicator target in words: "At least 100 schools by 31 December 2028". */
 export function metricText(metric: { target: number; direction: "at_least" | "at_most" | "below"; unit: string; by: string }, w: Words): string {
   return w.t(`metric.${metric.direction}`, { target: new Intl.NumberFormat(w.m.intl).format(metric.target), unit: metric.unit, date: longDate(w, metric.by) });
+}
+
+/** The forecast at the time (decision 36): "6 % by 31 March 2027, as forecast by OBR on 3 March 2026, before the promise". */
+export function baselineText(b: Baseline, w: Words): string {
+  return w.t("baseline.text", { value: new Intl.NumberFormat(w.m.intl).format(b.value), unit: b.unit, date: longDate(w, b.for), by: b.by.name, published: longDate(w, b.published_on) });
 }
 
 /** How many cards are at each status, in ladder order, leaving out the empty ones. */
