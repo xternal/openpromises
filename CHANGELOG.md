@@ -10,8 +10,17 @@ Decision 36: the forecast at the time, and circumstances changed.
 - **A new event type, `circumstances_changed`** (decision 36): something outside the speaker's hands changed what the promise could mean. It needs an `evidence_url` and never moves the status. Shown as "Circumstances changed" ("Обстоятельства изменились").
 - **Cards show the baseline** as "Forecast at the time" beside the target, with its source and note, in `PromiseCard` and the card's Markdown. New in `@openpromises/publish`: `baselineText()`; messages `card.baseline`, `baseline.text`, `event.circumstances_changed` and `field.baseline`, in English and Russian. The open-data CSV gains six columns at the end: `baseline_value`, `baseline_unit`, `baseline_for`, `baseline_by`, `baseline_published_on` and `baseline_source_url`.
 
+Fixes:
+
+- **"What the cost compares with" is its own section again.** In `PromiseCard` it sat inside "About the cost": a card whose cost had a range but no note, method or sources lost its comparisons, and otherwise they were nested in the cost section, ahead of its sources. It now follows "About the cost", as in the card's Markdown. Only sites that set `comparisons` see the change.
+- **The designations module checks an estimate's sources too**: `estimate.people.staff`, `estimate.people.reached` and `estimate.time.lead`. They were skipped, so a source there could miss its kind and designation, or carry one with the module off.
+- **The YAML writer orders the newer fields**: a cost's `method`, a version's `estimate` and `baseline` and what is inside them, and an editor's `named`. They were written last, in whatever order they came.
+- **`check-quote --record` explains a broken `quotes.json`** (not JSON, or not an object) and says to fix or remove it, instead of passing on the parser's message. A blank file is taken as empty.
+- **A quote check counts as a change to the card.** A `quote_checked_on` recorded on its own (`review --quote-checked` by an editor who has already approved) now moves the card's "Last updated", its `dateModified` and its sitemap `lastmod`.
+
 ### Upgrading from 0.15.0
 
+- **A site with the designations module and sources on an estimate** may now see `modules` errors for those sources; give each a `kind` and, unless it is official, a `designation`. RussiaLedger.com, the one site with the module, has no estimates.
 - **No configuration needed.** The card format only grows: every valid card stays valid. A site with a custom ladder that has a status called `circumstances_changed` must rename it, since that is now an event type.
 - **The open-data CSV has six more columns at the end**; no column moves.
 

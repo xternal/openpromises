@@ -169,7 +169,17 @@ export const sha256 = (bytes: Uint8Array | string) => createHash("sha256").updat
 
 /** quotes.json with one check added or replaced, keys sorted so the file changes only where it must. */
 export function withQuoteCheck(existing: string | null, key: string, check: QuoteCheck): string {
-  const all = existing ? (JSON.parse(existing) as Record<string, QuoteCheck>) : {};
+  let all: Record<string, QuoteCheck> = {};
+  if (existing?.trim()) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(existing);
+    } catch (e) {
+      throw new Error(`${QUOTES_FILE} is not valid JSON (${(e as Error).message}); fix or remove it, then record the check again`);
+    }
+    if (!isObj(parsed)) throw new Error(`${QUOTES_FILE} is not a quote check record (an object keyed by quote); fix or remove it, then record the check again`);
+    all = parsed as Record<string, QuoteCheck>;
+  }
   all[key] = check;
   const sorted = Object.fromEntries(Object.keys(all).sort().map((k) => [k, all[k]]));
   return `${JSON.stringify(sorted, null, 2)}\n`;

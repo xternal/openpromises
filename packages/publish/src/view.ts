@@ -164,12 +164,12 @@ export function eventLabel(config: Config, w: Words, type: string, subtype?: str
 }
 
 /**
- * The last day a card changed: its newest version, event, correction or
- * review up to today. Future dates (a deadline marker) are not changes. The
+ * The last day a card changed: its newest version, quote check, event,
+ * correction or review up to today. Future dates (a deadline marker) are not changes. The
  * same date is the page's "Last updated", its dateModified and the sitemap's lastmod.
  */
 export function lastUpdated(card: Card, today: string): string | undefined {
-  return [...card.events.map((e) => e.date), ...card.versions.map((v) => v.recorded_on), ...(card.corrections ?? []).map((c) => c.date), ...(card.reviews ?? []).map((r) => r.on)]
+  return [...card.events.map((e) => e.date), ...card.versions.flatMap((v) => [v.recorded_on, ...(v.quote_checked_on ? [v.quote_checked_on] : [])]), ...(card.corrections ?? []).map((c) => c.date), ...(card.reviews ?? []).map((r) => r.on)]
     .filter((d) => d <= today)
     .sort()
     .at(-1);

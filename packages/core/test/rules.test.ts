@@ -634,6 +634,26 @@ describe("modules", () => {
       "warning sources.3.designation.status",
     ]);
   });
+
+  it("checks the sources of an estimate too", () => {
+    const designations = resolveConfig({ ...CONFIG_INPUT, modules: ["designations"] });
+    const off = resolveConfig({ ...CONFIG_INPUT, modules: [] });
+    const media = { title: "Outlet", url: "https://example.org/o", kind: "media" as const };
+    const c = card((c) => {
+      c.versions[0]!.parameters!.cost!.sources![0]!.kind = "official";
+      c.versions[0]!.parameters!.estimate = {
+        people: { staff: { range: [1, 2, 3], unit: { en: "staff" }, sources: [media] }, reached: { range: [1, 2, 3], unit: { en: "people" }, sources: [media] } },
+        time: { lead: { months: [6, 9, 12], basis: "official_plan", sources: [media] } },
+      };
+    });
+    const at = "versions.0.parameters.estimate";
+    expect(check(c, { config: designations }).filter((i) => i.rule === "modules").map((i) => i.path.join("."))).toEqual([
+      `${at}.people.staff.sources.0.designation`,
+      `${at}.people.reached.sources.0.designation`,
+      `${at}.time.lead.sources.0.designation`,
+    ]);
+    expect(ruleIssues("modules", c, { config: off })).toContain(`${at.replaceAll(".0.", "[0].")}.people.staff.sources[0]: uses the "designations" module, which the configuration does not turn on (modules)`);
+  });
 });
 
 describe("references", () => {

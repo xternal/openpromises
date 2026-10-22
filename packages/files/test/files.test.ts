@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveConfig } from "@openpromises/core";
-import { appendToList, setField, checkFolder, commentLines, findConfig, folderSource, gitSource, loadConfig, placeComments, readContent, readYaml, resolveBase, toYaml } from "@openpromises/files";
+import { appendToList, setField, checkFolder, commentLines, findConfig, folderSource, gitSource, loadConfig, placeComments, readContent, readYaml, resolveBase, toYaml, withQuoteCheck } from "@openpromises/files";
 
 const FIXTURES = join(import.meta.dirname, "..", "..", "..", "fixtures");
 const dirs: string[] = [];
@@ -48,6 +48,63 @@ versions:
 `);
   });
 
+  it("orders the newer fields too: method, estimate, baseline and an editor's named", () => {
+    const card = {
+      versions: [
+        {
+          parameters: {
+            baseline: { note: { en: "n" }, source: { url: "https://example.org/f", title: "F" }, published_on: "2026-01-01", by: { name: "OBR", kind: "official" }, for: "2027-01-01", unit: "%", value: 2 },
+            estimate: { time: { lead: { sources: [{ url: "https://example.org/l", title: "L" }], basis: "official_plan", months: [6, 9, 12] } }, people: { staff: { sources: [], unit: { en: "staff" }, range: [1, 2, 3] } } },
+            cost: { sources: [], method: { en: "m" }, note: { en: "n" }, range: [1, 2, 3] },
+          },
+        },
+      ],
+    };
+    expect(toYaml(card, "card")).toBe(`versions:
+  - parameters:
+      cost:
+        range: [1, 2, 3]
+        note:
+          en: "n"
+        method:
+          en: m
+        sources: []
+      estimate:
+        people:
+          staff:
+            range: [1, 2, 3]
+            unit:
+              en: staff
+            sources: []
+        time:
+          lead:
+            months: [6, 9, 12]
+            basis: official_plan
+            sources:
+              - title: L
+                url: https://example.org/l
+      baseline:
+        value: 2
+        unit: "%"
+        for: "2027-01-01"
+        by:
+          kind: official
+          name: OBR
+        published_on: "2026-01-01"
+        source:
+          title: F
+          url: https://example.org/f
+        note:
+          en: "n"
+`);
+    expect(toYaml({ editors: [{ named: true, party: null, since: "2026-01-01", handle: "Sam" }] }, "editors")).toBe(`editors:
+  - handle: Sam
+    since: "2026-01-01"
+    party: null
+    named: true
+`);
+  });
+
   it("quotes text that older YAML readers would take for something else", () => {
     const out = toYaml({ format: "openpromises/1", id: "x", area: "yes", status: "on", x: { code: "01", time: "1:20" } }, "card");
     expect(out).toContain('area: "yes"');
@@ -59,6 +116,20 @@ versions:
   it("keeps every character of a quote, whatever the spaces", () => {
     const text = "Two  spaces,\ttabs, a trailing space and “curly quotes” —  kept. ".repeat(3);
     expect((readYaml(toYaml({ versions: [{ text }] }, "card")) as { versions: { text: string }[] }).versions[0]!.text).toBe(text);
+  });
+});
+
+describe("withQuoteCheck", () => {
+  const check = { match: "exact" as const, url: "https://example.org/a", checked_on: "2026-10-22", sha256: "0".repeat(64) };
+
+  it("starts a new record from a missing or blank file", () => {
+    expect(JSON.parse(withQuoteCheck(null, "k", check))).toEqual({ k: check });
+    expect(JSON.parse(withQuoteCheck("\n", "k", check))).toEqual({ k: check });
+  });
+
+  it("refuses a file that is not a quote check record, saying what to do", () => {
+    expect(() => withQuoteCheck("{", "k", check)).toThrow(/quotes\.json is not valid JSON .*fix or remove it/);
+    expect(() => withQuoteCheck("[]", "k", check)).toThrow(/quotes\.json is not a quote check record/);
   });
 });
 
