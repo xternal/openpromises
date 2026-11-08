@@ -24,6 +24,14 @@ function clean<T extends Raw>(o: T): T {
 /** Text in one language as a language map; null and undefined stay as they are. */
 const inLang = (locale: string) => (v: unknown) => (typeof v === "string" ? { [locale]: v } : v);
 
+/**
+ * Text whose language is not recorded, as a language map in the language its letters show: English when Latin
+ * letters outnumber Cyrillic ones, otherwise `fallback`. For a bilingual site's one-string fields, where an editor
+ * may write in either language.
+ */
+export const byScript = (fallback: string) => (v: unknown) =>
+  typeof v === "string" ? { [(v.match(/[A-Za-z]/g)?.length ?? 0) > (v.match(/[Ѐ-ӿ]/g)?.length ?? 0) ? "en" : fallback]: v } : v;
+
 /** Split an object into the listed fields and the rest. */
 function split(o: Raw, known: readonly string[]): [Raw, Raw] {
   const rest: Raw = {};
@@ -41,9 +49,10 @@ interface FieldMap {
 }
 
 /** Map a correction to v1 with a site's field map. */
-function mapCorrection(c: Raw, field: (list: string, tail: string) => FieldMap, reasonLocale: string): Raw {
+function mapCorrection(c: Raw, field: (list: string, tail: string) => FieldMap, reasonLocale: string | ((v: unknown) => unknown)): Raw {
   const p = typeof c.path === "string" ? parseCorrectionPath(c.path) : null;
-  const base = { date: c.date, path: c.path, was: c.was ?? null, now: c.now ?? null, reason: inLang(reasonLocale)(c.reason), source_url: c.source_url };
+  const reason = typeof reasonLocale === "string" ? inLang(reasonLocale) : reasonLocale;
+  const base = { date: c.date, path: c.path, was: c.was ?? null, now: c.now ?? null, reason: reason(c.reason), source_url: c.source_url };
   if (!p) return clean(base);
   const f = field(p.list, p.tail);
   return clean({ ...base, path: `${p.list}[${p.index}]${f.tail}`, was: f.value(c.was ?? null), now: f.value(c.now ?? null) });
@@ -352,12 +361,14 @@ function rlField(list: string, tail: string): FieldMap {
  * A card in the bilingual site's format, in format v1. Our text is already a
  * language map; the speaker's words are in `lang` (default "ru") with an
  * English translation. Correction reasons and review notes are one string
- * there, so they are filed under `locale` (default "ru").
+ * there, written in either language, so each is filed under the language its
+ * letters show: English when Latin letters outnumber Cyrillic ones, otherwise
+ * `locale` (default "ru"). Decision 37.
  */
 export function fromRussiaLedger(raw: unknown, opts: { locale?: string; quoteLang?: string } = {}): Raw {
   const locale = opts.locale ?? "ru";
   const quoteLang = opts.quoteLang ?? "ru";
-  const one = inLang(locale);
+  const one = byScript(locale);
   if (!isObj(raw)) return { format: FORMAT };
   const [c, unknown] = split(raw, RL_CARD);
   return clean({
@@ -389,7 +400,7 @@ export function fromRussiaLedger(raw: unknown, opts: { locale?: string; quoteLan
     ),
     events: arr(c.events).map(({ date, type, subtype, description, evidence_url, auto, ...rest }) => clean({ date, type, text: description, evidence_url, auto, subtype, ...rest })),
     replies: Array.isArray(c.replies) ? c.replies : undefined,
-    corrections: Array.isArray(c.corrections) ? arr(c.corrections).map((x) => mapCorrection(x, rlField, locale)) : undefined,
+    corrections: Array.isArray(c.corrections) ? arr(c.corrections).map((x) => mapCorrection(x, rlField, one)) : undefined,
     reviews: Array.isArray(c.reviews)
       ? arr(c.reviews).map(({ by, kind, on, note, batch, ...rest }) => clean({ by, kind, on, note: one(note), approves: kind === "editor" ? true : undefined, batch, ...rest }))
       : undefined,

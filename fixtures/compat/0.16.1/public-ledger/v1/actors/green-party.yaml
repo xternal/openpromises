@@ -1,0 +1,13 @@
+format: openpromises/1
+id: green-party
+kind: party
+name:
+  en: Green Party of England and Wales
+short_name:
+  en: Greens
+standing: opposition
+roles: []
+identifiers:
+  parliament_party_id: 44
+same_as:
+  - https://greenparty.org.uk/

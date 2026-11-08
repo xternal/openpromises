@@ -1,0 +1,31 @@
+format: openpromises/1
+id: lab-2026-parks
+actor_id: labour
+made_on: "2026-05-01"
+venue: manifesto
+area: Parks, libraries and leisure
+status: promised
+versions:
+  - version: 1
+    text: Deliver over £8m new investment in playgrounds and parks
+    recorded_on: "2026-10-07"
+    source_url: https://hflabour.com/wp-content/uploads/2026/05/HF-manifesto-EXEC.pdf
+    archived_url: https://web.archive.org/web/20260617065909/https://hflabour.com/wp-content/uploads/2026/05/HF-manifesto-EXEC.pdf
+    page: 5
+    parameters:
+      capital_cost:
+        range: [8, 8, 8]
+        quality: sourced
+        note:
+          en: >-
+            The manifesto says 'over £8m' of new investment: £8m is a lower bound, and it is capital
+            spending over the term.
+      deadline: null
+events:
+  - date: "2026-05-01"
+    type: promised
+    text:
+      en: Headline pledge in the 2026 Labour manifesto
+replies: []
+x:
+  editor_check_required: false

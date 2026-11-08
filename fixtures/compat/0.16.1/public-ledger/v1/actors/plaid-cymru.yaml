@@ -1,0 +1,11 @@
+format: openpromises/1
+id: plaid-cymru
+kind: party
+name:
+  en: Plaid Cymru
+standing: opposition
+roles: []
+identifiers:
+  parliament_party_id: 22
+same_as:
+  - https://www.partyof.wales/

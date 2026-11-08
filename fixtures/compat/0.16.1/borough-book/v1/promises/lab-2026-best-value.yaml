@@ -1,0 +1,28 @@
+format: openpromises/1
+id: lab-2026-best-value
+actor_id: labour
+made_on: "2026-05-01"
+venue: manifesto
+area: Running the council
+status: promised
+versions:
+  - version: 1
+    text: >-
+      Be the best value council in Britain, including free adult home care and cost-of-living support
+    recorded_on: "2026-10-07"
+    source_url: https://hflabour.com/wp-content/uploads/2026/05/HF-manifesto-EXEC.pdf
+    archived_url: https://web.archive.org/web/20260617065909/https://hflabour.com/wp-content/uploads/2026/05/HF-manifesto-EXEC.pdf
+    page: 3
+    parameters:
+      deadline: null
+events:
+  - date: "2026-05-01"
+    type: promised
+    text:
+      en: Headline pledge in the 2026 Labour manifesto
+replies: []
+x:
+  editor_check_required: false
+  editor_note: >-
+    'Best value council in Britain' has no stated measure; free home care has its own card
+    (hf-free-home-care).

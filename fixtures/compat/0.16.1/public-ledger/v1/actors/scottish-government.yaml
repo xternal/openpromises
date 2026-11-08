@@ -1,0 +1,8 @@
+format: openpromises/1
+id: scottish-government
+kind: government
+name:
+  en: Scottish Government
+roles: []
+same_as:
+  - https://www.gov.scot/

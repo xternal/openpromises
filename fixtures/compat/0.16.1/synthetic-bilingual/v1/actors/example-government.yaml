@@ -1,0 +1,11 @@
+format: openpromises/1
+id: example-government
+kind: government
+name:
+  ru: Правительство Примерной Федерации
+  en: Government of the Example Federation
+short_name:
+  ru: Правительство
+  en: Government
+level: federal
+roles: []

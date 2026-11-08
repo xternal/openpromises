@@ -1,0 +1,14 @@
+format: openpromises/1
+id: lucy-powell
+kind: person
+name:
+  en: Lucy Powell
+party_id: labour
+roles:
+  - title:
+      en: Secretary of State for Education
+    from: "2026-07-20"
+identifiers:
+  parliament_member_id: 4263
+same_as:
+  - https://www.gov.uk/government/people/lucy-powell
