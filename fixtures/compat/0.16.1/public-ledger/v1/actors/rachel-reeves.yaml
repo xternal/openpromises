@@ -1,0 +1,15 @@
+format: openpromises/1
+id: rachel-reeves
+kind: person
+name:
+  en: Rachel Reeves
+party_id: labour
+roles:
+  - title:
+      en: Chancellor of the Exchequer
+    from: "2024-07-05"
+    to: "2026-07-20"
+identifiers:
+  parliament_member_id: 4031
+same_as:
+  - https://www.gov.uk/government/people/rachel-reeves

@@ -166,6 +166,10 @@ Decided by Pavel Guzhikov on 20 October 2026 ("5 fix if something useful needed,
 
 The answer to the Gosplan worry stays what it was: the targets are the speakers' own words, the site sets none, and every figure has its source. Decided by Pavel Guzhikov on 22 October 2026 ("Draft decision 36: a baseline field (the independent forecast made at the time of the promise, with its source and date) and an 'overtaken by events' note. Branch and PR, no release yet.").
 
+## Accepted on 8 November 2026
+
+**37. A one-string note in a bilingual site's older format is filed in the language its letters show.** RussiaLedger.com's older format keeps a review note and a correction reason as one string, and `fromRussiaLedger` filed each under the site's first language, Russian. All 221 of its review notes are in English («initial promises database», «Promises database initiation by Pavel Guzhikov», the promise watch's automated checks). Reviews and corrections are history with no correction path, so the tag given at conversion stays for good, and the append-only check compares the converted form of the older file, so the site could not tag them correctly on its own. Decided: such a string is filed as `en` when Latin letters outnumber Cyrillic ones, otherwise in the site's first language. The rule counts letters only, so a note that quotes a Russian word in an English sentence («emergency (ЧП) pages») is English. Released in 0.16.1. Decided by Pavel Guzhikov on 8 November 2026 (option "fix the engine", then "Yes, publish 0.16.1").
+
 ## Proposed, waiting for the owner
 
 None.

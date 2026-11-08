@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appendOnlyIssues, fieldAt, fromPublicLedger, LEGACY_LATE_FIELDS, stable, withField } from "@openpromises/core";
+import { appendOnlyIssues, byScript, fieldAt, fromPublicLedger, fromRussiaLedger, LEGACY_LATE_FIELDS, stable, withField } from "@openpromises/core";
 import { BASE, card } from "./helpers";
 
 /** The same value with every object's keys in reverse order. */
@@ -138,6 +138,35 @@ describe("append-only", () => {
     // And a real edit made in the same change is still caught.
     written.versions[0]!.parameters.cost.range[0] = 0.5;
     expect(messages(fromPublicLedger(legacy), written)).toHaveLength(1);
+  });
+
+  it("files a RussiaLedger.com review note and correction reason in the language its letters show (decision 37)", () => {
+    expect(byScript("ru")("initial promises database")).toEqual({ en: "initial promises database" });
+    expect(byScript("ru")("Pavel's batch decision of 11 Oct 2026: all cards on emergency (ЧП) pages")).toEqual({
+      en: "Pavel's batch decision of 11 Oct 2026: all cards on emergency (ЧП) pages",
+    });
+    expect(byScript("ru")("Сверено с PDF")).toEqual({ ru: "Сверено с PDF" });
+    expect(byScript("ru")(null)).toBeNull();
+    const legacy = {
+      id: "ru-test-2026",
+      headline: { ru: "Тест", en: "Test" },
+      actor_id: "putin",
+      made_on: "2026-05-01",
+      status: "promised",
+      sources: [],
+      versions: [{ version: 1, text: "Сделаем.", text_en: "We will.", recorded_on: "2026-05-01", source_url: "https://example.org/s", parameters: {} }],
+      events: [{ date: "2026-05-01", type: "promised", description: { ru: "Обещано", en: "Promised" } }],
+      corrections: [{ date: "2026-10-01", path: "events[0].description", was: null, now: null, reason: "Typo fixed" }],
+      reviews: [
+        { by: "Editor A", kind: "editor", on: "2026-10-09", note: "initial promises database" },
+        { by: "Editor B", kind: "editor", on: "2026-10-10", note: "Сверено с PDF" },
+      ],
+    };
+    const v1 = fromRussiaLedger(legacy) as { reviews: { note: unknown }[]; corrections: { reason: unknown }[] };
+    expect(v1.reviews.map((r) => r.note)).toEqual([{ en: "initial promises database" }, { ru: "Сверено с PDF" }]);
+    expect(v1.corrections[0]!.reason).toEqual({ en: "Typo fixed" });
+    // The site's notes tagged by their letters read as no edit against the same card in the old format.
+    expect(messages(fromRussiaLedger(legacy), reversed(v1))).toEqual([]);
   });
 });
 

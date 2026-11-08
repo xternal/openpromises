@@ -1,0 +1,13 @@
+format: openpromises/1
+id: liberal-democrats
+kind: party
+name:
+  en: Liberal Democrats
+short_name:
+  en: Lib Dems
+standing: opposition
+roles: []
+identifiers:
+  parliament_party_id: 17
+same_as:
+  - https://www.libdems.org.uk/

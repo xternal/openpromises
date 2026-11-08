@@ -1,0 +1,13 @@
+format: openpromises/1
+id: labour
+kind: party
+name:
+  en: Labour Party
+short_name:
+  en: Labour
+standing: in_power
+roles: []
+identifiers:
+  parliament_party_id: 15
+same_as:
+  - https://labour.org.uk/

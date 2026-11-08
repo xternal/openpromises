@@ -4,6 +4,16 @@ All notable changes to OpenPromises. The packages share one version and follow [
 
 ## Unreleased
 
+## 0.16.1 (8 November 2026)
+
+A fix for RussiaLedger.com's conversion to format v1 (decision 37).
+
+- **A RussiaLedger.com review note or correction reason is filed in the language it is written in.** The site's older format keeps each as one string, and `fromRussiaLedger` filed every one under the site's first language, Russian. Most are in English, and since reviews and corrections are history, a wrong tag could never be fixed once the cards were converted. Now a string with more Latin than Cyrillic letters is filed as `en`, and anything else as before. `openpromises migrate` writes it that way, and `validate --base` reads a card still in the older format the same way, so a converted card compares as unchanged. New in `@openpromises/core`: `byScript(fallback)`.
+
+### Upgrading from 0.16.0
+
+- **Only RussiaLedger.com is affected**, and only until its cards are in format v1. Other sites, and cards already in v1, see no change. No configuration needed.
+
 ## 0.16.0 (22 October 2026)
 
 Decision 36: the forecast at the time, and circumstances changed; five fixes from an outside audit.
